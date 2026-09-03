@@ -37,6 +37,8 @@ type CourseSeed = {
   shortDescEn: string;
   fullDescAr: string;
   fullDescEn: string;
+  thumbnailUrl?: string;
+  bannerUrl?: string;
   categorySlug: string;
   tagSlugs: string[];
   difficulty: string;
@@ -979,6 +981,81 @@ const COURSES: CourseSeed[] = [
   },
 ];
 
+const REAL_COURSES: CourseSeed[] = [
+  {
+    titleAr: 'التوثيق الرقمي للتراث الفلسطيني: من الالتقاط إلى الإتاحة',
+    titleEn: 'Digital Documentation of Palestinian Heritage: From Capture to Access',
+    slug: 'digital-documentation-palestinian-heritage',
+    shortDescAr: 'دورة تطبيقية لبناء سجل رقمي موثوق للصور والفيديو والشهادات والمواد التراثية.',
+    shortDescEn: 'A practical course for creating trustworthy digital records of photographs, video, testimony, and heritage materials.',
+    fullDescAr: 'ترافق هذه الدورة المتعلم خلال مشروع توثيق صغير ومتكامل: تحديد الغرض وحقوق الاستخدام، التقاط نسخة رقمية سليمة، إنشاء البيانات الوصفية، حفظ النسخة الرئيسية، ثم إتاحة نسخة وصول. تتضمن مثالاً مرئياً حقيقياً للدبكة الفلسطينية محفوظاً داخل المنصة، وتمارين يمكن تطبيقها على مجموعات عائلية أو مؤسسية.',
+    fullDescEn: 'This course guides learners through a complete small-scale documentation project: defining purpose and rights, creating a sound digital capture, recording metadata, preserving a master copy, and publishing an access copy. It includes an authentic Palestinian dabke video hosted by the platform and practical exercises for family or institutional collections.',
+    thumbnailUrl: '/uploads/archives/real/jerusalem-1933.jpg',
+    bannerUrl: '/uploads/archives/real/palestine-map-1946.jpg',
+    categorySlug: 'digital-preservation',
+    tagSlugs: ['archives', 'digital-preservation', 'heritage'],
+    difficulty: 'beginner',
+    duration: 95,
+    estimatedStudyTime: 4,
+    language: 'ar',
+    instructorName: 'فريق أرشيفنا للتدريب',
+    instructorBio: 'مادة تدريبية تطبيقية أعدها فريق المنصة بالاستناد إلى مبادئ الوصف الأرشيفي والحفظ الرقمي، مع توثيق مصدر المادة المرئية وحقوق استخدامها.',
+    archiveTopic: 'التوثيق والحفظ الرقمي',
+    region: 'فلسطين',
+    historicalPeriod: 'القرن العشرون والحادي والعشرون',
+    targetAudience: 'المبتدئون، طلبة التاريخ والإعلام، العاملون في المؤسسات الثقافية، وأصحاب المجموعات العائلية',
+    learningObjectives: [
+      'إعداد خطة توثيق تحدد النطاق والحقوق والمسؤوليات',
+      'إنشاء نسخة رقمية رئيسية ونسخة مخصصة للإتاحة',
+      'كتابة بيانات وصفية تساعد على الفهم والاسترجاع',
+      'تنظيم الملفات والنسخ الاحتياطية بطريقة قابلة للاستمرار',
+    ],
+    prerequisites: 'لا توجد متطلبات سابقة',
+    isFeatured: true,
+    isPopular: false,
+    isFree: true,
+    publishedAt: '2026-09-03',
+    lessons: [
+      {
+        lessonNumber: 1,
+        titleAr: 'خطة التوثيق والحقوق قبل البدء',
+        titleEn: 'Documentation Planning and Rights',
+        slug: 'planning-and-rights',
+        contentAr: '<p>يبدأ التوثيق الجيد قبل تشغيل الكاميرا أو الماسح. حدّد المادة التي ستوثقها، وصاحبها، والغرض من جمعها، ومن يحق له مشاهدتها أو إعادة استخدامها. سجّل موافقة واضحة عندما تتضمن المادة أشخاصاً أو شهادات شخصية، وافصل بين ملكية الأصل وحقوق النسخة الرقمية.</p><p>أنشئ رقماً مرجعياً فريداً لكل مادة، وسجل حالة الأصل ومكانه وتاريخ الالتقاط واسم المنفذ. هذه المعلومات تمنع ضياع السياق وتحول الملف من صورة مجهولة إلى سجل أرشيفي يمكن الوثوق به.</p>',
+        contentEn: '<p>Good documentation begins before operating a camera or scanner. Define the material, its owner, the purpose of collection, and who may view or reuse it. Record clear consent for personal testimony and distinguish ownership of the original from rights in the digital copy.</p>',
+        summaryAr: 'تحديد النطاق والملكية والموافقة والرقم المرجعي قبل الرقمنة.',
+        summaryEn: 'Define scope, ownership, consent, and reference numbers before digitization.',
+        estimatedReadingTime: 12,
+      },
+      {
+        lessonNumber: 2,
+        titleAr: 'توثيق الفيديو: الدبكة الفلسطينية نموذجاً',
+        titleEn: 'Video Documentation: Palestinian Dabke as a Case Study',
+        slug: 'video-documentation-dabke',
+        videoUrl: '/uploads/archives/real/palestinian-dabke.webm',
+        videoDuration: 76,
+        contentAr: '<p>شاهد المقطع بوصفه مادة أرشيفية، لا مجرد فيديو. دوّن نوع الحدث، والمكان إن كان معروفاً، والأشخاص أو الفرقة، وتاريخ التسجيل، واسم المصور، واللغة، وحقوق الاستخدام. عند غياب معلومة لا تخمّنها؛ استخدم عبارة «غير معروف» واحتفظ بمصدر الملف.</p><p>احتفظ بالملف الأصلي كما استلمته، وأنشئ نسخة وصول أخف للعرض على الويب. مصدر هذا المثال هو Wikimedia Commons، والمؤلفة Sarah Canbel، والترخيص CC BY-SA 4.0.</p>',
+        contentEn: '<p>Watch the clip as an archival record, not merely a video. Record the event type, known location, participants, date, creator, language, and reuse rights. Preserve the received original and create a smaller access copy for the web.</p>',
+        summaryAr: 'تطبيق عملي على وصف فيديو تراثي وحفظ نسخته الرئيسية ونسخة الإتاحة.',
+        summaryEn: 'A practical exercise in describing and preserving a heritage video.',
+        estimatedReadingTime: 15,
+      },
+      {
+        lessonNumber: 3,
+        titleAr: 'البيانات الوصفية والحفظ طويل الأمد',
+        titleEn: 'Metadata and Long-Term Preservation',
+        slug: 'metadata-and-preservation',
+        contentAr: '<p>اكتب عنواناً واضحاً ووصفاً موضوعياً، ثم أضف التاريخ والمكان والمنشئ والموضوع واللغة ونوع المادة والحقوق. استخدم أسماء ملفات ثابتة مثل PS-DABKE-0001_master.webm وتجنب كلمات مثل final أو new التي تفقد معناها مع الوقت.</p><p>طبّق قاعدة النسخ الثلاث: ثلاث نسخ على الأقل، في وسيطين مختلفين، وإحداها في موقع منفصل. افحص الملفات دورياً باستخدام قيمة تحقق رقمية، وسجل أي تحويل للصيغة حتى يبقى تاريخ المادة التقني قابلاً للتتبع.</p>',
+        contentEn: '<p>Create a clear title and objective description, then record date, place, creator, subject, language, material type, and rights. Keep at least three copies on two media types, with one copy off-site, and verify integrity periodically using checksums.</p>',
+        summaryAr: 'وصف المادة، تسمية الملفات، النسخ الاحتياطي، والتحقق الدوري من السلامة.',
+        summaryEn: 'Description, file naming, backup, and periodic integrity checking.',
+        estimatedReadingTime: 15,
+        isAssessment: true,
+      },
+    ],
+  },
+];
+
 async function main() {
   console.log('Seeding database...');
 
@@ -1699,8 +1776,11 @@ async function main() {
     courseTags[seed.slug] = tag.id;
   }
 
+  // Keep the learning area focused on genuine, fully usable courses.
+  await prisma.course.deleteMany({ where: { slug: { notIn: REAL_COURSES.map((course) => course.slug) } } });
+
   // Courses + lessons (upsert by slug)
-  for (const seed of COURSES) {
+  for (const seed of REAL_COURSES) {
     const categoryId = courseCategories[seed.categorySlug];
     const course = await prisma.course.upsert({
       where: { slug: seed.slug },
@@ -1713,6 +1793,8 @@ async function main() {
         shortDescEn: seed.shortDescEn,
         fullDescAr: seed.fullDescAr,
         fullDescEn: seed.fullDescEn,
+        thumbnailUrl: seed.thumbnailUrl,
+        bannerUrl: seed.bannerUrl,
         categoryId,
         instructorName: seed.instructorName,
         instructorBio: seed.instructorBio,

@@ -8,6 +8,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueryCourseDto } from './dto/query-course.dto';
+import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 
@@ -528,5 +529,58 @@ export class LmsService {
       totalReviews,
       totalLearningHours: Math.round((totalHours._sum.totalWatchTime || 0) / 3600),
     };
+  }
+
+  async findAdminCourses() {
+    return this.prisma.course.findMany({
+      include: { _count: { select: { lessons: true, enrollments: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createAdminCourse(dto: CreateCourseDto) {
+    const slugBase = (dto.title_en || dto.title_ar)
+      .toLowerCase()
+      .trim()
+      .replace(/[^\p{L}\p{N}]+/gu, '-')
+      .replace(/^-|-$/g, '') || 'course';
+    const slug = `${slugBase}-${Date.now().toString(36)}`;
+    return this.prisma.course.create({
+      data: {
+        titleAr: dto.title_ar,
+        titleEn: dto.title_en,
+        slug,
+        instructorName: dto.instructor_name,
+        shortDescAr: dto.short_desc_ar,
+        fullDescAr: dto.full_desc_ar,
+        thumbnailUrl: dto.thumbnail_url,
+        difficulty: dto.difficulty || 'beginner',
+        duration: dto.duration,
+        language: 'ar',
+        status: 'published',
+        visibility: 'public',
+        isFeatured: dto.is_featured ?? false,
+        isFree: true,
+        publishedAt: new Date(),
+        lessons: {
+          create: {
+            lessonNumber: 1,
+            sortOrder: 1,
+            titleAr: dto.lesson_title_ar,
+            titleEn: dto.lesson_title_en,
+            slug: `lesson-1-${Date.now().toString(36)}`,
+            contentAr: dto.lesson_content_ar,
+            summaryAr: dto.lesson_summary_ar,
+            videoUrl: dto.lesson_video_url,
+            status: 'published',
+          },
+        },
+      },
+      include: { lessons: true, _count: { select: { lessons: true, enrollments: true } } },
+    });
+  }
+
+  async deleteAdminCourse(courseId: string) {
+    return this.prisma.course.delete({ where: { id: courseId } });
   }
 }

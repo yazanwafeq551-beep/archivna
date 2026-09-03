@@ -140,6 +140,7 @@ export default {
     "archived": "Archived"
   },
   "dashboard": {
+    "coursesAdmin": "Manage Courses",
     "overview": {
       "title": "Overview",
       "totalArchives": "Total Archives",
@@ -837,4 +838,3 @@ export default {
     "address": "Jerusalem, Palestine"
   }
 }
-

@@ -140,6 +140,7 @@ export default {
     "archived": "مؤرشف"
   },
   "dashboard": {
+    "coursesAdmin": "إدارة الدورات",
     "overview": {
       "title": "نظرة عامة",
       "totalArchives": "إجمالي الأرشيفات",
@@ -837,4 +838,3 @@ export default {
     "address": "القدس، فلسطين"
   }
 }
-

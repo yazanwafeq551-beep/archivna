@@ -193,7 +193,38 @@ export interface LmsStats {
   totalLearningHours: number;
 }
 
+export interface CreateCourseInput {
+  titleAr: string;
+  titleEn?: string;
+  instructorName: string;
+  shortDescAr?: string;
+  fullDescAr?: string;
+  thumbnailUrl?: string;
+  difficulty?: string;
+  duration?: number;
+  isFeatured?: boolean;
+  lessonTitleAr: string;
+  lessonTitleEn?: string;
+  lessonContentAr?: string;
+  lessonSummaryAr?: string;
+  lessonVideoUrl?: string;
+}
+
 export const lmsApi = {
+  getAdminCourses: async (): Promise<Course[]> => {
+    const response = await apiClient.get("/lms/admin/courses");
+    return response.data;
+  },
+
+  createAdminCourse: async (data: CreateCourseInput): Promise<Course> => {
+    const response = await apiClient.post("/lms/admin/courses", data);
+    return response.data;
+  },
+
+  deleteAdminCourse: async (courseId: string): Promise<void> => {
+    await apiClient.delete(`/lms/admin/courses/${courseId}`);
+  },
+
   getCategories: async (): Promise<CourseCategory[]> => {
     const response = await apiClient.get("/lms/categories");
     return response.data;

@@ -38,6 +38,7 @@ import { FavoritesPage } from "@/pages/dashboard/FavoritesPage";
 import { NotificationsPage } from "@/pages/dashboard/NotificationsPage";
 import { ProfilePage } from "@/pages/dashboard/ProfilePage";
 import { SettingsPage } from "@/pages/dashboard/SettingsPage";
+import { AdminCoursesPage } from "@/pages/dashboard/AdminCoursesPage";
 
 // System Pages
 import { NotFoundPage } from "@/pages/system/NotFoundPage";
@@ -119,6 +120,7 @@ export const router = createBrowserRouter([
       { path: "notifications", element: <NotificationsPage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "settings", element: <SettingsPage /> },
+      { path: "courses", element: <AdminCoursesPage /> },
     ],
   },
   { path: "/404", element: <NotFoundPage /> },

@@ -11,9 +11,11 @@ import {
   User,
   Settings,
   GraduationCap,
+  BookOpenCheck,
 } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 import { DASHBOARD_SIDEBAR_ITEMS } from "@/lib/constants";
+import { useAuth } from "@/hooks/useAuth";
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard className="h-5 w-5" />,
@@ -26,6 +28,7 @@ const iconMap: Record<string, React.ReactNode> = {
   User: <User className="h-5 w-5" />,
   Settings: <Settings className="h-5 w-5" />,
   GraduationCap: <GraduationCap className="h-5 w-5" />,
+  BookOpenCheck: <BookOpenCheck className="h-5 w-5" />,
 };
 
 const labelKeyMap: Record<string, string> = {
@@ -39,6 +42,7 @@ const labelKeyMap: Record<string, string> = {
   notifications: "dashboard.notifications.title",
   profile: "dashboard.profile.title",
   settings: "dashboard.settings.title",
+  courseAdmin: "dashboard.coursesAdmin",
 };
 
 interface SidebarProps {
@@ -47,6 +51,7 @@ interface SidebarProps {
 
 export function Sidebar({ unreadCount = 0 }: SidebarProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const location = useLocation();
   const isActive = (path: string) => {
     if (path === "/dashboard") {
@@ -64,7 +69,7 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
       </div>
       <nav className="flex-1 overflow-y-auto p-4" aria-label={t("common.dashboardMenu")}>
         <ul className="space-y-1">
-          {DASHBOARD_SIDEBAR_ITEMS.map((item) => (
+          {DASHBOARD_SIDEBAR_ITEMS.filter((item) => !("adminOnly" in item) || user?.email === "admin@example.com").map((item) => (
             <li key={item.key}>
               <Link
                 to={item.path}

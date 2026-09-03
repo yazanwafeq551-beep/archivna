@@ -36,6 +36,7 @@ const sidebarLabelKeyMap: Record<string, string> = {
   notifications: "dashboard.notifications.title",
   profile: "dashboard.profile.title",
   settings: "dashboard.settings.title",
+  courseAdmin: "dashboard.coursesAdmin",
 };
 
 export function DashboardLayout() {
@@ -74,6 +75,7 @@ export function DashboardLayout() {
     if (path.includes("/favorites")) return t("dashboard.favorites.title");
     if (path.includes("/notifications")) return t("dashboard.notifications.title");
     if (path.includes("/profile")) return t("dashboard.profile.title");
+    if (path.includes("/courses")) return t("dashboard.coursesAdmin");
     if (path.includes("/settings")) return t("dashboard.settings.title");
     return t("dashboard.overview.title");
   };
@@ -103,7 +105,7 @@ export function DashboardLayout() {
                 </SheetHeader>
                 <nav className="p-4">
                   <ul className="space-y-1">
-                    {DASHBOARD_SIDEBAR_ITEMS.map((item) => (
+                    {DASHBOARD_SIDEBAR_ITEMS.filter((item) => !("adminOnly" in item) || user?.email === "admin@example.com").map((item) => (
                       <li key={item.key}>
                         <Link
                           to={item.path}

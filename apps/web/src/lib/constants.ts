@@ -48,6 +48,7 @@ export const DASHBOARD_SIDEBAR_ITEMS = [
   { key: "learning", label: "لوحة تعلمي", labelEn: "My Learning", path: "/lms/dashboard", icon: "GraduationCap" },
   { key: "archives", label: "ملفاتي الأرشيفية", path: "/dashboard/archives", icon: "FolderOpen" },
   { key: "new", label: "إضافة مادة أرشيفية", path: "/dashboard/archives/new", icon: "Plus" },
+  { key: "courseAdmin", label: "إدارة الدورات", labelEn: "Manage Courses", path: "/dashboard/courses", icon: "BookOpenCheck", adminOnly: true },
   { key: "drafts", label: "المسودات", path: "/dashboard/drafts", icon: "FileEdit" },
   { key: "published", label: "المواد المنشورة", path: "/dashboard/published", icon: "Globe" },
   { key: "favorites", label: "المفضلة", path: "/dashboard/favorites", icon: "Heart" },

@@ -10,6 +10,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { LmsService } from './lms.service';
@@ -18,11 +19,16 @@ import { UpdateProgressDto } from './dto/update-progress.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard, Public, OptionalAuth } from '../auth/auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CreateCourseDto } from './dto/create-course.dto';
 
 @ApiTags('LMS')
 @Controller('lms')
 export class LmsController {
   constructor(private lmsService: LmsService) {}
+
+  private requireAdmin(email?: string) {
+    if (email !== 'admin@example.com') throw new ForbiddenException('Admin access required');
+  }
 
   // === Categories ===
   @Get('categories')
@@ -34,6 +40,31 @@ export class LmsController {
   }
 
   // === Courses ===
+  @Get('admin/courses')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async findAdminCourses(@CurrentUser('email') email: string) {
+    this.requireAdmin(email);
+    return this.lmsService.findAdminCourses();
+  }
+
+  @Post('admin/courses')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async createAdminCourse(@Body() dto: CreateCourseDto, @CurrentUser('email') email: string) {
+    this.requireAdmin(email);
+    return this.lmsService.createAdminCourse(dto);
+  }
+
+  @Delete('admin/courses/:courseId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAdminCourse(@Param('courseId') courseId: string, @CurrentUser('email') email: string) {
+    this.requireAdmin(email);
+    await this.lmsService.deleteAdminCourse(courseId);
+  }
+
   @Get('courses')
   @Public()
   @UseGuards(JwtAuthGuard)
