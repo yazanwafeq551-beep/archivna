@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 96" role="img" aria-labelledby="title">
+  <title id="title">Arsheefna</title>
+  <path d="M12 26 45 8v15L25 34v48H12V26Z" fill="#0F4C45"/>
+  <path d="M30 35 58 20v57L30 87V35Z" fill="#C6A15B"/>
+  <path d="M51 45c-10 2-16 8-17 21 8-2 14-8 17-21Zm-16 25c6-8 10-12 16-17" fill="none" stroke="#0F4C45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#C6A15B"><rect x="65" y="34" width="9" height="9" rx="1"/><rect x="72" y="49" width="11" height="11" rx="1"/><rect x="64" y="64" width="8" height="8" rx="1"/><rect x="76" y="72" width="6" height="6" rx="1"/></g>
+  <text x="102" y="66" fill="#0F4C45" font-family="Poppins, Arial, sans-serif" font-size="48" font-weight="600" letter-spacing="-1.5">Arsheefna</text>
+</svg>

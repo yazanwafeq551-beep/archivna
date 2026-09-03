@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: archivna-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: archivna
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: archivna-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/archivna?schema=public
+      JWT_ACCESS_SECRET: dev-access-secret-key-change-in-production
+      JWT_REFRESH_SECRET: dev-refresh-secret-key-change-in-production
+      ACCESS_TOKEN_EXPIRATION: 15m
+      REFRESH_TOKEN_EXPIRATION: 7d
+      STORAGE_DRIVER: local
+      UPLOAD_DIRECTORY: ./uploads
+      MAX_IMAGE_SIZE: 20971520
+      MAX_DOCUMENT_SIZE: 104857600
+      MAX_AUDIO_SIZE: 262144000
+      MAX_VIDEO_SIZE: 1073741824
+      MAX_ZIP_SIZE: 262144000
+      FRONTEND_URL: http://localhost:5173
+      PORT: 3000
+      NODE_ENV: development
+    volumes:
+      - uploads:/app/apps/api/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: archivna-web
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  uploads:
