@@ -76,11 +76,26 @@ export function HomePage() {
     <div>
       {/* Hero Section */}
       <section className="relative flex min-h-[650px] items-center overflow-hidden bg-primary-dark py-16 md:min-h-[700px] lg:py-20">
-        <img
-          src="/images/arsheefna-heritage-hero-v3.png"
-          alt=""
-          className={`absolute inset-0 h-full w-full object-cover object-[32%_center] ${isArabic ? "" : "-scale-x-100"}`}
-        />
+        {/*
+          The hero is the largest asset on the site: served as WebP at the size
+          the viewport actually needs, with a JPEG fallback.
+        */}
+        <picture>
+          <source
+            type="image/webp"
+            srcSet="/images/arsheefna-heritage-hero-v3-800.webp 800w, /images/arsheefna-heritage-hero-v3-1200.webp 1200w, /images/arsheefna-heritage-hero-v3.webp 1920w"
+            sizes="100vw"
+          />
+          <img
+            src="/images/arsheefna-heritage-hero-v3.jpg"
+            alt=""
+            width={1774}
+            height={887}
+            fetchPriority="high"
+            decoding="async"
+            className={`absolute inset-0 h-full w-full object-cover object-[32%_center] ${isArabic ? "" : "-scale-x-100"}`}
+          />
+        </picture>
         <div className="absolute inset-0 bg-primary-dark/65 lg:bg-transparent" />
         <div className={`absolute inset-0 hidden lg:block ${isArabic ? "bg-gradient-to-l from-primary-dark via-primary-dark/95 to-primary-dark/5" : "bg-gradient-to-r from-primary-dark via-primary-dark/95 to-primary-dark/5"}`} />
         <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/70 via-transparent to-primary-dark/15" />

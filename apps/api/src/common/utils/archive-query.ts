@@ -215,7 +215,7 @@ export function sanitizeListingRecord<T extends { access_level?: string; files?:
   return {
     ...record,
     files: (record.files || []).map(
-      ({ secure_url, public_id, ...file }: any) => file,
+      ({ secure_url, public_id, thumbnail_path, ...file }: any) => file,
     ),
   };
 }
