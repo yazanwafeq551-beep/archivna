@@ -75,6 +75,7 @@ model User {
   user_achievements  UserAchievement[]
   course_reviews     CourseReview[]
   saved_courses      SavedCourse[]
+  certificates       Certificate[]
 
   institution Institution? @relation(fields: [institution_id], references: [id], onDelete: SetNull)
 }
@@ -494,6 +495,7 @@ model Course {
   updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
 
   category    CourseCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  certificates   Certificate[]
   lessons        Lesson[]
   lessonProgress LessonProgress[]
   enrollments    CourseEnrollment[]
@@ -649,4 +651,28 @@ model SavedCourse {
 
   @@id([userId, courseId])
   @@map("saved_courses")
+}
+
+/// Issued once a learner completes every published lesson of a course. The
+/// learner and course details are copied in so a printed certificate keeps
+/// saying what it said on the day it was issued.
+model Certificate {
+  id            String   @id @default(uuid())
+  serial        String   @unique
+  userId        String   @map("user_id")
+  courseId      String   @map("course_id")
+  recipientName String   @map("recipient_name")
+  courseTitleAr String   @map("course_title_ar")
+  courseTitleEn String?  @map("course_title_en")
+  instructorName String? @map("instructor_name")
+  lessonsCount  Int      @default(0) @map("lessons_count")
+  learningHours Float    @default(0) @map("learning_hours")
+  issuedAt      DateTime @default(now()) @map("issued_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+  @@map("certificates")
 }

@@ -36,7 +36,9 @@ export class LocalStorageService extends StorageService {
         throw new Error('No file data available');
       }
 
-      const storagePath = path.join(folder, storedFilename);
+      // Always a URL path: path.join would use backslashes on Windows and the
+      // browser would never resolve it.
+      const storagePath = [folder, storedFilename].join('/');
       const mimeType = file.mimetype || 'application/octet-stream';
 
       return {
