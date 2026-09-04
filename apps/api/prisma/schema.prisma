@@ -87,6 +87,8 @@ model RefreshToken {
   created_at     DateTime  @default(now())
   is_revoked     Boolean   @default(false)
   revoked_at     DateTime?
+  /// rotated | logout | password_change | reuse_detected
+  revoked_reason String?
   replaced_by_id String?
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)

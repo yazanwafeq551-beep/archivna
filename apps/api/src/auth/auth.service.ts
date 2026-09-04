@@ -9,6 +9,14 @@ import { CreateInstitutionDto } from '../institutions/dto/create-institution.dto
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
+/** Why a refresh token stopped being valid - see rotateRefreshToken. */
+const REVOKE_REASON = {
+  rotated: 'rotated',
+  logout: 'logout',
+  passwordChange: 'password_change',
+  reuseDetected: 'reuse_detected',
+} as const;
+
 @Injectable()
 export class AuthService {
   /** How long a just-rotated refresh token still answers concurrent callers. */
@@ -181,16 +189,26 @@ export class AuthService {
         return this.issueFromExistingRefreshToken(stored.user_id, replacement.token);
       }
 
-      // The token was revoked long ago but is being presented again. Either it
-      // leaked or the session was closed - drop every session for that user.
-      await this.revokeAllUserTokens(stored.user_id);
+      // A rotated token replayed long after its replacement was issued is the
+      // signature of a stolen cookie, so every session for that user goes.
+      // A token revoked by signing out or by a password change is a different
+      // story: refusing this one call is enough, and cascading would knock the
+      // user's other devices offline too.
+      if (stored.revoked_reason === REVOKE_REASON.rotated) {
+        await this.revokeAllUserTokens(stored.user_id, REVOKE_REASON.reuseDetected);
+      }
+
       throw new UnauthorizedException('انتهت صلاحية الجلسة، يرجى تسجيل الدخول من جديد');
     }
 
     // Claim the rotation. Exactly one concurrent caller gets count === 1.
     const claimed = await this.prisma.refreshToken.updateMany({
       where: { id: stored.id, is_revoked: false },
-      data: { is_revoked: true, revoked_at: new Date() },
+      data: {
+        is_revoked: true,
+        revoked_at: new Date(),
+        revoked_reason: REVOKE_REASON.rotated,
+      },
     });
 
     if (claimed.count === 0) {
@@ -229,7 +247,7 @@ export class AuthService {
       if (stored) {
         // Revoke the whole rotation chain so a token issued moments earlier in
         // another tab cannot keep the session alive.
-        await this.revokeChain(stored.id);
+        await this.revokeChain(stored.id, REVOKE_REASON.logout);
       }
     }
 
@@ -289,7 +307,7 @@ export class AuthService {
     return { user, accessToken, refreshToken };
   }
 
-  private async revokeChain(tokenId: string) {
+  private async revokeChain(tokenId: string, reason: string) {
     let currentId: string | null = tokenId;
 
     for (let hop = 0; hop < AuthService.MAX_ROTATION_HOPS; hop += 1) {
@@ -299,9 +317,16 @@ export class AuthService {
       });
       if (!current) return;
 
-      await this.prisma.refreshToken.updateMany({
-        where: { id: current.id, is_revoked: false },
-        data: { is_revoked: true, revoked_at: new Date() },
+      // The whole chain is marked with the new reason, including links that
+      // were already revoked by rotation: the session is over, so replaying an
+      // earlier link is not evidence of theft.
+      await this.prisma.refreshToken.update({
+        where: { id: current.id },
+        data: {
+          is_revoked: true,
+          revoked_at: new Date(),
+          revoked_reason: reason,
+        },
       });
 
       if (!current.replaced_by_id) return;
@@ -309,10 +334,10 @@ export class AuthService {
     }
   }
 
-  private async revokeAllUserTokens(userId: string) {
+  private async revokeAllUserTokens(userId: string, reason: string) {
     await this.prisma.refreshToken.updateMany({
       where: { user_id: userId, is_revoked: false },
-      data: { is_revoked: true, revoked_at: new Date() },
+      data: { is_revoked: true, revoked_at: new Date(), revoked_reason: reason },
     });
   }
 
@@ -409,9 +434,14 @@ export class AuthService {
       },
     });
 
+    // Every existing session ends when the password changes.
     await this.prisma.refreshToken.updateMany({
       where: { user_id: user.id },
-      data: { is_revoked: true },
+      data: {
+        is_revoked: true,
+        revoked_at: new Date(),
+        revoked_reason: REVOKE_REASON.passwordChange,
+      },
     });
 
     return { message: 'تم إعادة تعيين كلمة المرور بنجاح' };
@@ -448,7 +478,11 @@ export class AuthService {
 
     await this.prisma.refreshToken.updateMany({
       where: { user_id: userId },
-      data: { is_revoked: true },
+      data: {
+        is_revoked: true,
+        revoked_at: new Date(),
+        revoked_reason: REVOKE_REASON.passwordChange,
+      },
     });
 
     return { message: 'تم تغيير كلمة المرور بنجاح' };
