@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LmsLayout } from "@/components/layout/LmsLayout";
@@ -26,6 +26,9 @@ import { CoursesPage } from "@/pages/lms/CoursesPage";
 import { CourseDetailPage } from "@/pages/lms/CourseDetailPage";
 import { LessonPage } from "@/pages/lms/LessonPage";
 import { LmsDashboardPage } from "@/pages/lms/LmsDashboardPage";
+import { MyCoursesPage } from "@/pages/lms/MyCoursesPage";
+import { SavedCoursesPage } from "@/pages/lms/SavedCoursesPage";
+import { AchievementsPage } from "@/pages/lms/AchievementsPage";
 
 // Dashboard Pages
 import { DashboardOverview } from "@/pages/dashboard/DashboardOverview";
@@ -46,19 +49,25 @@ import { NotFoundPage } from "@/pages/system/NotFoundPage";
 import { UnauthorizedPage } from "@/pages/system/UnauthorizedPage";
 import { ErrorPage } from "@/pages/system/ErrorPage";
 
+function RouteLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <BrandLoader className="h-16 w-16" />
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <BrandLoader className="h-16 w-16" />
-      </div>
-    );
+    return <RouteLoader />;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Remember where the user was headed so login can send them back.
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   return <>{children}</>;
@@ -66,8 +75,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function RoleRoute({ roles, children }: { roles: string[]; children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-  if (isLoading) return <div className="flex min-h-screen items-center justify-center"><BrandLoader className="h-16 w-16" /></div>;
-  if (!user?.roleAssignments?.some((assignment) => roles.includes(assignment.role))) return <Navigate to="/unauthorized" replace />;
+  const location = useLocation();
+
+  if (isLoading) return <RouteLoader />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (!user.roleAssignments?.some((assignment) => roles.includes(assignment.role))) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   return <>{children}</>;
 }
 
@@ -108,6 +123,9 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <LmsDashboardPage /> },
+      { path: "courses", element: <MyCoursesPage /> },
+      { path: "saved", element: <SavedCoursesPage /> },
+      { path: "achievements", element: <AchievementsPage /> },
     ],
   },
   {

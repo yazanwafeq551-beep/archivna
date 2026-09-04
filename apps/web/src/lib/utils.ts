@@ -1,16 +1,22 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format, formatDistanceToNow, parseISO } from "date-fns";
-import { ar } from "date-fns/locale";
+import { ar, enUS } from "date-fns/locale";
+import i18n from "@/i18n";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Dates, units and labels follow the language the user is reading in. */
+function currentDateLocale() {
+  return i18n.language?.startsWith("ar") ? ar : enUS;
+}
+
 export function formatDate(dateString: string): string {
   try {
     const date = parseISO(dateString);
-    return format(date, "dd MMMM yyyy", { locale: ar });
+    return format(date, "dd MMMM yyyy", { locale: currentDateLocale() });
   } catch {
     return dateString;
   }
@@ -19,19 +25,23 @@ export function formatDate(dateString: string): string {
 export function formatRelativeDate(dateString: string): string {
   try {
     const date = parseISO(dateString);
-    return formatDistanceToNow(date, { addSuffix: true, locale: ar });
+    return formatDistanceToNow(date, { addSuffix: true, locale: currentDateLocale() });
   } catch {
     return dateString;
   }
 }
 
 export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return "0 بايت";
-  const units = ["بايت", "كيلوبايت", "ميغابايت", "غيغابايت"];
+  const units = ["bytes", "kb", "mb", "gb"] as const;
+  if (!bytes || bytes <= 0) return `0 ${i18n.t("common.fileSize.bytes")}`;
+
   const k = 1024;
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  const size = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
-  return `${size} ${units[i]}`;
+  const index = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(k)),
+    units.length - 1
+  );
+  const size = parseFloat((bytes / Math.pow(k, index)).toFixed(2));
+  return `${size} ${i18n.t(`common.fileSize.${units[index]}`)}`;
 }
 
 export function truncateText(text: string, maxLength: number): string {
@@ -40,24 +50,11 @@ export function truncateText(text: string, maxLength: number): string {
 }
 
 export function getMaterialTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    document: "وثيقة",
-    image: "صورة",
-    audio: "صوت",
-    video: "فيديو",
-    map: "خريطة",
-    manuscript: "مخطوطة",
-  };
-  return labels[type] || type;
+  return i18n.t(`materialTypes.${type}`, { defaultValue: type });
 }
 
 export function getAccessLabel(access: string): string {
-  const labels: Record<string, string> = {
-    public: "عام",
-    sensitive: "حساس",
-    sovereign: "سيادي",
-  };
-  return labels[access] || access;
+  return i18n.t(`accessLevels.${access}`, { defaultValue: access });
 }
 
 export function getAccessColor(access: string): string {

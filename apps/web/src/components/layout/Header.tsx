@@ -102,7 +102,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                      <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                       <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -110,7 +110,7 @@ export function Header() {
                 <DropdownMenuContent align="end" className="w-56">
                   <div className="flex items-center gap-2 p-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                      <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                       <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
@@ -213,7 +213,7 @@ export function Header() {
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3 px-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                            <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                             <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                           </Avatar>
                           <div>

@@ -8,25 +8,28 @@ import { Separator } from "@/components/ui/separator";
 import { changeLanguage } from "@/i18n";
 import { settingsApi, type UserSettings } from "@/api/settings";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  applyReducedMotion,
+  applyTextSize,
+  applyTheme,
+  getStoredReducedMotion,
+  getStoredTextSize,
+  getStoredTheme,
+  normalizeTextSize,
+  normalizeTheme,
+  type TextSize,
+  type Theme,
+} from "@/lib/appearance";
 import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 
 type SaveStatus = "idle" | "loading" | "saved" | "error";
 
-const DEFAULT_THEME: "light" | "dark" | "system" = "light";
-const DEFAULT_TEXT_SIZE: "small" | "medium" | "large" = "medium";
-
 export function SettingsPage() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
-  const [theme, setTheme] = useState<"light" | "dark" | "system">(
-    (localStorage.getItem("archivna-theme") as "light" | "dark" | "system") || DEFAULT_THEME
-  );
-  const [textSize, setTextSize] = useState<"small" | "medium" | "large">(
-    (localStorage.getItem("archivna-text-size") as "small" | "medium" | "large") || DEFAULT_TEXT_SIZE
-  );
-  const [reducedMotion, setReducedMotion] = useState(
-    localStorage.getItem("archivna-reduced-motion") === "true"
-  );
+  const [theme, setTheme] = useState<Theme>(getStoredTheme);
+  const [textSize, setTextSize] = useState<TextSize>(getStoredTextSize);
+  const [reducedMotion, setReducedMotion] = useState(getStoredReducedMotion);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [initialized, setInitialized] = useState(false);
@@ -56,14 +59,8 @@ export function SettingsPage() {
       .getSettings()
       .then((settings) => {
         if (cancelled) return;
-        const loadedTheme = ["light", "dark", "system"].includes(settings.theme)
-          ? (settings.theme as "light" | "dark" | "system")
-          : DEFAULT_THEME;
-        const loadedTextSize = ["small", "medium", "large"].includes(settings.textSize)
-          ? (settings.textSize as "small" | "medium" | "large")
-          : DEFAULT_TEXT_SIZE;
-        setTheme(loadedTheme);
-        setTextSize(loadedTextSize);
+        setTheme(normalizeTheme(settings.theme));
+        setTextSize(normalizeTextSize(settings.textSize));
         setReducedMotion(settings.reducedMotion);
         setEmailNotifications(settings.emailNotifications);
         setInitialized(true);
@@ -75,27 +72,17 @@ export function SettingsPage() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    document.documentElement.classList.remove("light", "dark");
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    }
-    localStorage.setItem("archivna-theme", theme);
+    applyTheme(theme);
     if (initialized && isAuthenticated) persist({ theme });
   }, [theme, initialized, isAuthenticated, persist]);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-text-size", textSize);
-    localStorage.setItem("archivna-text-size", textSize);
+    applyTextSize(textSize);
     if (initialized && isAuthenticated) persist({ textSize });
   }, [textSize, initialized, isAuthenticated, persist]);
 
   useEffect(() => {
-    if (reducedMotion) {
-      document.documentElement.classList.add("reduce-motion");
-    } else {
-      document.documentElement.classList.remove("reduce-motion");
-    }
-    localStorage.setItem("archivna-reduced-motion", String(reducedMotion));
+    applyReducedMotion(reducedMotion);
     if (initialized && isAuthenticated) persist({ reducedMotion });
   }, [reducedMotion, initialized, isAuthenticated, persist]);
 

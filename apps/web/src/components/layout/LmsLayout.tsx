@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   BookOpen, GraduationCap, Menu, LayoutDashboard, BookMarked, Award, Bell, User,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LMS_SIDEBAR_ITEMS } from "@/lib/constants";
 import { cn, getInitials } from "@/lib/utils";
+import { changeLanguage as switchLanguage } from "@/i18n";
 
 const lmsSidebarLabels: Record<string, string> = {
   overview: "lms.sidebar.overview",
@@ -32,15 +33,16 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const isRtl = i18n.language === "ar";
 
-  const changeLanguage = () => {
-    const newLang = isRtl ? "en" : "ar";
-    i18n.changeLanguage(newLang);
-  };
+  // Goes through the shared helper so the choice persists and the document
+  // direction flips with it.
+  const toggleLanguage = () => switchLanguage(isRtl ? "en" : "ar");
 
   const handleLogout = async () => {
     await logout();
+    navigate("/");
   };
 
   const isSidebarActive = (path: string) => {
@@ -92,7 +94,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
             <div className="border-t border-gold-light/30 p-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatarPath} alt={user.fullName} />
+                  <AvatarImage src={user.avatarUrl} alt={user.fullName} />
                   <AvatarFallback>{getInitials(user.fullName || "")}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 truncate">
@@ -154,7 +156,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={changeLanguage} className="text-muted hover:text-primary">
+              <Button variant="ghost" size="icon" onClick={toggleLanguage} className="text-muted hover:text-primary">
                 <Globe className="h-5 w-5" />
               </Button>
 
@@ -163,7 +165,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                       <Avatar className="h-9 w-9">
-                        <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                        <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                         <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                       </Avatar>
                     </Button>
@@ -171,7 +173,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
                   <DropdownMenuContent align="end" className="w-56 border-gold-light/30">
                     <div className="flex items-center gap-2 p-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                        <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                         <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
@@ -292,7 +294,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={changeLanguage} className="text-muted hover:text-primary">
+            <Button variant="ghost" size="icon" onClick={toggleLanguage} className="text-muted hover:text-primary">
               <Globe className="h-5 w-5" />
             </Button>
 
@@ -301,7 +303,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                      <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                       <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -309,7 +311,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
                 <DropdownMenuContent align="end" className="w-56 border-gold-light/30">
                   <div className="flex items-center gap-2 p-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                      <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                       <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">

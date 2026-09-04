@@ -24,7 +24,7 @@ export class FavoritesService {
         archive_record: {
           include: {
             owner: {
-              select: { id: true, full_name: true, avatar_path: true },
+              select: { id: true, full_name: true, avatar_url: true },
             },
             subjects: true,
             _count: { select: { files: true, favorites: true } },

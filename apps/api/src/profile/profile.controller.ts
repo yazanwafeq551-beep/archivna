@@ -1,7 +1,7 @@
 import {
   Controller,
+  Delete,
   Get,
-  Patch,
   Post,
   Put,
   Body,
@@ -74,5 +74,12 @@ export class ProfileController {
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
   ) {
     return this.profileService.uploadAvatar(userId, file);
+  }
+
+  @Delete('avatar')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'حذف الصورة الشخصية' })
+  async deleteAvatar(@CurrentUser('id') userId: string) {
+    return this.profileService.deleteAvatar(userId);
   }
 }

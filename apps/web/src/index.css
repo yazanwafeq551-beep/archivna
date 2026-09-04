@@ -154,6 +154,18 @@
   }
 }
 
+/* Accessibility preferences from the settings page (see lib/appearance.ts). */
+html[data-text-size="small"] { font-size: 14px; }
+html[data-text-size="medium"] { font-size: 16px; }
+html[data-text-size="large"] { font-size: 18px; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+html.reduce-motion, html.reduce-motion * , html.reduce-motion *::before, html.reduce-motion *::after {
+  scroll-behavior: auto !important;
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
 }

@@ -54,7 +54,7 @@ export class SearchService {
         where,
         include: {
           owner: {
-            select: { id: true, full_name: true, avatar_path: true },
+            select: { id: true, full_name: true, avatar_url: true },
           },
           subjects: true,
           institution: { select: { id: true, name_ar: true, name_en: true } },

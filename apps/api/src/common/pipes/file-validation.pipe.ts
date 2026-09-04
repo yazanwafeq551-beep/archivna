@@ -65,7 +65,7 @@ export class FileValidationPipe implements PipeTransform {
     const allowedMimes = ALLOWED_MIME_TYPES[matchedCategory];
     if (!allowedMimes.includes(file.mimetype)) {
       throw new BadRequestException(
-        `نوع الم MIME "${file.mimetype}" غير متوافق مع امتداد "${ext}"`,
+        `نوع الملف "${file.mimetype}" غير متوافق مع امتداد "${ext}"`,
       );
     }
 

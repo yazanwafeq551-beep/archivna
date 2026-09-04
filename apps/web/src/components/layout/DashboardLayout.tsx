@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, Bell, LogOut, User, Settings } from "lucide-react";
@@ -22,28 +23,16 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { notificationsApi } from "@/api/notifications";
-import { DASHBOARD_SIDEBAR_ITEMS } from "@/lib/constants";
+import { visibleSidebarItems } from "@/lib/permissions";
+import { SIDEBAR_LABEL_KEYS } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
-
-const sidebarLabelKeyMap: Record<string, string> = {
-  overview: "dashboard.overview.title",
-  learning: "lms.dashboard.title",
-  archives: "dashboard.archives.title",
-  new: "dashboard.newArchive.title",
-  drafts: "dashboard.drafts.title",
-  published: "dashboard.published.title",
-  favorites: "dashboard.favorites.title",
-  notifications: "dashboard.notifications.title",
-  profile: "dashboard.profile.title",
-  settings: "dashboard.settings.title",
-  courseAdmin: "dashboard.coursesAdmin",
-};
 
 export function DashboardLayout() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { data: notifData } = useQuery({
     queryKey: ["unreadCount"],
@@ -89,10 +78,11 @@ export function DashboardLayout() {
         <header className="flex h-16 items-center justify-between border-b border-border bg-white px-4 lg:px-6">
           <div className="flex items-center gap-3">
             {/* Mobile Menu */}
-            <Sheet>
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden">
                   <Menu className="h-5 w-5" />
+                  <span className="sr-only">{t("common.openMenu")}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="end" className="w-[280px] p-0">
@@ -105,17 +95,18 @@ export function DashboardLayout() {
                 </SheetHeader>
                 <nav className="p-4">
                   <ul className="space-y-1">
-                    {DASHBOARD_SIDEBAR_ITEMS.filter((item) => !("adminOnly" in item) || user?.email === "admin@example.com").map((item) => (
+                    {visibleSidebarItems(user).map((item) => (
                       <li key={item.key}>
                         <Link
                           to={item.path}
+                          onClick={() => setMobileOpen(false)}
                           className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                             isActive(item.path)
                               ? "bg-primary/10 text-primary"
                               : "text-muted hover:bg-muted-bg"
                           }`}
                         >
-                          <span>{t(sidebarLabelKeyMap[item.key])}</span>
+                          <span>{t(SIDEBAR_LABEL_KEYS[item.key])}</span>
                         </Link>
                       </li>
                     ))}
@@ -154,7 +145,7 @@ export function DashboardLayout() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                    <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                     <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -162,7 +153,7 @@ export function DashboardLayout() {
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatarPath} alt={user?.fullName} />
+                    <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
                     <AvatarFallback>{getInitials(user?.fullName || "")}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">

@@ -58,6 +58,22 @@ export const DASHBOARD_SIDEBAR_ITEMS = [
   { key: "settings", label: "الإعدادات", path: "/dashboard/settings", icon: "Settings" },
 ] as const;
 
+/** Translation key for each dashboard sidebar entry, shared by every surface. */
+export const SIDEBAR_LABEL_KEYS: Record<string, string> = {
+  overview: "dashboard.overview.title",
+  learning: "lms.dashboard.title",
+  archives: "dashboard.archives.title",
+  new: "dashboard.newArchive.title",
+  archiveManagement: "dashboard.archiveManagement",
+  drafts: "dashboard.drafts.title",
+  published: "dashboard.published.title",
+  favorites: "dashboard.favorites.title",
+  notifications: "dashboard.notifications.title",
+  profile: "dashboard.profile.title",
+  settings: "dashboard.settings.title",
+  courseAdmin: "dashboard.coursesAdmin",
+};
+
 export const NAV_LINKS = [
   { key: "home", label: "الرئيسية", path: "/" },
   { key: "search", label: "استكشف الأرشيف", path: "/search" },

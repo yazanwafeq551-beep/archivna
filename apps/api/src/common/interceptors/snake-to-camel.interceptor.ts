@@ -8,7 +8,6 @@ import { Observable, map } from 'rxjs';
 
 const FIELD_MAP: Record<string, string> = {
   institution_name: 'institutionName',
-  avatar_path: 'avatar',
   full_name: 'fullName',
   password_hash: 'passwordHash',
   account_status: 'accountStatus',

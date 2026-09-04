@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   BookOpen, Clock, Award, TrendingUp, ChevronRight,
@@ -19,6 +19,7 @@ import { cn, getInitials } from "@/lib/utils";
 export function LmsDashboardPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: dashboard, isLoading, isError, refetch } = useDashboard();
   const { data: achievements } = useAchievements();
 
@@ -182,7 +183,7 @@ export function LmsDashboardPage() {
               icon={<Clock className="h-12 w-12 text-muted" />}
               action={{
                 label: t("lms.dashboard.startLearning"),
-                onClick: () => window.location.href = "/lms",
+                onClick: () => navigate("/lms"),
               }}
             />
           </Card>
@@ -281,7 +282,7 @@ export function LmsDashboardPage() {
             icon={<GraduationCap className="h-16 w-16 text-muted" />}
             action={{
               label: t("lms.dashboard.browseCourses"),
-              onClick: () => window.location.href = "/lms",
+              onClick: () => navigate("/lms"),
             }}
           />
         </Card>

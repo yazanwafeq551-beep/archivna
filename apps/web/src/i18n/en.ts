@@ -269,7 +269,8 @@ export default {
       "newPassword": "New Password",
       "confirmPassword": "Confirm Password",
       "save": "Save Changes",
-      "saved": "Changes saved successfully"
+      "saved": "Changes saved successfully",
+      "passwordChanged": "Password changed successfully"
     },
     "settings": {
       "title": "Settings",
@@ -491,6 +492,8 @@ export default {
     "unauthorized": "Unauthorized",
     "unauthorizedDesc": "You don't have permission to access this page.",
     "genericMessage": "Sorry, an unexpected error occurred. Please try again later.",
+    "network": "Could not reach the server. Check your connection and try again.",
+    "sessionExpired": "Your session has expired, please sign in again.",
     "notFoundMessage": "Sorry, the page you are looking for does not exist or has been moved to another address.",
     "unauthorizedMessage": "Sorry, you do not have permission to access this page. Please login with the correct account."
   },

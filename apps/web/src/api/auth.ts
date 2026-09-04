@@ -9,6 +9,7 @@ export interface User {
   institutionId?: string;
   accountType?: string;
   avatarPath?: string;
+  avatarUrl?: string;
   bio?: string;
   preferredLanguage?: string;
   theme?: string;
@@ -24,6 +25,8 @@ export interface User {
 export interface LoginRequest {
   email: string;
   password: string;
+  /** When false the session ends with the browser session. */
+  rememberMe?: boolean;
 }
 
 export interface RegisterRequest {

@@ -26,6 +26,7 @@ export class ProfileService {
         phone: true,
         institution_name: true,
         avatar_path: true,
+        avatar_url: true,
         bio: true,
         preferred_language: true,
         theme: true,
@@ -73,6 +74,7 @@ export class ProfileService {
         phone: true,
         institution_name: true,
         avatar_path: true,
+        avatar_url: true,
         bio: true,
         preferred_language: true,
         theme: true,
@@ -143,5 +145,24 @@ export class ProfileService {
     });
 
     return { avatar_path: uploadResult.publicId, avatar_url: uploadResult.secureUrl };
+  }
+
+  async deleteAvatar(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('المستخدم غير موجود');
+    }
+
+    if (user.avatar_path) {
+      await this.storageService.delete(user.avatar_path).catch(() => {});
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatar_path: null, avatar_url: null },
+    });
+
+    return { message: 'تم حذف الصورة الشخصية' };
   }
 }

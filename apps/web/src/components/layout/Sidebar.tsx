@@ -15,7 +15,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
-import { DASHBOARD_SIDEBAR_ITEMS } from "@/lib/constants";
+import { visibleSidebarItems } from "@/lib/permissions";
+import { SIDEBAR_LABEL_KEYS } from "@/lib/constants";
 import { useAuth } from "@/hooks/useAuth";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -33,21 +34,6 @@ const iconMap: Record<string, React.ReactNode> = {
   ShieldCheck: <ShieldCheck className="h-5 w-5" />,
 };
 
-const labelKeyMap: Record<string, string> = {
-  overview: "dashboard.overview.title",
-  learning: "lms.dashboard.title",
-  archives: "dashboard.archives.title",
-  new: "dashboard.newArchive.title",
-  drafts: "dashboard.drafts.title",
-  published: "dashboard.published.title",
-  favorites: "dashboard.favorites.title",
-  notifications: "dashboard.notifications.title",
-  profile: "dashboard.profile.title",
-  settings: "dashboard.settings.title",
-  courseAdmin: "dashboard.coursesAdmin",
-  archiveManagement: "dashboard.archiveManagement",
-};
-
 interface SidebarProps {
   unreadCount?: number;
 }
@@ -56,7 +42,7 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
-  const canDeposit = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin", "depositor", "cataloger"].includes(assignment.role));
+  const items = visibleSidebarItems(user);
   const isActive = (path: string) => {
     if (path === "/dashboard") {
       return location.pathname === "/dashboard";
@@ -73,11 +59,7 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
       </div>
       <nav className="flex-1 overflow-y-auto p-4" aria-label={t("common.dashboardMenu")}>
         <ul className="space-y-1">
-          {DASHBOARD_SIDEBAR_ITEMS.filter((item) => {
-            if ("adminOnly" in item && !user?.roleAssignments?.some((assignment) => assignment.role === "system_admin")) return false;
-            if (item.key === "new" && !canDeposit) return false;
-            return true;
-          }).map((item) => (
+          {items.map((item) => (
             <li key={item.key}>
               <Link
                 to={item.path}
@@ -88,7 +70,7 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
                 }`}
               >
                 {iconMap[item.icon]}
-                <span>{t(labelKeyMap[item.key])}</span>
+                <span>{t(SIDEBAR_LABEL_KEYS[item.key])}</span>
                 {item.key === "notifications" && unreadCount > 0 && (
                   <span className="ms-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs text-white">
                     {unreadCount}

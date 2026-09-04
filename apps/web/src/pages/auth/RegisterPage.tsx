@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 import apiClient from "@/api/client";
 import { toast } from "sonner";
 import { debounce } from "@/lib/utils";
+import { getApiErrorMessage } from "@/lib/apiError";
 
 
 interface Institution {
@@ -277,9 +278,9 @@ export function RegisterPage() {
         accountType: data.accountType,
       });
       toast.success(t("auth.register.success"));
-      navigate("/");
-    } catch {
-      toast.error(t("auth.register.error"));
+      navigate("/dashboard", { replace: true });
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, t("auth.register.error")));
     } finally {
       setIsLoading(false);
     }

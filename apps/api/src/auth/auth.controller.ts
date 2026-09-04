@@ -23,6 +23,10 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard, Public } from './auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
+const REFRESH_COOKIE = 'refresh_token';
+const REFRESH_COOKIE_PATH = '/api/v1/auth';
+const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -31,6 +35,29 @@ export class AuthController {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
+
+  /**
+   * `remember` controls persistence only: without it the cookie is dropped when
+   * the browser closes, with it the session survives for a week.
+   */
+  private setRefreshCookie(res: Response, token: string, remember = true) {
+    res.cookie(REFRESH_COOKIE, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: REFRESH_COOKIE_PATH,
+      ...(remember ? { maxAge: REFRESH_COOKIE_MAX_AGE } : {}),
+    });
+  }
+
+  private clearRefreshCookie(res: Response) {
+    res.clearCookie(REFRESH_COOKIE, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: REFRESH_COOKIE_PATH,
+    });
+  }
 
   @Public()
   @Post('register')
@@ -41,13 +68,7 @@ export class AuthController {
   ) {
     const result = await this.authService.register(dto);
 
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/api/v1/auth',
-    });
+    this.setRefreshCookie(res, result.refreshToken);
 
     return {
       user: result.user,
@@ -65,13 +86,7 @@ export class AuthController {
   ) {
     const result = await this.authService.login(dto);
 
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/api/v1/auth',
-    });
+    this.setRefreshCookie(res, result.refreshToken, dto.remember_me !== false);
 
     return {
       user: result.user,
@@ -87,39 +102,28 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.refresh_token;
+    const refreshToken = req.cookies?.[REFRESH_COOKIE];
     if (!refreshToken) {
       throw new UnauthorizedException('رمز التحديث غير موجود');
     }
 
-    let payload: any;
     try {
-      payload = this.jwtService.verify(refreshToken, {
+      this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
     } catch {
+      this.clearRefreshCookie(res);
       throw new UnauthorizedException('رمز التحديث غير صالح أو منتهي الصلاحية');
     }
 
-    const storedToken = await this.authService.findRefreshToken(refreshToken);
-    if (!storedToken) {
-      throw new UnauthorizedException('رمز التحديث غير صالح');
+    try {
+      const result = await this.authService.rotateRefreshToken(refreshToken);
+      this.setRefreshCookie(res, result.refreshToken);
+      return { accessToken: result.accessToken, user: result.user };
+    } catch (error) {
+      this.clearRefreshCookie(res);
+      throw error;
     }
-
-    const result = await this.authService.refresh(
-      payload.sub,
-      storedToken.id,
-    );
-
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/api/v1/auth',
-    });
-
-    return { accessToken: result.accessToken, user: result.user };
   }
 
   @Public()
@@ -130,27 +134,11 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.refresh_token;
-    let refreshTokenId: string | null = null;
+    const refreshToken = req.cookies?.[REFRESH_COOKIE];
 
-    if (refreshToken) {
-      try {
-        const payload = this.jwtService.verify(refreshToken, {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        });
-        if (payload?.jti) {
-          refreshTokenId = payload.jti;
-        }
-      } catch {
-        // Token invalid, just clear cookie
-      }
-    }
+    const result = await this.authService.logout(refreshToken);
 
-    const result = await this.authService.logout(refreshTokenId);
-
-    res.clearCookie('refresh_token', {
-      path: '/api/v1/auth',
-    });
+    this.clearRefreshCookie(res);
 
     return result;
   }

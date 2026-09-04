@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Lock } from "lucide-react";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,8 +26,21 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+
+  // Where the user was headed before ProtectedRoute sent them here.
+  const redirectTo =
+    (location.state as { from?: { pathname: string; search?: string } } | null)?.from
+      ?.pathname ?? "/dashboard";
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [authLoading, isAuthenticated, navigate, redirectTo]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -35,11 +49,11 @@ export function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      await login(data.email, data.password);
+      await login(data.email, data.password, rememberMe);
       toast.success(t("auth.login.success"));
-      navigate("/");
-    } catch {
-      toast.error(t("auth.login.error"));
+      navigate(redirectTo, { replace: true });
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, t("auth.login.error")));
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +100,11 @@ export function LoginPage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Checkbox id="remember" />
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                />
                 <Label htmlFor="remember" className="text-sm cursor-pointer">
                   {t("auth.login.rememberMe")}
                 </Label>

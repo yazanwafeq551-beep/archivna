@@ -26,7 +26,6 @@ export interface Archive {
   owner?: {
     id: string;
     fullName: string;
-    avatar?: string;
     avatarUrl?: string;
   };
   status: "draft" | "processing" | "cataloging" | "inReview" | "approved" | "published" | "archived";

@@ -13,7 +13,28 @@ import { SnakeToCamelInterceptor } from './common/interceptors/snake-to-camel.in
 import { CamelToSnakePipe } from './common/pipes/camel-to-snake.pipe';
 import { PrismaService } from './prisma/prisma.service';
 
+/**
+ * The example secrets are fine for local work but must never reach production -
+ * anyone holding them can mint valid tokens.
+ */
+function assertProductionSecrets() {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  const weak = ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'].filter((key) => {
+    const value = process.env[key];
+    return !value || value.length < 32 || value.includes('change-in-production');
+  });
+
+  if (weak.length > 0) {
+    throw new Error(
+      `Refusing to start: ${weak.join(', ')} must be set to a strong value in production`,
+    );
+  }
+}
+
 async function bootstrap() {
+  assertProductionSecrets();
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const prisma = app.get(PrismaService);
@@ -41,12 +62,18 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.use(helmet());
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+
+  // Behind a reverse proxy the client IP arrives in X-Forwarded-For; without
+  // this every visitor shares one rate-limit bucket.
+  app.set('trust proxy', 1);
 
   app.use(
     rateLimit({
       windowMs: 60 * 1000,
-      max: 100,
+      limit: Number(process.env.RATE_LIMIT_MAX || 600),
+      standardHeaders: true,
+      legacyHeaders: false,
       message: {
         statusCode: 429,
         message: 'لقد تجاوزت الحد الأقصى من الطلبات، يرجى المحاولة لاحقاً',
@@ -54,18 +81,31 @@ async function bootstrap() {
     }),
   );
 
-  app.use(
-    '/api/v1/auth',
-    rateLimit({
-      windowMs: 60 * 1000,
-      max: 10,
-      message: {
-        statusCode: 429,
-        message:
-          'لقد تجاوزت الحد الأقصى من محاولات تسجيل الدخول، يرجى المحاولة لاحقاً',
-      },
-    }),
-  );
+  // Only the credential endpoints get the strict budget. Session upkeep
+  // (/auth/refresh, /auth/me) runs on every page load and must not be throttled
+  // into logging the user out.
+  const credentialLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: Number(process.env.AUTH_RATE_LIMIT_MAX || 20),
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    message: {
+      statusCode: 429,
+      message:
+        'لقد تجاوزت الحد الأقصى من محاولات تسجيل الدخول، يرجى المحاولة لاحقاً',
+    },
+  });
+
+  for (const path of [
+    '/api/v1/auth/login',
+    '/api/v1/auth/register',
+    '/api/v1/auth/forgot-password',
+    '/api/v1/auth/reset-password',
+    '/api/v1/auth/change-password',
+  ]) {
+    app.use(path, credentialLimiter);
+  }
 
   app.use(cookieParser());
 

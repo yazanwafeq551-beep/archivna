@@ -1,5 +1,5 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class LoginDto {
   @ApiProperty({ example: 'ahmed@example.com' })
@@ -10,4 +10,12 @@ export class LoginDto {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @ApiPropertyOptional({
+    description: 'إبقاء الجلسة مفتوحة بعد إغلاق المتصفح',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  remember_me?: boolean;
 }

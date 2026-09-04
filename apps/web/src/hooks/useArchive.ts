@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { archivesApi, type SearchParams, type CreateArchiveRequest } from "@/api/archives";
 import { toast } from "sonner";
 import i18n from "@/i18n";
+import { getApiErrorMessage } from "@/lib/apiError";
 
 export function useArchives(params: SearchParams) {
   return useQuery({
@@ -78,8 +79,8 @@ export function useCreateArchive() {
       queryClient.invalidateQueries({ queryKey: ["drafts"] });
       toast.success(i18n.t("archive.createSuccess"));
     },
-    onError: () => {
-      toast.error(i18n.t("archive.createError"));
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, i18n.t("archive.createError")));
     },
   });
 }
@@ -95,8 +96,8 @@ export function useUpdateArchive() {
       queryClient.invalidateQueries({ queryKey: ["archive", variables.id] });
       toast.success(i18n.t("archive.updateSuccess"));
     },
-    onError: () => {
-      toast.error(i18n.t("archive.updateError"));
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, i18n.t("archive.updateError")));
     },
   });
 }
@@ -112,8 +113,8 @@ export function useDeleteArchive() {
       queryClient.invalidateQueries({ queryKey: ["published"] });
       toast.success(i18n.t("archive.deleteSuccess"));
     },
-    onError: () => {
-      toast.error(i18n.t("archive.deleteError"));
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, i18n.t("archive.deleteError")));
     },
   });
 }
@@ -129,8 +130,8 @@ export function usePublishArchive() {
       queryClient.invalidateQueries({ queryKey: ["published"] });
       toast.success(i18n.t("archive.submitSuccess"));
     },
-    onError: () => {
-      toast.error(i18n.t("archive.submitError"));
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, i18n.t("archive.submitError")));
     },
   });
 }
@@ -146,8 +147,8 @@ export function useUnpublishArchive() {
       queryClient.invalidateQueries({ queryKey: ["published"] });
       toast.success(i18n.t("archive.unpublishSuccess"));
     },
-    onError: () => {
-      toast.error(i18n.t("archive.unpublishError"));
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, i18n.t("archive.unpublishError")));
     },
   });
 }
@@ -175,8 +176,8 @@ export function useUploadFiles() {
       queryClient.invalidateQueries({ queryKey: ["relatedArchives"] });
       toast.success(i18n.t("archive.uploadSuccess"));
     },
-    onError: () => {
-      toast.error(i18n.t("archive.uploadError"));
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, i18n.t("archive.uploadError")));
     },
   });
 }
