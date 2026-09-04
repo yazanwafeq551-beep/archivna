@@ -13,6 +13,22 @@ function currentDateLocale() {
   return i18n.language?.startsWith("ar") ? ar : enUS;
 }
 
+/**
+ * Archival records carry both an Arabic and an English field. The reader's
+ * language leads; the other one, when it exists, is shown underneath.
+ */
+export function primaryText(ar?: string | null, en?: string | null): string {
+  const arabicFirst = i18n.language?.startsWith("ar");
+  const preferred = arabicFirst ? ar : en;
+  return preferred || ar || en || "";
+}
+
+export function secondaryText(ar?: string | null, en?: string | null): string {
+  const primary = primaryText(ar, en);
+  const other = primary === ar ? en : ar;
+  return other && other !== primary ? other : "";
+}
+
 export function formatDate(dateString: string): string {
   try {
     const date = parseISO(dateString);

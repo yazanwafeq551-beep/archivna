@@ -20,6 +20,27 @@ export function canDeposit(user: User | null | undefined): boolean {
   return hasRole(user, DEPOSIT_ROLES);
 }
 
+/**
+ * Mirrors the API's rule (owner, or a cataloguing role over the record's
+ * institution) so the UI offers editing exactly where the server allows it.
+ * The server remains the authority - this only decides what to render.
+ */
+export function canEditArchive(
+  user: User | null | undefined,
+  archive: { ownerId?: string; institutionId?: string | null }
+): boolean {
+  if (!user) return false;
+  if (archive.ownerId && user.id === archive.ownerId) return true;
+
+  return !!user.roleAssignments?.some(
+    (assignment) =>
+      ["system_admin", "institution_admin", "cataloger"].includes(assignment.role) &&
+      (!assignment.institutionId ||
+        !archive.institutionId ||
+        assignment.institutionId === archive.institutionId)
+  );
+}
+
 /** Single source of truth for the desktop sidebar and the mobile drawer. */
 export function visibleSidebarItems(user: User | null | undefined) {
   return DASHBOARD_SIDEBAR_ITEMS.filter((item) => {

@@ -17,7 +17,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { favoritesApi } from "@/api/favorites";
 import { filesApi } from "@/api/files";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDate, formatFileSize } from "@/lib/utils";
+import { formatDate, formatFileSize, primaryText, secondaryText } from "@/lib/utils";
+import { canEditArchive } from "@/lib/permissions";
 import { toast } from "sonner";
 import { governanceApi } from "@/api/governance";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,7 +71,7 @@ export function ArchiveDetailPage() {
   if (!archive) return <ErrorState title={t("archive.notFound")} />;
 
   const canAccessFile = archive.accessGranted ?? (archive.accessLevel === "public" || user?.id === archive.ownerId);
-  const canEdit = user?.id === archive.ownerId;
+  const canEdit = canEditArchive(user, archive);
   const allowDownload = archive.accessLevel === "public" || canEdit;
 
   return (
@@ -78,7 +79,7 @@ export function ArchiveDetailPage() {
       <Breadcrumbs
         items={[
           { label: t("nav.search"), href: "/search" },
-          { label: archive.titleAr },
+          { label: primaryText(archive.titleAr, archive.titleEn) },
         ]}
       />
 
@@ -112,11 +113,13 @@ export function ArchiveDetailPage() {
           )}
 
           {/* Description */}
-          {archive.descriptionAr && (
+          {primaryText(archive.descriptionAr, archive.descriptionEn) && (
             <Card>
               <CardContent className="p-6">
                 <h3 className="mb-3 font-semibold text-foreground">{t("archive.detail.description")}</h3>
-                <p className="text-muted leading-relaxed">{archive.descriptionAr}</p>
+                <p className="text-muted leading-relaxed">
+                  {primaryText(archive.descriptionAr, archive.descriptionEn)}
+                </p>
               </CardContent>
             </Card>
           )}
@@ -151,10 +154,12 @@ export function ArchiveDetailPage() {
           {/* Title & Actions */}
           <div>
             <h1 className="mb-2 text-2xl font-heading font-bold text-foreground">
-              {archive.titleAr}
+              {primaryText(archive.titleAr, archive.titleEn)}
             </h1>
-            {archive.titleEn && (
-              <p className="text-lg text-muted ltr">{archive.titleEn}</p>
+            {secondaryText(archive.titleAr, archive.titleEn) && (
+              <p className="text-lg text-muted">
+                {secondaryText(archive.titleAr, archive.titleEn)}
+              </p>
             )}
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <AccessBadge level={archive.accessLevel} />

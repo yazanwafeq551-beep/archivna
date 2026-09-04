@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatDate } from "@/lib/utils";
+import { formatDate, primaryText, secondaryText } from "@/lib/utils";
 import type { Archive } from "@/api/archives";
 
 interface ArchiveTableProps {
@@ -70,10 +70,12 @@ export function ArchiveTable({
                       to={`/archives/${archive.id}`}
                       className="font-medium text-foreground hover:text-primary"
                     >
-                      {archive.titleAr}
+                      {primaryText(archive.titleAr, archive.titleEn)}
                     </Link>
-                    {archive.titleEn && (
-                      <p className="text-xs text-muted ltr">{archive.titleEn}</p>
+                    {secondaryText(archive.titleAr, archive.titleEn) && (
+                      <p className="text-xs text-muted">
+                        {secondaryText(archive.titleAr, archive.titleEn)}
+                      </p>
                     )}
                   </div>
                 </TableCell>

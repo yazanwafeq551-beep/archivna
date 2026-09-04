@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AccessBadge } from "./AccessBadge";
 import { filesApi, resolveMediaUrl } from "@/api/files";
-import { formatDate, truncateText } from "@/lib/utils";
+import { formatDate, truncateText, primaryText, secondaryText } from "@/lib/utils";
 import type { Archive } from "@/api/archives";
 
 const typeIcons: Record<string, React.ReactNode> = {
@@ -26,6 +26,10 @@ interface ArchiveCardProps {
 export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
   const { t } = useTranslation();
   const [thumbnailFailed, setThumbnailFailed] = useState(false);
+
+  const title = primaryText(archive.titleAr, archive.titleEn);
+  const alternateTitle = secondaryText(archive.titleAr, archive.titleEn);
+  const description = primaryText(archive.descriptionAr, archive.descriptionEn);
 
   const firstFile = archive.files?.[0];
   const playableFile = archive.files?.find((file) => {
@@ -79,7 +83,7 @@ export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
       return (
         <img
           src={thumbnailUrl}
-          alt={archive.titleAr}
+          alt={title}
           loading="lazy"
           onError={() => setThumbnailFailed(true)}
           className={`h-full w-full object-cover ${compact ? "" : "transition-transform duration-700 group-hover:scale-105"}`}
@@ -106,15 +110,15 @@ export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
             <div className="flex-1 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-foreground line-clamp-1">{archive.titleAr}</h3>
-                  {archive.titleEn && (
-                    <p className="text-sm text-muted line-clamp-1 ltr">{archive.titleEn}</p>
+                  <h3 className="font-semibold text-foreground line-clamp-1">{title}</h3>
+                  {alternateTitle && (
+                    <p className="text-sm text-muted line-clamp-1">{alternateTitle}</p>
                   )}
                 </div>
                 <AccessBadge level={archive.accessLevel} />
               </div>
-              {archive.descriptionAr && (
-                <p className="mt-2 text-sm text-muted line-clamp-2">{truncateText(archive.descriptionAr, 120)}</p>
+              {description && (
+                <p className="mt-2 text-sm text-muted line-clamp-2">{truncateText(description, 120)}</p>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted">
                 <Badge variant="secondary">{t("materialTypes." + archive.materialType)}</Badge>
@@ -148,12 +152,12 @@ export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
           </div>
         </div>
         <CardContent className="p-4">
-          <h3 className="font-semibold text-foreground line-clamp-1">{archive.titleAr}</h3>
-          {archive.titleEn && (
-            <p className="text-sm text-muted line-clamp-1 ltr">{archive.titleEn}</p>
+          <h3 className="font-semibold text-foreground line-clamp-1">{title}</h3>
+          {alternateTitle && (
+            <p className="text-sm text-muted line-clamp-1">{alternateTitle}</p>
           )}
-          {archive.descriptionAr && (
-            <p className="mt-2 text-sm text-muted line-clamp-2">{truncateText(archive.descriptionAr, 100)}</p>
+          {description && (
+            <p className="mt-2 text-sm text-muted line-clamp-2">{truncateText(description, 100)}</p>
           )}
         </CardContent>
         <CardFooter className="p-4 pt-0 flex items-center justify-between">
