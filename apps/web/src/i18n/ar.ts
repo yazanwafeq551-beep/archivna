@@ -586,11 +586,11 @@ export default {
   "validation": {
     "invalidEmail": "البريد الإلكتروني غير صالح",
     "passwordRequired": "كلمة المرور مطلوبة",
-    "passwordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    "passwordMinLength": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
     "passwordsNotMatch": "كلمتا المرور غير متطابقتين",
     "nameMinLength": "الاسم يجب أن يكون حرفين على الأقل",
     "currentPasswordRequired": "كلمة المرور الحالية مطلوبة",
-    "newPasswordMinLength": "كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل"
+    "newPasswordMinLength": "كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل"
   },
   "lms": {
     "title": "بناء القدرات الأرشيفية",

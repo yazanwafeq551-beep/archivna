@@ -31,7 +31,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, i18n.t("validation.currentPasswordRequired")),
-  newPassword: z.string().min(6, i18n.t("validation.newPasswordMinLength")),
+  newPassword: z.string().min(8, i18n.t("validation.newPasswordMinLength")),
   confirmPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: i18n.t("validation.passwordsNotMatch"),

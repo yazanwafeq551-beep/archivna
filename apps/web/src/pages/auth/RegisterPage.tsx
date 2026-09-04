@@ -47,7 +47,7 @@ const registerBaseSchema = z.object({
   accountType: z.enum(["individual", "institution_representative"]),
   fullName: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(8),
   confirmPassword: z.string(),
   phone: z.string().optional(),
   terms: z.boolean().refine((val) => val === true),
@@ -223,43 +223,13 @@ export function RegisterPage() {
     }
   }, [accountType]);
 
-  const createInstitution = async (): Promise<string | null> => {
-    const values = form.getValues();
-    try {
-      const response = await apiClient.post("/institutions", {
-        nameAr: values.newInstitutionNameAr,
-        nameEn: values.newInstitutionNameEn,
-        type: values.newInstitutionType,
-        contactPerson: values.newInstitutionContactPerson,
-        email: values.newInstitutionEmail,
-        phone: values.newInstitutionPhone,
-        address: values.newInstitutionAddress,
-        city: values.newInstitutionCity,
-        website: values.newInstitutionWebsite,
-      });
-      return response.data.id;
-    } catch {
-      return null;
-    }
-  };
-
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      let finalInstitutionId = data.institutionId;
-
-      if (
-        data.accountType === "institution_representative" &&
-        data.institutionId === "registerNew"
-      ) {
-        const newId = await createInstitution();
-        if (!newId) {
-          toast.error(t("auth.register.institutionCreationFailed"));
-          setIsLoading(false);
-          return;
-        }
-        finalInstitutionId = newId;
-      }
+      const representsInstitution =
+        data.accountType === "institution_representative";
+      const registersNewInstitution =
+        representsInstitution && data.institutionId === "registerNew";
 
       await registerUser({
         fullName: data.fullName,
@@ -267,15 +237,29 @@ export function RegisterPage() {
         password: data.password,
         confirmPassword: data.confirmPassword,
         phone: data.phone,
-        institutionName:
-          data.accountType === "institution_representative"
-            ? data.newInstitutionNameAr
-            : undefined,
+        institutionName: registersNewInstitution
+          ? data.newInstitutionNameAr
+          : undefined,
         institutionId:
-          data.accountType === "institution_representative"
-            ? finalInstitutionId
+          representsInstitution && !registersNewInstitution
+            ? data.institutionId
             : undefined,
         accountType: data.accountType,
+        // The account and its institution are created in one request; the
+        // institutions endpoint itself is reserved for system administrators.
+        newInstitution: registersNewInstitution
+          ? {
+              nameAr: data.newInstitutionNameAr!,
+              nameEn: data.newInstitutionNameEn,
+              institutionType: data.newInstitutionType,
+              contactPerson: data.newInstitutionContactPerson,
+              email: data.newInstitutionEmail,
+              phone: data.newInstitutionPhone,
+              address: data.newInstitutionAddress,
+              city: data.newInstitutionCity,
+              website: data.newInstitutionWebsite,
+            }
+          : undefined,
       });
       toast.success(t("auth.register.success"));
       navigate("/dashboard", { replace: true });

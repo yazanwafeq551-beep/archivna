@@ -37,6 +37,12 @@ export class CreateInstitutionDto {
   @MaxLength(2000)
   description_en?: string;
 
+  @ApiPropertyOptional({ description: 'الشخص المسؤول عن التواصل' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  contact_person?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

@@ -586,11 +586,11 @@ export default {
   "validation": {
     "invalidEmail": "Invalid email",
     "passwordRequired": "Password is required",
-    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordMinLength": "Password must be at least 8 characters",
     "passwordsNotMatch": "Passwords do not match",
     "nameMinLength": "Name must be at least 2 characters",
     "currentPasswordRequired": "Current password is required",
-    "newPasswordMinLength": "New password must be at least 6 characters"
+    "newPasswordMinLength": "New password must be at least 8 characters"
   },
   "lms": {
     "title": "Archival Capacity Building",

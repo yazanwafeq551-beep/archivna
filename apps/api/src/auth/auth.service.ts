@@ -5,6 +5,7 @@ import { createHash, randomBytes, randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+import { CreateInstitutionDto } from '../institutions/dto/create-institution.dto';
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
@@ -31,6 +32,14 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
+    // A representative of an institution that is not on the platform yet
+    // registers it together with their account: creating institutions is
+    // otherwise reserved for system administrators.
+    const institution = dto.new_institution
+      ? await this.createInstitutionForSignup(dto.new_institution)
+      : null;
+    const institutionId = institution?.id ?? dto.institution_id;
+
     const user = await this.prisma.user.create({
       data: {
         full_name: dto.full_name,
@@ -38,7 +47,8 @@ export class AuthService {
         password_hash: hashedPassword,
         ...(dto.phone && { phone: dto.phone }),
         ...(dto.institution_name && { institution_name: dto.institution_name }),
-        ...(dto.institution_id && { institution_id: dto.institution_id }),
+        ...(institution && { institution_name: institution.name_ar }),
+        ...(institutionId && { institution_id: institutionId }),
         ...(dto.account_type && { account_type: dto.account_type }),
         app_settings: {
           create: {},
@@ -62,6 +72,13 @@ export class AuthService {
       },
     });
 
+    if (institution) {
+      await this.prisma.institution.update({
+        where: { id: institution.id },
+        data: { created_by: user.id },
+      });
+    }
+
     const userWithRoles = await this.getMe(user.id);
     const tokens = await this.generateTokens(user.id, user.email);
     await this.storeRefreshToken(user.id, tokens.refreshToken);
@@ -71,6 +88,31 @@ export class AuthService {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
+  }
+
+  /**
+   * Registers the institution itself. The account is still created with the
+   * default researcher role - claiming an institution does not grant its
+   * administration, that is assigned by a system administrator.
+   */
+  private async createInstitutionForSignup(dto: CreateInstitutionDto) {
+    if (!dto.name_ar) {
+      throw new BadRequestException('اسم المؤسسة بالعربية مطلوب');
+    }
+
+    const slug =
+      dto.name_ar
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 100) +
+      '-' +
+      Date.now().toString(36);
+
+    return this.prisma.institution.create({
+      data: { ...dto, slug },
+    });
   }
 
   async login(dto: LoginDto) {

@@ -16,7 +16,7 @@ import { toast } from "sonner";
 
 const resetSchema = z
   .object({
-    password: z.string().min(6, i18n.t("validation.passwordMinLength")),
+    password: z.string().min(8, i18n.t("validation.passwordMinLength")),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

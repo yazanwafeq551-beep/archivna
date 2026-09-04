@@ -17,6 +17,7 @@ model Institution {
   description_ar     String?
   description_en     String?
   logo_path          String?
+  contact_person     String?
   email              String?
   phone              String?
   website            String?

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import i18n from "@/i18n";
-import { authApi, type User } from "@/api/auth";
+import { authApi, type RegisterRequest, type User } from "@/api/auth";
 import { setAccessToken, getAccessToken, refreshSession, setOnSessionExpired } from "@/api/client";
 
 interface AuthContextType {
@@ -17,16 +17,7 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
 }
 
-interface RegisterInput {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phone?: string;
-  institutionName?: string;
-  institutionId?: string;
-  accountType?: "individual" | "institution_representative";
-}
+type RegisterInput = RegisterRequest;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

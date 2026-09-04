@@ -1,5 +1,15 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsIn } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
+  IsIn,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { CreateInstitutionDto } from '../../institutions/dto/create-institution.dto';
 
 export class RegisterDto {
   @ApiProperty({ example: 'أحمد محمد' })
@@ -39,4 +49,14 @@ export class RegisterDto {
   @IsOptional()
   @IsIn(['individual', 'institution_representative'])
   account_type?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'بيانات مؤسسة جديدة يتم إنشاؤها مع الحساب عندما لا تكون المؤسسة مسجلة بعد',
+    type: CreateInstitutionDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreateInstitutionDto)
+  new_institution?: CreateInstitutionDto;
 }

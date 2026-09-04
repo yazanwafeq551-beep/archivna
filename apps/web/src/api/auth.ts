@@ -29,6 +29,18 @@ export interface LoginRequest {
   rememberMe?: boolean;
 }
 
+export interface NewInstitutionInput {
+  nameAr: string;
+  nameEn?: string;
+  institutionType?: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  website?: string;
+}
+
 export interface RegisterRequest {
   fullName: string;
   email: string;
@@ -38,6 +50,8 @@ export interface RegisterRequest {
   institutionName?: string;
   institutionId?: string;
   accountType?: "individual" | "institution_representative";
+  /** Registers the institution together with the account. */
+  newInstitution?: NewInstitutionInput;
 }
 
 export interface AuthResponse {

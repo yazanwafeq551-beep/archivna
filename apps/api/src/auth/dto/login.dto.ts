@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class LoginDto {
@@ -6,9 +6,12 @@ export class LoginDto {
   @IsEmail()
   email: string;
 
+  // No length rule here: sign-in checks the stored password, and rejecting a
+  // short one with a validation error would both leak the policy and lock out
+  // accounts created under an older rule.
   @ApiProperty({ example: 'StrongPass123!' })
   @IsString()
-  @MinLength(8)
+  @IsNotEmpty()
   password: string;
 
   @ApiPropertyOptional({
