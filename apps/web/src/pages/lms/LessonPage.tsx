@@ -237,7 +237,7 @@ export function LessonPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Bar */}
-      <div className="sticky top-0 z-30 border-b border-gold-light/30 bg-white/95 backdrop-blur-md">
+      <div className="sticky top-0 z-30 border-b border-gold-light/30 bg-surface/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild className="text-muted hover:text-primary">
@@ -266,7 +266,7 @@ export function LessonPage() {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Locked Overlay */}
         {isLocked ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-gold-light/30 bg-white p-16 text-center">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-gold-light/30 bg-surface p-16 text-center">
             <div className="mb-4 rounded-full bg-gold-light/30 p-6">
               <Lock className="h-12 w-12 text-muted" />
             </div>
@@ -390,7 +390,7 @@ export function LessonPage() {
 
               {/* Lesson Content */}
               {lesson.contentAr || lesson.contentEn ? (
-                <div className="rounded-xl border border-gold-light/30 bg-white p-6">
+                <div className="rounded-xl border border-gold-light/30 bg-surface p-6">
                   <LessonContent
                     content={isRtl ? (lesson.contentAr || "") : (lesson.contentEn || lesson.contentAr || "")}
                     attachments={lesson.attachments}
@@ -399,7 +399,7 @@ export function LessonPage() {
               ) : null}
 
               {/* Completion Status */}
-              <div className="rounded-xl border border-gold-light/30 bg-white p-4">
+              <div className="rounded-xl border border-gold-light/30 bg-surface p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={cn(
@@ -478,7 +478,7 @@ export function LessonPage() {
       {/* Completion Animation */}
       {showCompletion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in zoom-in-95">
-          <div className="mx-4 flex flex-col items-center rounded-2xl bg-white p-6 sm:p-10 shadow-2xl">
+          <div className="mx-4 flex flex-col items-center rounded-2xl bg-surface p-6 sm:p-10 shadow-2xl">
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-gold to-amber-500 shadow-lg shadow-gold/30">
               <Sparkles className="h-10 w-10 text-white" />
             </div>

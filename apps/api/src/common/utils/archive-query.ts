@@ -201,3 +201,21 @@ export function buildArchiveOrderBy(
       return { created_at: 'desc' };
   }
 }
+
+/**
+ * Listings may expose file locations for public records only. Restricted
+ * records still list their files (so the UI can show what exists) but without
+ * anything that could be fetched directly.
+ */
+export function sanitizeListingRecord<T extends { access_level?: string; files?: any[] }>(
+  record: T,
+): T {
+  if (record.access_level === 'public') return record;
+
+  return {
+    ...record,
+    files: (record.files || []).map(
+      ({ secure_url, public_id, ...file }: any) => file,
+    ),
+  };
+}

@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { buildArchiveWhere, buildArchiveOrderBy } from '../common/utils/archive-query';
+import {
+  buildArchiveWhere,
+  buildArchiveOrderBy,
+  sanitizeListingRecord,
+} from '../common/utils/archive-query';
 
 export interface SearchParams {
   q?: string;
@@ -61,7 +65,17 @@ export class SearchService {
           archival_unit: { select: { id: true, title_ar: true, title_en: true, level: true, reference_code: true } },
           access_policy: { select: { requires_reason: true, watermark_enabled: true } },
           files: {
-            select: { id: true, original_filename: true, thumbnail_path: true, file_type: true },
+            // Same shape as the archive listing so search results can render
+            // the same thumbnails and inline players.
+            select: {
+              id: true,
+              original_filename: true,
+              thumbnail_path: true,
+              file_type: true,
+              secure_url: true,
+              public_id: true,
+              mime_type: true,
+            },
             take: 1,
           },
           _count: { select: { files: true, favorites: true } },
@@ -74,7 +88,7 @@ export class SearchService {
     ]);
 
     return {
-      data: records,
+      data: records.map((record) => sanitizeListingRecord(record)),
       meta: {
         total,
         page,

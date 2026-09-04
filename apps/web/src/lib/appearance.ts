@@ -58,8 +58,14 @@ function prefersDark() {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
 }
 
+/** Turns the stored preference into the theme actually being displayed. */
+export function resolveTheme(theme: Theme): "light" | "dark" {
+  if (theme === "system") return prefersDark() ? "dark" : "light";
+  return theme;
+}
+
 export function applyTheme(theme: Theme, persist = true) {
-  const resolved = theme === "system" ? (prefersDark() ? "dark" : "light") : theme;
+  const resolved = resolveTheme(theme);
   document.documentElement.classList.toggle("dark", resolved === "dark");
   document.documentElement.dataset.theme = theme;
   if (persist) writeStorage(THEME_KEY, theme);

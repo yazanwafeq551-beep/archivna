@@ -97,7 +97,7 @@ export function HomePage() {
                 {t("home.hero.description")}
               </p>
               <form onSubmit={handleSearch} className="mx-auto max-w-xl lg:mx-0">
-                <div className="relative rounded-2xl bg-white p-1.5 shadow-[0_24px_60px_rgba(0,0,0,.22)]">
+                <div className="relative rounded-2xl bg-surface p-1.5 shadow-[0_24px_60px_rgba(0,0,0,.22)]">
                   <Input
                     type="search"
                     placeholder={t("home.hero.searchPlaceholder")}

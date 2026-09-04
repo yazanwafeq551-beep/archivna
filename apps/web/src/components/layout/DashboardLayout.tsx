@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Menu, Bell, LogOut, User, Settings } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { Logo } from "@/components/shared/Logo";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -75,7 +76,7 @@ export function DashboardLayout() {
 
       <div className="flex flex-1 flex-col">
         {/* Top Bar */}
-        <header className="flex h-16 items-center justify-between border-b border-border bg-white px-4 lg:px-6">
+        <header className="flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-6">
           <div className="flex items-center gap-3">
             {/* Mobile Menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -125,6 +126,8 @@ export function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
+
             <Button
               variant="ghost"
               size="icon"

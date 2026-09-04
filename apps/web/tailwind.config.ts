@@ -1,38 +1,49 @@
 /** @type {import('tailwindcss').Config} */
+
+/**
+ * Every palette entry resolves to a CSS variable holding raw RGB channels, so
+ * the same class works in both themes and Tailwind's `/opacity` modifiers keep
+ * working. The values live in src/index.css (`:root` and `.dark`).
+ */
+const token = (name: string) => `rgb(var(${name}) / <alpha-value>)`;
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#0F4C45",
-          dark: "#072F2B",
-          light: "#1B6B60",
+          DEFAULT: token("--color-primary"),
+          dark: token("--color-primary-dark"),
+          light: token("--color-primary-light"),
         },
         gold: {
-          DEFAULT: "#C6A15B",
-          light: "#EADFC4",
-          deep: "#A9853F",
+          DEFAULT: token("--color-gold"),
+          light: token("--color-gold-light"),
+          deep: token("--color-gold-deep"),
         },
-        background: "#F8F4EC",
-        foreground: "#22302D",
+        background: token("--color-background"),
+        /** Cards, sheets, headers - "paper" in light, raised ink in dark. */
+        surface: token("--color-surface"),
+        foreground: token("--color-foreground"),
         muted: {
-          DEFAULT: "#78736B",
-          bg: "#EDE4D1",
+          DEFAULT: token("--color-muted"),
+          bg: token("--color-muted-bg"),
         },
-        border: "#E2DBC9",
+        border: token("--color-border"),
         burgundy: {
-          DEFAULT: "#8B2635",
-          light: "#A83244",
+          DEFAULT: token("--color-burgundy"),
+          light: token("--color-burgundy-light"),
         },
-        olive: "#5F7A48",
-        ivory: "#F8F4EC",
-        beige: "#EDE4D1",
-        stone: "#9A938A",
+        olive: token("--color-olive"),
+        ivory: token("--color-surface"),
+        beige: token("--color-muted-bg"),
+        stone: token("--color-stone"),
         white: "#FFFFFF",
-        destructive: "#DC2626",
-        success: "#16A34A",
-        warning: "#F59E0B",
+        destructive: token("--color-destructive"),
+        success: token("--color-success"),
+        warning: token("--color-warning"),
       },
       fontFamily: {
         sans: ["Almarai", "sans-serif"],

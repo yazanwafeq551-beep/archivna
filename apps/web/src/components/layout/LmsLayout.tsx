@@ -17,6 +17,7 @@ import {
 import { LMS_SIDEBAR_ITEMS } from "@/lib/constants";
 import { cn, getInitials } from "@/lib/utils";
 import { changeLanguage as switchLanguage } from "@/i18n";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 const lmsSidebarLabels: Record<string, string> = {
   overview: "lms.sidebar.overview",
@@ -53,7 +54,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
     return (
       <div className="flex min-h-screen bg-background">
         {/* Sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 border-s border-gold-light/30 bg-white shadow-sm lg:block">
+        <aside className="hidden w-64 flex-shrink-0 border-s border-gold-light/30 bg-surface shadow-sm lg:block">
           <div className="flex h-16 items-center border-b border-gold-light/30 px-6">
             <Link to="/lms/dashboard" className="flex items-center gap-2">
               <GraduationCap className="h-6 w-6 text-gold" />
@@ -109,7 +110,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
         {/* Main Content */}
         <div className="flex flex-1 flex-col">
           {/* Top Bar */}
-          <header className="flex h-16 items-center justify-between border-b border-gold-light/30 bg-white/95 px-4 backdrop-blur-md lg:px-6">
+          <header className="flex h-16 items-center justify-between border-b border-gold-light/30 bg-surface/95 px-4 backdrop-blur-md lg:px-6">
             <div className="flex items-center gap-3">
               <Sheet>
                 <SheetTrigger asChild>
@@ -117,7 +118,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="end" className="w-[280px] border-gold-light/30 bg-[#FDFCF9] p-0">
+                <SheetContent side="end" className="w-[280px] border-gold-light/30 bg-surface p-0">
                   <SheetHeader className="border-b border-gold-light/30 p-4">
                     <SheetTitle>
                       <Link to="/lms/dashboard" className="flex items-center gap-2">
@@ -159,6 +160,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
               <Button variant="ghost" size="icon" onClick={toggleLanguage} className="text-muted hover:text-primary">
                 <Globe className="h-5 w-5" />
               </Button>
+              <ThemeToggle className="text-muted hover:text-primary" />
 
               {isAuthenticated ? (
                 <DropdownMenu>
@@ -227,7 +229,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Top Nav */}
-      <header className="sticky top-0 z-40 border-b border-gold-light/30 bg-white/95 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-gold-light/30 bg-surface/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 sm:gap-6">
             <Sheet>
@@ -236,7 +238,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="end" className="w-[280px] border-gold-light/30 bg-[#FDFCF9] p-0">
+              <SheetContent side="end" className="w-[280px] border-gold-light/30 bg-surface p-0">
                 <SheetHeader className="border-b border-gold-light/30 p-4">
                   <SheetTitle>
                     <Link to="/lms" className="flex items-center gap-2">
@@ -297,6 +299,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
             <Button variant="ghost" size="icon" onClick={toggleLanguage} className="text-muted hover:text-primary">
               <Globe className="h-5 w-5" />
             </Button>
+              <ThemeToggle className="text-muted hover:text-primary" />
 
             {isAuthenticated ? (
               <DropdownMenu>
@@ -352,7 +355,7 @@ export function LmsLayout({ dashboard }: LmsLayoutProps) {
       </main>
 
       {/* Simple Footer */}
-      <footer className="border-t border-gold-light/30 bg-white py-8">
+      <footer className="border-t border-gold-light/30 bg-surface py-8">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <GraduationCap className="h-5 w-5 text-gold" />

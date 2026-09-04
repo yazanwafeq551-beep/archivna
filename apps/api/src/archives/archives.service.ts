@@ -10,7 +10,11 @@ import { FilesService } from '../files/files.service';
 import { CreateArchiveDto } from './dto/create-archive.dto';
 import { UpdateArchiveDto } from './dto/update-archive.dto';
 import { QueryArchiveDto } from './dto/query-archive.dto';
-import { buildArchiveWhere, buildArchiveOrderBy } from '../common/utils/archive-query';
+import {
+  buildArchiveWhere,
+  buildArchiveOrderBy,
+  sanitizeListingRecord,
+} from '../common/utils/archive-query';
 import { AuthorizationService } from '../common/authorization/authorization.service';
 import { AuditService } from '../audit/audit.service';
 
@@ -113,11 +117,7 @@ export class ArchivesService {
   };
 
   private sanitizeListingRecord(record: any) {
-    if (record.access_level === 'public') return record;
-    return {
-      ...record,
-      files: (record.files || []).map(({ secure_url, public_id, ...file }: any) => file),
-    };
+    return sanitizeListingRecord(record);
   }
 
   async findAll(query: QueryArchiveDto, userId?: string) {

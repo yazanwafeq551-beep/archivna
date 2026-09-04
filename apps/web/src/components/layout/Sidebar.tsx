@@ -51,7 +51,7 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
   };
 
   return (
-    <aside className="hidden lg:flex w-64 shrink-0 flex-col border-s border-border bg-white">
+    <aside className="hidden lg:flex w-64 shrink-0 flex-col border-s border-border bg-surface">
       <div className="flex h-16 items-center border-b border-border px-6">
         <Link to="/">
           <Logo variant="icon" size="sm" />

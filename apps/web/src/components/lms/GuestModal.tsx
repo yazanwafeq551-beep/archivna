@@ -27,7 +27,7 @@ export function GuestModal({ open, onOpenChange }: GuestModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md overflow-hidden border-gold-light/40 bg-[#FDFCF9] p-0 rounded-2xl">
+      <DialogContent className="max-w-md overflow-hidden border-gold-light/40 bg-surface p-0 rounded-2xl">
         <div className="bg-gradient-to-br from-primary to-primary/90 px-6 pb-8 pt-10 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/20 ring-4 ring-gold/10">
             <GraduationCap className="h-8 w-8 text-gold" />

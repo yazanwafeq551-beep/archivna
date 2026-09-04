@@ -125,7 +125,7 @@ export function CourseDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
-      <div className="border-b border-gold-light/30 bg-white/80 backdrop-blur-sm">
+      <div className="border-b border-gold-light/30 bg-surface/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 text-sm text-muted sm:px-6 lg:px-8">
           <Link to="/lms" className="hover:text-primary transition-colors">{t("lms.nav.courses")}</Link>
           <ChevronIcon className="h-3 w-3" />
@@ -200,7 +200,7 @@ export function CourseDetailPage() {
 
             {/* CTA Card */}
             <div className="lg:col-span-1">
-              <Card className="overflow-hidden border-gold-light/30 bg-white shadow-lg">
+              <Card className="overflow-hidden border-gold-light/30 bg-surface shadow-lg">
                 <div className="aspect-video bg-gradient-to-br from-gold-light/30 to-primary/10 flex items-center justify-center">
                   {course.thumbnailUrl ? (
                     <img src={course.thumbnailUrl} alt={title} className="h-full w-full object-cover" />
@@ -251,7 +251,7 @@ export function CourseDetailPage() {
       {/* Content */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border border-gold-light/30">
+          <TabsList className="bg-surface border border-gold-light/30">
             <TabsTrigger value="overview">{t("lms.courseDetail.tabs.overview")}</TabsTrigger>
             <TabsTrigger value="curriculum">
               {t("lms.courseDetail.tabs.curriculum")}
@@ -269,7 +269,7 @@ export function CourseDetailPage() {
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="lg:col-span-2 space-y-8">
                 {fullDesc && (
-                  <Card className="border-gold-light/30 bg-white p-6">
+                  <Card className="border-gold-light/30 bg-surface p-6">
                     <h2 className="mb-4 text-lg font-semibold text-foreground">
                       {t("lms.courseDetail.aboutCourse")}
                     </h2>
@@ -278,7 +278,7 @@ export function CourseDetailPage() {
                 )}
 
                 {objectives.length > 0 && (
-                  <Card className="border-gold-light/30 bg-white p-6">
+                  <Card className="border-gold-light/30 bg-surface p-6">
                     <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
                       <Award className="h-5 w-5 text-gold" />
                       {t("lms.courseDetail.learningObjectives")}
@@ -295,7 +295,7 @@ export function CourseDetailPage() {
                 )}
 
                 {prerequisites && (
-                  <Card className="border-gold-light/30 bg-white p-6">
+                  <Card className="border-gold-light/30 bg-surface p-6">
                     <h2 className="mb-4 text-lg font-semibold text-foreground">
                       {t("lms.courseDetail.prerequisites")}
                     </h2>
@@ -306,7 +306,7 @@ export function CourseDetailPage() {
 
               {/* Instructor Sidebar */}
               <div className="lg:col-span-1">
-                <Card className="sticky top-24 border-gold-light/30 bg-white p-6">
+                <Card className="sticky top-24 border-gold-light/30 bg-surface p-6">
                   <h2 className="mb-4 text-lg font-semibold text-foreground">
                     {t("lms.courseDetail.instructor")}
                   </h2>
@@ -337,7 +337,7 @@ export function CourseDetailPage() {
           <TabsContent value="curriculum">
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="lg:col-span-2">
-                <Card className="border-gold-light/30 bg-white p-6">
+                <Card className="border-gold-light/30 bg-surface p-6">
                   <h2 className="mb-6 text-lg font-semibold text-foreground">
                     {lessonCount} {t("lms.courseDetail.lessons")}
                   </h2>
@@ -362,7 +362,7 @@ export function CourseDetailPage() {
                                 ? "border-gold bg-gold-light/20"
                                 : isCompleted
                                 ? "border-green-200 bg-green-50/30"
-                                : "border-gold-light/30 bg-white"
+                                : "border-gold-light/30 bg-surface"
                             )}
                           >
                             <div className={cn(
@@ -409,7 +409,7 @@ export function CourseDetailPage() {
 
               {/* Sidebar progress */}
               <div className="lg:col-span-1">
-                <Card className="sticky top-24 border-gold-light/30 bg-white p-6">
+                <Card className="sticky top-24 border-gold-light/30 bg-surface p-6">
                   <h3 className="mb-4 font-semibold text-foreground">{t("lms.courseDetail.yourProgress")}</h3>
                   {isEnrolled ? (
                     <div className="space-y-4">
@@ -437,7 +437,7 @@ export function CourseDetailPage() {
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="lg:col-span-2 space-y-6">
                 {reviews.length === 0 ? (
-                  <Card className="border-gold-light/30 bg-white p-6">
+                  <Card className="border-gold-light/30 bg-surface p-6">
                     <EmptyState
                       title={t("lms.courseDetail.noReviews")}
                       icon={<MessageSquare className="h-12 w-12 text-muted" />}
@@ -445,7 +445,7 @@ export function CourseDetailPage() {
                   </Card>
                 ) : (
                   reviews.map((review: any) => (
-                    <Card key={review.id} className="border-gold-light/30 bg-white p-6">
+                    <Card key={review.id} className="border-gold-light/30 bg-surface p-6">
                       <div className="flex items-start gap-4">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                           {review.user?.fullName?.charAt(0)?.toUpperCase() || "?"}
@@ -469,7 +469,7 @@ export function CourseDetailPage() {
 
                 {/* Review Form */}
                 {isAuthenticated && (
-                  <Card className="border-gold-light/30 bg-white p-6">
+                  <Card className="border-gold-light/30 bg-surface p-6">
                     <h3 className="mb-4 font-semibold text-foreground">{t("lms.courseDetail.writeReview")}</h3>
                     <form onSubmit={handleSubmitReview} className="space-y-4">
                       <div>
@@ -489,7 +489,7 @@ export function CourseDetailPage() {
                           {t("lms.courseDetail.yourComment")}
                         </label>
                         <textarea
-                          className="w-full rounded-lg border border-gold-light/40 bg-white p-3 text-sm text-foreground placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-[100px]"
+                          className="w-full rounded-lg border border-gold-light/40 bg-surface p-3 text-sm text-foreground placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-[100px]"
                           placeholder={t("lms.courseDetail.commentPlaceholder")}
                           value={reviewComment}
                           onChange={(e) => setReviewComment(e.target.value)}
@@ -506,7 +506,7 @@ export function CourseDetailPage() {
 
               {/* Rating Summary */}
               <div className="lg:col-span-1">
-                <Card className="sticky top-24 border-gold-light/30 bg-white p-6 text-center">
+                <Card className="sticky top-24 border-gold-light/30 bg-surface p-6 text-center">
                   <p className="text-5xl font-bold text-gold">{rating > 0 ? rating.toFixed(1) : "0.0"}</p>
                   <div className="my-2 flex items-center justify-center gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (

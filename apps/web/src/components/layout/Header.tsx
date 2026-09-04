@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, User, LogOut, Settings, LayoutDashboard } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -97,6 +98,8 @@ export function Header() {
               {i18n.language === "ar" ? "EN" : "ع"}
             </Button>
 
+            <ThemeToggle />
+
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -165,6 +168,8 @@ export function Header() {
             >
               {i18n.language === "ar" ? "EN" : "ع"}
             </Button>
+
+            <ThemeToggle />
 
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>

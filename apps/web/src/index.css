@@ -10,30 +10,88 @@
 @font-face { font-family: 'Poppins'; src: url('/fonts/Poppins-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
 
 @layer base {
+  /*
+   * Palette as raw RGB channels so Tailwind can apply opacity modifiers.
+   * tailwind.config.ts maps every colour class onto these variables.
+   */
   :root {
-    --color-primary: #0F4C45;
-    --color-primary-dark: #072F2B;
-    --color-gold: #C6A15B;
-    --color-gold-light: #EADFC4;
-    --color-background: #F8F4EC;
-    --color-foreground: #1D2C29;
-    --color-muted: #716E66;
-    --color-border: #DED6C5;
-    --color-burgundy: #8B2635;
+    --color-primary: 15 76 69;
+    --color-primary-dark: 7 47 43;
+    --color-primary-light: 27 107 96;
+    --color-gold: 198 161 91;
+    --color-gold-light: 234 223 196;
+    --color-gold-deep: 169 133 63;
+    --color-background: 248 244 236;
+    --color-surface: 255 255 255;
+    --color-foreground: 34 48 45;
+    --color-muted: 120 115 107;
+    --color-muted-bg: 237 228 209;
+    --color-border: 226 219 201;
+    --color-stone: 154 147 138;
+    --color-burgundy: 139 38 53;
+    --color-burgundy-light: 168 50 68;
+    --color-olive: 95 122 72;
+    --color-destructive: 220 38 38;
+    --color-success: 22 163 74;
+    --color-warning: 245 158 11;
+
+    --page-glow: rgba(198, 161, 91, .055);
+    --paper-tint: rgba(255, 255, 255, .76);
+    --paper-rule: rgba(15, 76, 69, .018);
+    --card-shadow: 0 1px 2px rgba(15, 76, 69, .04), 0 10px 30px rgba(40, 53, 48, .055);
+    --card-shadow-hover: 0 20px 50px rgba(15, 76, 69, .12);
+    --scrollbar-thumb: #E2DBC9;
+  }
+
+  /*
+   * Dark theme: the ivory paper becomes deep ink, and the green and gold are
+   * lifted so they keep their contrast against it.
+   */
+  .dark {
+    --color-primary: 74 168 151;
+    --color-primary-dark: 40 110 99;
+    --color-primary-light: 108 197 179;
+    --color-gold: 214 180 116;
+    /* Stays light: it is used both as a tint (bg/border at low opacity over
+       the dark ground) and as text on the dark hero and footer. */
+    --color-gold-light: 185 168 127;
+    --color-gold-deep: 198 161 91;
+    --color-background: 17 21 20;
+    --color-surface: 26 33 31;
+    --color-foreground: 236 230 218;
+    --color-muted: 165 159 148;
+    --color-muted-bg: 37 46 43;
+    --color-border: 51 63 58;
+    --color-stone: 140 133 124;
+    --color-burgundy: 196 84 98;
+    --color-burgundy-light: 214 108 121;
+    --color-olive: 138 168 110;
+    --color-destructive: 239 94 94;
+    --color-success: 74 190 120;
+    --color-warning: 245 180 70;
+
+    --page-glow: rgba(198, 161, 91, .05);
+    --paper-tint: rgba(26, 33, 31, .8);
+    --paper-rule: rgba(234, 223, 196, .03);
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .3);
+    --card-shadow-hover: 0 20px 50px rgba(0, 0, 0, .45);
+    --scrollbar-thumb: #3A4641;
+
+    color-scheme: dark;
   }
 
   * {
     @apply border-border;
   }
 
-  html { scroll-behavior: smooth; background: var(--color-background); }
+  html { scroll-behavior: smooth; @apply bg-background; }
 
   body {
     font-family: 'Almarai', sans-serif;
     font-feature-settings: "ss01", "ss02", "cv01";
     line-height: 1.7;
     @apply bg-background text-foreground antialiased;
-    background-image: radial-gradient(circle at 20% 0%, rgba(198,161,91,.055), transparent 28rem);
+    background-image: radial-gradient(circle at 20% 0%, var(--page-glow), transparent 28rem);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -42,9 +100,9 @@
     text-wrap: balance;
   }
 
-  ::selection { background: #C6A15B; color: #072F2B; }
+  ::selection { background: rgb(var(--color-gold)); color: #0B1512; }
   img { color: transparent; }
-  :focus-visible { outline: 2px solid #C6A15B; outline-offset: 3px; }
+  :focus-visible { outline: 2px solid rgb(var(--color-gold)); outline-offset: 3px; }
 
   [dir="rtl"] {
     text-align: right;
@@ -56,16 +114,37 @@
 }
 
 @layer components {
+  /*
+   * The brand fills are light in dark mode, so label text that is white on a
+   * light theme flips to ink instead of washing out.
+   */
+  .dark .bg-primary.text-white,
+  .dark .bg-primary-light.text-white,
+  .dark .bg-gold.text-white,
+  .dark .bg-gold-deep.text-white,
+  .dark .bg-destructive.text-white,
+  .dark .bg-success.text-white {
+    color: rgb(11 21 18);
+  }
+
   .container-app {
     @apply mx-auto max-w-[1380px] px-5 sm:px-7 lg:px-10;
   }
 
   .gradient-primary {
-    background: linear-gradient(135deg, #0F4C45 0%, #072F2B 100%);
+    background: linear-gradient(
+      135deg,
+      rgb(var(--color-primary)) 0%,
+      rgb(var(--color-primary-dark)) 100%
+    );
   }
 
   .gradient-gold {
-    background: linear-gradient(135deg, #C6A15B 0%, #EADFC4 100%);
+    background: linear-gradient(
+      135deg,
+      rgb(var(--color-gold)) 0%,
+      rgb(var(--color-gold-deep)) 100%
+    );
   }
 
   .text-gradient {
@@ -74,12 +153,12 @@
 
   .hover-card {
     @apply transition-all duration-300 hover:-translate-y-1;
-    box-shadow: 0 1px 2px rgba(15,76,69,.04), 0 10px 30px rgba(40,53,48,.055);
+    box-shadow: var(--card-shadow);
   }
 
   .hover-card:hover {
-    box-shadow: 0 20px 50px rgba(15,76,69,.12);
-    border-color: rgba(198,161,91,.55);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgb(var(--color-gold) / .55);
   }
 
   .archive-rule {
@@ -92,14 +171,14 @@
   }
 
   .paper-surface {
-    background-color: rgba(255,255,255,.76);
-    background-image: linear-gradient(rgba(15,76,69,.018) 1px, transparent 1px);
+    background-color: var(--paper-tint);
+    background-image: linear-gradient(var(--paper-rule) 1px, transparent 1px);
     background-size: 100% 32px;
   }
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #E2DBC9 transparent;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -111,7 +190,7 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #E2DBC9;
+    background-color: var(--scrollbar-thumb);
     border-radius: 3px;
   }
 }

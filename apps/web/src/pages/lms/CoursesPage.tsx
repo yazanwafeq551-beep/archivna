@@ -152,7 +152,7 @@ export function CoursesPage() {
       </section>
 
       {/* Categories */}
-      <section className="border-b border-gold-light/30 bg-white/50">
+      <section className="border-b border-gold-light/30 bg-surface/50">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
             <button
@@ -161,7 +161,7 @@ export function CoursesPage() {
                 "flex-shrink-0 rounded-full border px-5 py-2 text-sm font-medium transition-all",
                 selectedCategory === "all"
                   ? "border-primary bg-primary text-white shadow-md"
-                  : "border-gold-light/40 bg-white text-foreground hover:border-gold/30 hover:shadow-sm"
+                  : "border-gold-light/40 bg-surface text-foreground hover:border-gold/30 hover:shadow-sm"
               )}
             >
               {t("lms.categories.all")}
@@ -178,7 +178,7 @@ export function CoursesPage() {
                     "flex-shrink-0 rounded-full border px-5 py-2 text-sm font-medium transition-all",
                     isActive
                       ? "border-primary bg-primary text-white shadow-md"
-                      : "border-gold-light/40 bg-white text-foreground hover:border-gold/30 hover:shadow-sm"
+                      : "border-gold-light/40 bg-surface text-foreground hover:border-gold/30 hover:shadow-sm"
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -212,12 +212,12 @@ export function CoursesPage() {
                 placeholder={t("lms.courses.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="ps-10 border-gold-light/40 bg-white"
+                className="ps-10 border-gold-light/40 bg-surface"
               />
             </form>
             <div className="flex flex-wrap items-center gap-3">
               <Select value={selectedDifficulty} onValueChange={handleFilterChange(setSelectedDifficulty)}>
-                <SelectTrigger className="w-[140px] border-gold-light/40 bg-white">
+                <SelectTrigger className="w-[140px] border-gold-light/40 bg-surface">
                   <SelectValue placeholder={t("lms.courses.allDifficulties")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -228,7 +228,7 @@ export function CoursesPage() {
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={handleFilterChange(setSortBy)}>
-                <SelectTrigger className="w-[160px] border-gold-light/40 bg-white">
+                <SelectTrigger className="w-[160px] border-gold-light/40 bg-surface">
                   <SelectValue placeholder={t("lms.courses.sortBy")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -245,7 +245,7 @@ export function CoursesPage() {
         {coursesLoading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="animate-pulse rounded-xl border border-gold-light/30 bg-white p-4">
+              <div key={i} className="animate-pulse rounded-xl border border-gold-light/30 bg-surface p-4">
                 <div className="mb-4 aspect-video rounded-lg bg-gold-light/30" />
                 <div className="mb-2 h-5 w-3/4 rounded bg-gold-light/30" />
                 <div className="mb-3 h-4 w-full rounded bg-gold-light/20" />

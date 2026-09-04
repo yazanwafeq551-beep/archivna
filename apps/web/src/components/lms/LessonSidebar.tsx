@@ -52,7 +52,7 @@ export function LessonSidebar({
   };
 
   return (
-    <aside className={cn("flex flex-col rounded-xl border border-gold-light/40 bg-white shadow-sm", className)}>
+    <aside className={cn("flex flex-col rounded-xl border border-gold-light/40 bg-surface shadow-sm", className)}>
       <div className="border-b border-gold-light/30 p-4">
         <h3 className="mb-1 text-sm font-medium text-muted">{t("lms.lessonSidebar.course")}</h3>
         <p className="line-clamp-2 text-sm font-semibold text-foreground">{courseTitle}</p>

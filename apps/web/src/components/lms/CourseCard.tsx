@@ -50,7 +50,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
     <Link
       to={`/lms/courses/${course.slug}`}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border border-gold-light/40 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-gold/30",
+        "group relative flex flex-col overflow-hidden rounded-xl border border-gold-light/40 bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-gold/30",
         className
       )}
     >
@@ -80,7 +80,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
         )}
 
         {isEnrolled && (
-          <div className="absolute end-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-primary shadow-sm backdrop-blur-sm">
+          <div className="absolute end-3 top-3 rounded-full bg-surface/90 px-2.5 py-1 text-xs font-medium text-primary shadow-sm backdrop-blur-sm">
             <PlayCircle className="me-1 inline h-3 w-3" />
             {t("lms.courseCard.continue")}
           </div>

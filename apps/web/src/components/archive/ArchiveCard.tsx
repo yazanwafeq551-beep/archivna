@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { FileText, Image, Headphones, Video, Map, ScrollText, Calendar, Building } from "lucide-react";
@@ -24,6 +25,7 @@ interface ArchiveCardProps {
 
 export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
   const { t } = useTranslation();
+  const [thumbnailFailed, setThumbnailFailed] = useState(false);
 
   const firstFile = archive.files?.[0];
   const playableFile = archive.files?.find((file) => {
@@ -36,7 +38,16 @@ export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
   const rawThumbnailUrl = playableFile?.mimeType?.startsWith("image/")
     ? playableFile.secureUrl
     : firstFile?.thumbnailPath || (firstFile as typeof firstFile & { thumbnailUrl?: string })?.thumbnailUrl || (firstFile?.mimeType?.startsWith("image/") ? firstFile.secureUrl : undefined);
-  const thumbnailUrl = resolveMediaUrl(rawThumbnailUrl) || (firstFile && (archive.accessLevel === "public" || archive.accessGranted) ? filesApi.getDownloadUrl(firstFile.id) : undefined);
+  // Falling back to the download URL only makes sense for images; pointing an
+  // <img> at an audio or video file just renders a broken-image icon.
+  const canStreamFirstFile =
+    !!firstFile &&
+    firstFile.mimeType?.startsWith("image/") &&
+    (archive.accessLevel === "public" || archive.accessGranted);
+  const resolvedThumbnail =
+    resolveMediaUrl(rawThumbnailUrl) ||
+    (canStreamFirstFile ? filesApi.getDownloadUrl(firstFile.id) : undefined);
+  const thumbnailUrl = thumbnailFailed ? undefined : resolvedThumbnail;
 
   const stopCardNavigation = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -50,18 +61,34 @@ export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
     if (archive.materialType === "audio" && playableUrl) {
       return (
         <div className="relative flex h-full w-full items-end overflow-hidden bg-primary/10 p-3">
-          {thumbnailUrl && <img src={thumbnailUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-55" />}
+          {thumbnailUrl && (
+            <img
+              src={thumbnailUrl}
+              alt=""
+              loading="lazy"
+              onError={() => setThumbnailFailed(true)}
+              className="absolute inset-0 h-full w-full object-cover opacity-55"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
           <audio src={playableUrl} controls preload="metadata" className="relative z-10 h-10 w-full" onClick={stopCardNavigation} />
         </div>
       );
     }
     if (thumbnailUrl) {
-      return <img src={thumbnailUrl} alt={archive.titleAr} className={`h-full w-full object-cover ${compact ? "" : "transition-transform duration-700 group-hover:scale-105"}`} />;
+      return (
+        <img
+          src={thumbnailUrl}
+          alt={archive.titleAr}
+          loading="lazy"
+          onError={() => setThumbnailFailed(true)}
+          className={`h-full w-full object-cover ${compact ? "" : "transition-transform duration-700 group-hover:scale-105"}`}
+        />
+      );
     }
     return (
       <div className="paper-surface flex h-full items-center justify-center text-primary/45">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl border border-gold/30 bg-white/70">
+        <div className="grid h-16 w-16 place-items-center rounded-2xl border border-gold/30 bg-surface/70">
           {typeIcons[archive.materialType] || <FileText className="h-12 w-12" />}
         </div>
       </div>

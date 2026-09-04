@@ -94,7 +94,7 @@ export function LmsDashboardPage() {
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.label} className="border-gold-light/30 bg-white p-5 shadow-sm">
+            <Card key={stat.label} className="border-gold-light/30 bg-surface p-5 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl", stat.color)}>
                   <Icon className="h-6 w-6" />
@@ -124,7 +124,7 @@ export function LmsDashboardPage() {
               </Link>
             </Button>
           </div>
-          <Card className="overflow-hidden border-gold-light/30 bg-white shadow-sm">
+          <Card className="overflow-hidden border-gold-light/30 bg-surface shadow-sm">
             <div className="flex flex-col gap-6 p-6 sm:flex-row">
               <div className="h-32 w-full flex-shrink-0 overflow-hidden rounded-xl sm:w-48">
                 {continueCourse.thumbnailUrl ? (
@@ -177,7 +177,7 @@ export function LmsDashboardPage() {
           {t("lms.dashboard.recentActivity")}
         </h2>
         {recentActivity.length === 0 ? (
-          <Card className="border-gold-light/30 bg-white p-8">
+          <Card className="border-gold-light/30 bg-surface p-8">
             <EmptyState
               title={t("lms.dashboard.noActivity")}
               icon={<Clock className="h-12 w-12 text-muted" />}
@@ -190,7 +190,7 @@ export function LmsDashboardPage() {
         ) : (
           <div className="space-y-2">
             {recentActivity.slice(0, 5).map((activity) => (
-              <Card key={activity.id} className="border-gold-light/30 bg-white p-4 shadow-sm">
+              <Card key={activity.id} className="border-gold-light/30 bg-surface p-4 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "flex h-10 w-10 items-center justify-center rounded-full",
@@ -275,7 +275,7 @@ export function LmsDashboardPage() {
 
       {/* Empty Dashboard */}
       {!activeCourse && recentActivity.length === 0 && savedCourses.length === 0 && recommendedCourses.length === 0 && (
-        <Card className="border-gold-light/30 bg-white p-12">
+        <Card className="border-gold-light/30 bg-surface p-12">
           <EmptyState
             title={t("lms.dashboard.emptyTitle")}
             description={t("lms.dashboard.emptyDescription")}

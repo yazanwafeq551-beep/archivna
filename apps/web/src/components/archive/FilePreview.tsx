@@ -52,7 +52,7 @@ export function FilePreview({ file, canAccess = true, allowDownload = true, wate
   if (!canAccess) {
     return (
       <Card className="flex flex-col items-center justify-center p-8 text-center bg-muted-bg">
-        <div className="mb-4 rounded-full bg-white p-4 shadow-sm">
+        <div className="mb-4 rounded-full bg-surface p-4 shadow-sm">
           <svg className="h-12 w-12 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
@@ -72,7 +72,7 @@ export function FilePreview({ file, canAccess = true, allowDownload = true, wate
 
   if (isImageFile(filename)) {
     return (
-      <div className="relative overflow-hidden rounded-lg border border-border bg-white">
+      <div className="relative overflow-hidden rounded-lg border border-border bg-surface">
         {watermark}
         <img
           src={fileUrl}
@@ -95,7 +95,7 @@ export function FilePreview({ file, canAccess = true, allowDownload = true, wate
 
   if (isPdfFile(filename)) {
     return (
-      <div className="relative rounded-lg border border-border overflow-hidden bg-white">
+      <div className="relative rounded-lg border border-border overflow-hidden bg-surface">
         {watermark}
         <iframe
           src={fileUrl}
@@ -149,7 +149,7 @@ export function FilePreview({ file, canAccess = true, allowDownload = true, wate
           <source src={fileUrl} />
           {t("archive.browserNoVideo")}
         </video>
-        <div className="flex items-center justify-between border-t border-border bg-white p-3">
+        <div className="flex items-center justify-between border-t border-border bg-surface p-3">
           <span className="text-sm text-muted truncate">{filename}</span>
           {allowDownload && <Button size="sm" variant="outline" onClick={handleDownload}>
             <Download className="ms-1 h-4 w-4" />

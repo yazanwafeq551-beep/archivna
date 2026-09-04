@@ -42,7 +42,7 @@ export function LessonContent({ content, attachments, className }: LessonContent
                 href={attachment.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-lg border border-gold-light/30 bg-white p-3 text-sm transition-all hover:border-gold/30 hover:shadow-sm"
+                className="flex items-center gap-3 rounded-lg border border-gold-light/30 bg-surface p-3 text-sm transition-all hover:border-gold/30 hover:shadow-sm"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold-light/30 text-gold">
                   <Download className="h-4 w-4" />

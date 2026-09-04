@@ -78,7 +78,7 @@ export function AdminCoursesPage() {
           <CardHeader><CardTitle>الدورات المنشورة <Badge variant="secondary" className="me-2">{courses.length}</Badge></CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {isLoading ? <p className="text-muted">جارٍ تحميل الدورات…</p> : courses.map((course) => (
-              <div key={course.id} className="flex items-start gap-3 rounded-xl border border-border bg-white p-4">
+              <div key={course.id} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
                 {course.thumbnailUrl ? <img src={course.thumbnailUrl} alt="" className="h-16 w-20 rounded-lg object-cover" /> : <div className="grid h-16 w-20 place-items-center rounded-lg bg-primary/10"><BookOpenCheck className="h-6 w-6 text-primary" /></div>}
                 <div className="min-w-0 flex-1"><h3 className="font-semibold text-foreground">{course.titleAr}</h3><p className="mt-1 text-sm text-muted">{course.instructorName} · {course._count?.lessons ?? 0} دروس</p></div>
                 <Button variant="ghost" size="icon" className="text-destructive" aria-label="حذف الدورة" onClick={() => setCourseToDelete(course)}><Trash2 className="h-4 w-4" /></Button>

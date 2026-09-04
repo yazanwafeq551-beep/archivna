@@ -16,21 +16,21 @@ export function AboutPage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="rounded-lg border border-border bg-white p-6 text-center">
+          <div className="rounded-lg border border-border bg-surface p-6 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Target className="h-8 w-8" />
             </div>
             <h3 className="mb-2 font-semibold text-foreground">{t("about.mission")}</h3>
             <p className="text-sm text-muted">{t("about.missionText")}</p>
           </div>
-          <div className="rounded-lg border border-border bg-white p-6 text-center">
+          <div className="rounded-lg border border-border bg-surface p-6 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold">
               <Eye className="h-8 w-8" />
             </div>
             <h3 className="mb-2 font-semibold text-foreground">{t("about.vision")}</h3>
             <p className="text-sm text-muted">{t("about.visionText")}</p>
           </div>
-          <div className="rounded-lg border border-border bg-white p-6 text-center">
+          <div className="rounded-lg border border-border bg-surface p-6 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-burgundy">
               <Heart className="h-8 w-8" />
             </div>
