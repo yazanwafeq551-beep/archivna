@@ -492,7 +492,11 @@ export function LessonPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">
-                        {hasCompleted ? t("lms.lesson.completedMessage") : t("lms.lesson.watchToComplete")}
+                        {hasCompleted
+                          ? t("lms.lesson.completedMessage")
+                          : lesson.videoUrl
+                          ? t("lms.lesson.watchToComplete")
+                          : t("lms.lessonActions.markComplete")}
                       </p>
                       {!hasCompleted && watchPercentage > 0 && (
                         <p className="text-xs text-muted">

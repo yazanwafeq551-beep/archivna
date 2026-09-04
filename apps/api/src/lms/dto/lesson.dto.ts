@@ -9,7 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
 export class LessonAttachmentDto {
   @ApiProperty({ example: 'دليل الفهرسة' })
@@ -105,7 +105,8 @@ export class LessonInputDto {
   attachments?: LessonAttachmentDto[];
 }
 
-export class UpdateLessonDto extends LessonInputDto {
+/** PATCH: every field is optional, including the title. */
+export class UpdateLessonDto extends PartialType(LessonInputDto) {
   @ApiPropertyOptional({ description: 'ترتيب الدرس داخل الدورة' })
   @IsOptional()
   @IsInt()
