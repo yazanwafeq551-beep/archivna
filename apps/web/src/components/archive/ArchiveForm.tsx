@@ -81,6 +81,9 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
     },
   });
 
+  const isSaving =
+    createArchive.isPending || updateArchive.isPending || uploadFiles.isPending;
+
   const titleAr = form.watch("titleAr");
   const institutionId = form.watch("institutionId");
   const { data: institutions = [] } = useQuery({ queryKey: ["institutions"], queryFn: catalogApi.institutions });
@@ -136,14 +139,17 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
       } else {
         const archive = await createArchive.mutateAsync(payload);
         savedArchiveId = archive.id;
+      }
 
-        if (files.length > 0) {
-          await uploadFiles.mutateAsync({
-            archiveId: archive.id,
-            files,
-            onProgress: setUploadProgress,
-          });
-        }
+      // Files picked in step one belong to the record either way - when
+      // editing they used to be dropped on the floor.
+      if (files.length > 0 && savedArchiveId) {
+        await uploadFiles.mutateAsync({
+          archiveId: savedArchiveId,
+          files,
+          onProgress: setUploadProgress,
+        });
+        setFiles([]);
       }
 
       if (intent === "submit" && savedArchiveId) {
@@ -224,9 +230,14 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
               rows={4}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/*
+                Archival dating is rarely a calendar date: records carry things
+                like "1936-1938" or "قبل النكبة", and the API stores the value
+                as free text. A date picker silently dropped those on edit.
+              */}
               <Input
                 label={t("dashboard.newArchive.info.date")}
-                type="date"
+                placeholder={t("dashboard.newArchive.info.datePlaceholder")}
                 {...form.register("date")}
               />
               <div>
@@ -417,13 +428,15 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
               <Button
                 variant="outline"
                 onClick={() => form.handleSubmit((data) => onSubmit(data, "draft"))()}
-                disabled={createArchive.isPending || updateArchive.isPending}
+                isLoading={isSaving}
+                disabled={isSaving}
               >
                 {t("dashboard.newArchive.review.saveDraft")}
               </Button>
               <Button
                 onClick={() => form.handleSubmit((data) => onSubmit(data, "submit"))()}
-                disabled={createArchive.isPending || updateArchive.isPending}
+                isLoading={isSaving}
+                disabled={isSaving}
               >
                 {t("dashboard.newArchive.review.submit")}
               </Button>

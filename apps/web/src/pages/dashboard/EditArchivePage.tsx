@@ -10,10 +10,10 @@ export function EditArchivePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { data: archive, isLoading, error } = useArchive(id!);
+  const { data: archive, isLoading, error, refetch } = useArchive(id!);
 
   if (isLoading) return <PageLoader />;
-  if (error) return <ErrorState onRetry={() => window.location.reload()} />;
+  if (error) return <ErrorState onRetry={() => refetch()} />;
   if (!archive) return <ErrorState title={t("archive.notFound")} />;
 
   return (

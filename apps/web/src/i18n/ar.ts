@@ -35,7 +35,9 @@ export default {
     },
     "featured": {
       "title": "مواد مميزة",
-      "subtitle": "مواد أرشيفية مختارة بعناية"
+      "subtitle": "مواد أرشيفية مختارة بعناية",
+      "emptyTitle": "لا توجد مواد مميزة بعد",
+      "emptyDesc": "ستظهر هنا المواد المختارة فور إضافتها إلى الأرشيف"
     },
     "stats": {
       "title": "إحصائيات المنصة",
@@ -47,9 +49,11 @@ export default {
     "news": {
       "title": "آخر الأخبار",
       "viewAll": "عرض جميع الأخبار",
-    "empty": "لا توجد أخبار حالياً",
-    "subtitle": "آخر الأخبار من أرشيفنا"
-  },
+      "empty": "لا توجد أخبار حالياً",
+      "emptyTitle": "لا توجد أخبار بعد",
+      "emptyDesc": "تابعنا لمعرفة آخر مستجدات أرشيفنا",
+      "subtitle": "آخر الأخبار من أرشيفنا"
+    },
     "about": {
       "title": "عن أرشيفنا",
       "description": "أرشيفنا هو منصة رقمية فلسطينية تهدف إلى حفظ وتوثيق وإتاحة المواد الأرشيفية الفلسطينية للأجيال الحالية والقادمة."
@@ -155,6 +159,7 @@ export default {
     "archiveManagement": "إدارة الأرشيف والوصول",
     "overview": {
       "title": "نظرة عامة",
+      "error": "تعذّر تحميل بيانات لوحة التحكم",
       "totalArchives": "إجمالي الأرشيفات",
       "myArchives": "أرشيفاتي",
       "drafts": "المسودات",
@@ -222,9 +227,12 @@ export default {
         "reference": "الرقم المرجعي",
         "description": "الوصف",
         "date": "التاريخ",
+        "datePlaceholder": "مثال: 1948 أو 1936-1938",
         "institution": "المؤسسة",
         "creator": "المنشئ",
-        "collection": "المجموعة"
+        "collection": "المجموعة",
+        "archivalUnit": "الوحدة الأرشيفية الأب",
+        "selectArchivalUnit": "اختر الرصيد أو السلسلة أو الملف..."
       },
       "classify": {
         "subjects": "المواضيع",
@@ -339,22 +347,27 @@ export default {
       "login": "تسجيل الدخول",
       "button": "إنشاء حساب",
       "success": "تم إنشاء الحساب بنجاح",
-      "newInstitution": {
-        "title": "بيانات المؤسسة الجديدة",
-        "nameAr": "اسم المؤسسة بالعربية *",
-        "nameEn": "اسم المؤسسة بالإنجليزية",
-        "type": "نوع المؤسسة *",
-        "registrationNumber": "رقم التسجيل",
-        "contactPerson": "جهة الاتصال *",
-        "email": "بريد المؤسسة *",
-        "phone": "هاتف المؤسسة",
-        "address": "العنوان *",
-        "city": "المدينة *",
-        "website": "الموقع الإلكتروني",
-        "description": "وصف المؤسسة"
-      },
+      "error": "تعذّر إنشاء الحساب، يرجى المحاولة مرة أخرى",
+      "searchInstitutions": "ابحث عن مؤسسة...",
+      "searching": "جارٍ البحث...",
+      "noInstitutions": "لا توجد مؤسسات مطابقة",
+      "institutionCreationFailed": "تعذّر تسجيل المؤسسة الجديدة",
+      "newInstitutionDetails": "بيانات المؤسسة الجديدة",
+      "institutionNameAr": "اسم المؤسسة بالعربية",
+      "institutionNameEn": "اسم المؤسسة بالإنجليزية",
+      "institutionType": "نوع المؤسسة",
+      "selectInstitutionType": "اختر نوع المؤسسة...",
+      "contactPerson": "جهة الاتصال",
+      "institutionEmail": "بريد المؤسسة",
+      "institutionPhone": "هاتف المؤسسة",
+      "institutionAddress": "العنوان",
+      "institutionCity": "المدينة",
+      "institutionWebsite": "الموقع الإلكتروني",
       "institutionTypes": {
         "university": "جامعة",
+        "college": "كلية",
+        "research_center": "مركز أبحاث",
+        "library": "مكتبة",
         "school": "مدرسة",
         "archive": "أرشيف",
         "museum": "متحف",

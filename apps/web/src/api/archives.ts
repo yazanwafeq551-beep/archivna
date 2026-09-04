@@ -167,9 +167,7 @@ export const archivesApi = {
   },
 
   uploadFiles: async (archiveId: string, files: File[], onProgress?: (progress: number) => void): Promise<ArchiveFile[]> => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
-
+    // The API takes one file per request, so progress is tracked across them.
     const results: ArchiveFile[] = [];
     for (const file of files) {
       const singleFormData = new FormData();

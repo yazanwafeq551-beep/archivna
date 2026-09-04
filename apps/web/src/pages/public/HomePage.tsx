@@ -11,6 +11,8 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useLatestArchives, useFeaturedArchives, useArchiveStats } from "@/hooks/useArchive";
+import { useAuth } from "@/hooks/useAuth";
+import { canDeposit } from "@/lib/permissions";
 import { useQuery } from "@tanstack/react-query";
 import { newsApi } from "@/api/news";
 import { MATERIAL_TYPES } from "@/lib/constants";
@@ -56,6 +58,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const isArabic = i18n.language.startsWith("ar");
+  const { user, isAuthenticated } = useAuth();
 
   const { data: latestArchives, isLoading: latestLoading, error: latestError } = useLatestArchives(6);
   const { data: featuredArchives, isLoading: featuredLoading, error: featuredError } = useFeaturedArchives(4);
@@ -128,11 +131,21 @@ export function HomePage() {
                 </div>
               </form>
               <div className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-                <Button asChild variant="gold">
-                  <Link to="/dashboard/archives/new">
-                    {t("home.hero.addButton")}
-                  </Link>
-                </Button>
+                {/* Depositing needs a role, so visitors are invited to join
+                    instead of being sent to a page that refuses them. */}
+                {!isAuthenticated ? (
+                  <Button asChild variant="gold">
+                    <Link to="/register">{t("nav.register")}</Link>
+                  </Button>
+                ) : (
+                  canDeposit(user) && (
+                    <Button asChild variant="gold">
+                      <Link to="/dashboard/archives/new">
+                        {t("home.hero.addButton")}
+                      </Link>
+                    </Button>
+                  )
+                )}
                 <Button variant="outline" asChild className="border-white/20 bg-white/[.06] text-white hover:border-gold/50 hover:bg-white/10 hover:text-white">
                   <Link to="/search">{t("nav.search")}</Link>
                 </Button>

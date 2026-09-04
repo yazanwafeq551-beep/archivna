@@ -71,12 +71,25 @@ export class FilesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'حذف ملف السجل الأرشيفي' })
-  async deleteFile(
+  @ApiOperation({ summary: 'حذف جميع ملفات السجل الأرشيفي' })
+  async deleteAllFiles(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
   ) {
     return this.filesService.deleteFile(id, userId);
+  }
+
+  @Delete(':id/file/:fileId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'حذف ملف واحد من السجل الأرشيفي' })
+  async deleteFile(
+    @Param('id') id: string,
+    @Param('fileId') fileId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.filesService.deleteSingleFile(id, fileId, userId);
   }
 
   @Get('file/:fileId/download')

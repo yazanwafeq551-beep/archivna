@@ -226,6 +226,42 @@ export class FilesService {
       where: { archive_record_id: archiveRecordId },
     });
 
+    return { message: 'تم حذف جميع ملفات السجل بنجاح' };
+  }
+
+  /** Removes a single attachment, leaving the rest of the record intact. */
+  async deleteSingleFile(
+    archiveRecordId: string,
+    fileId: string,
+    userId: string,
+  ) {
+    const archive = await this.prisma.archiveRecord.findUnique({
+      where: { id: archiveRecordId },
+    });
+
+    if (!archive) {
+      throw new NotFoundException('السجل الأرشيفي غير موجود');
+    }
+
+    if (!(await this.authorization.canEditArchive(archive, userId))) {
+      throw new ForbiddenException('ليس لديك صلاحية حذف ملفات هذا السجل');
+    }
+
+    const file = await this.prisma.archiveFile.findFirst({
+      where: { id: fileId, archive_record_id: archiveRecordId },
+    });
+
+    if (!file) {
+      throw new NotFoundException('الملف غير موجود');
+    }
+
+    const deleteId = file.public_id || file.storage_path;
+    await this.storageService.delete(deleteId).catch((err) => {
+      this.logger.warn(`Failed to delete stored asset ${deleteId}: ${err.message}`);
+    });
+
+    await this.prisma.archiveFile.delete({ where: { id: file.id } });
+
     return { message: 'تم حذف الملف بنجاح' };
   }
 

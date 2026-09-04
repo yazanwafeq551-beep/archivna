@@ -35,7 +35,9 @@ export default {
     },
     "featured": {
       "title": "Featured Materials",
-      "subtitle": "Carefully selected archival materials"
+      "subtitle": "Carefully selected archival materials",
+      "emptyTitle": "No featured materials yet",
+      "emptyDesc": "Selected materials will appear here once they are added"
     },
     "stats": {
       "title": "Platform Statistics",
@@ -47,9 +49,11 @@ export default {
     "news": {
       "title": "Latest News",
       "viewAll": "View All News",
-    "empty": "No news available yet",
-    "subtitle": "Latest news from Archivna"
-  },
+      "empty": "No news available yet",
+      "emptyTitle": "No news yet",
+      "emptyDesc": "Follow us for the latest from Archivna",
+      "subtitle": "Latest news from Archivna"
+    },
     "about": {
       "title": "About Archivna",
       "description": "Archivna is a Palestinian digital platform dedicated to preserving, documenting, and providing access to Palestinian archival materials for current and future generations."
@@ -155,6 +159,7 @@ export default {
     "archiveManagement": "Archive Management",
     "overview": {
       "title": "Overview",
+      "error": "Could not load the dashboard data",
       "totalArchives": "Total Archives",
       "myArchives": "My Archives",
       "drafts": "Drafts",
@@ -222,9 +227,12 @@ export default {
         "reference": "Reference Number",
         "description": "Description",
         "date": "Date",
+        "datePlaceholder": "e.g. 1948 or 1936-1938",
         "institution": "Institution",
         "creator": "Creator",
-        "collection": "Collection"
+        "collection": "Collection",
+        "archivalUnit": "Parent archival unit",
+        "selectArchivalUnit": "Select a fonds, series, or file..."
       },
       "classify": {
         "subjects": "Subjects",
@@ -339,22 +347,27 @@ export default {
       "login": "Login",
       "button": "Create Account",
       "success": "Account created successfully",
-      "newInstitution": {
-        "title": "New Institution Details",
-        "nameAr": "Institution Name (Arabic) *",
-        "nameEn": "Institution Name (English)",
-        "type": "Institution Type *",
-        "registrationNumber": "Registration Number",
-        "contactPerson": "Contact Person *",
-        "email": "Institution Email *",
-        "phone": "Institution Phone",
-        "address": "Address *",
-        "city": "City *",
-        "website": "Website",
-        "description": "Institution Description"
-      },
+      "error": "Could not create the account, please try again",
+      "searchInstitutions": "Search for an institution...",
+      "searching": "Searching...",
+      "noInstitutions": "No matching institutions",
+      "institutionCreationFailed": "Could not register the new institution",
+      "newInstitutionDetails": "New Institution Details",
+      "institutionNameAr": "Institution Name (Arabic)",
+      "institutionNameEn": "Institution Name (English)",
+      "institutionType": "Institution Type",
+      "selectInstitutionType": "Select an institution type...",
+      "contactPerson": "Contact Person",
+      "institutionEmail": "Institution Email",
+      "institutionPhone": "Institution Phone",
+      "institutionAddress": "Address",
+      "institutionCity": "City",
+      "institutionWebsite": "Website",
       "institutionTypes": {
         "university": "University",
+        "college": "College",
+        "research_center": "Research Center",
+        "library": "Library",
         "school": "School",
         "archive": "Archive",
         "museum": "Museum",

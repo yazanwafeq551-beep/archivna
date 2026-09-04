@@ -10,11 +10,15 @@ import { ErrorState } from "@/components/shared";
 import { useQuery } from "@tanstack/react-query";
 import { archivesApi } from "@/api/archives";
 import { useMyArchives } from "@/hooks/useArchive";
+import { useAuth } from "@/hooks/useAuth";
+import { canDeposit } from "@/lib/permissions";
 import { formatFileSize, formatDate } from "@/lib/utils";
 
 export function DashboardOverview() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userCanDeposit = canDeposit(user);
 
   const { data: stats, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useQuery({
     queryKey: ["dashboardStats"],
@@ -64,10 +68,12 @@ export function DashboardOverview() {
         <h2 className="text-2xl font-heading font-bold text-foreground">
           {t("dashboard.overview.title")}
         </h2>
-        <Button onClick={() => navigate("/dashboard/archives/new")}>
-          <Plus className="ms-1 h-4 w-4" />
-          {t("dashboard.archives.new")}
-        </Button>
+        {userCanDeposit && (
+          <Button onClick={() => navigate("/dashboard/archives/new")}>
+            <Plus className="ms-1 h-4 w-4" />
+            {t("dashboard.archives.new")}
+          </Button>
+        )}
       </div>
 
       {statsError ? (
@@ -179,14 +185,18 @@ export function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-1"
-                onClick={() => navigate("/dashboard/archives/new")}
-              >
-                <Plus className="h-6 w-6 text-primary" />
-                <span className="text-sm">{t("dashboard.overview.newArchive")}</span>
-              </Button>
+              {/* Depositing is role-gated; offering it to a researcher only
+                  leads to the unauthorized page. */}
+              {userCanDeposit && (
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center gap-1"
+                  onClick={() => navigate("/dashboard/archives/new")}
+                >
+                  <Plus className="h-6 w-6 text-primary" />
+                  <span className="text-sm">{t("dashboard.overview.newArchive")}</span>
+                </Button>
+              )}
               <Button
                 variant="outline"
                 className="h-auto py-4 flex flex-col items-center gap-1"
