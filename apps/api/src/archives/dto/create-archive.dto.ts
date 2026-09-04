@@ -6,6 +6,7 @@ import {
   MaxLength,
   IsArray,
   ArrayMaxSize,
+  IsObject,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -50,6 +51,16 @@ export class CreateArchiveDto {
   @MaxLength(200)
   collection?: string;
 
+  @ApiPropertyOptional({ description: 'معرّف المؤسسة المالكة' })
+  @IsOptional()
+  @IsString()
+  institution_id?: string;
+
+  @ApiPropertyOptional({ description: 'معرّف الوحدة الأب في التسلسل الأرشيفي' })
+  @IsOptional()
+  @IsString()
+  archival_unit_id?: string;
+
   @ApiPropertyOptional({ example: 'النكبة الفلسطينية' })
   @IsOptional()
   @IsString()
@@ -68,9 +79,12 @@ export class CreateArchiveDto {
   @MaxLength(50)
   language?: string;
 
-  @ApiProperty({ example: 'document', enum: ['document', 'image', 'audio', 'video'] })
+  @ApiProperty({
+    example: 'document',
+    enum: ['document', 'image', 'audio', 'video', 'map', 'manuscript'],
+  })
   @IsString()
-  @IsEnum(['document', 'image', 'audio', 'video'])
+  @IsEnum(['document', 'image', 'audio', 'video', 'map', 'manuscript'])
   material_type: string;
 
   @ApiPropertyOptional({ example: '1948' })
@@ -95,11 +109,16 @@ export class CreateArchiveDto {
   @MaxLength(500)
   rights?: string;
 
-  @ApiPropertyOptional({ example: 'public', enum: ['public', 'sensitive', 'private'] })
+  @ApiPropertyOptional({ example: 'public', enum: ['public', 'sensitive', 'sovereign'] })
   @IsOptional()
   @IsString()
-  @IsEnum(['public', 'sensitive', 'private'])
+  @IsEnum(['public', 'sensitive', 'sovereign'])
   access_level?: string;
+
+  @ApiPropertyOptional({ description: 'حقول وصفية إضافية قابلة للتصدير' })
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
 
   @ApiPropertyOptional({ example: ['nkba', 'history'] })
   @IsOptional()
@@ -108,7 +127,7 @@ export class CreateArchiveDto {
   @ArrayMaxSize(10)
   subjects?: string[];
 
-  @ApiPropertyOptional({ example: 'published', enum: ['draft', 'published'] })
+  @ApiPropertyOptional({ example: 'draft', enum: ['draft'] })
   @IsOptional()
   @IsString()
   status?: string;

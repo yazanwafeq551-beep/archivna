@@ -10,7 +10,7 @@ export const MATERIAL_TYPES = [
 export const ACCESS_LEVELS = [
   { value: "public", label: "عام", color: "green" },
   { value: "sensitive", label: "حساس", color: "amber" },
-  { value: "private", label: "خاص", color: "burgundy" },
+  { value: "sovereign", label: "سيادي", color: "burgundy" },
 ] as const;
 
 export const SORT_OPTIONS = [
@@ -48,6 +48,7 @@ export const DASHBOARD_SIDEBAR_ITEMS = [
   { key: "learning", label: "لوحة تعلمي", labelEn: "My Learning", path: "/lms/dashboard", icon: "GraduationCap" },
   { key: "archives", label: "ملفاتي الأرشيفية", path: "/dashboard/archives", icon: "FolderOpen" },
   { key: "new", label: "إضافة مادة أرشيفية", path: "/dashboard/archives/new", icon: "Plus" },
+  { key: "archiveManagement", label: "إدارة الأرشيف والوصول", labelEn: "Archive Management", path: "/dashboard/archive-management", icon: "ShieldCheck" },
   { key: "courseAdmin", label: "إدارة الدورات", labelEn: "Manage Courses", path: "/dashboard/courses", icon: "BookOpenCheck", adminOnly: true },
   { key: "drafts", label: "المسودات", path: "/dashboard/drafts", icon: "FileEdit" },
   { key: "published", label: "المواد المنشورة", path: "/dashboard/published", icon: "Globe" },

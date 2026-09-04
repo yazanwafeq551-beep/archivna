@@ -18,6 +18,7 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
+  roleAssignments?: Array<{ id: string; role: string; institutionId?: string }>;
 }
 
 export interface LoginRequest {

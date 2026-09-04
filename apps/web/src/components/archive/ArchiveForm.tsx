@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,10 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileUploader, type FileItem } from "./FileUploader";
+import { FileUploader } from "./FileUploader";
 import { MATERIAL_TYPES, ACCESS_LEVELS } from "@/lib/constants";
 import { useCreateArchive, useUpdateArchive, useUploadFiles } from "@/hooks/useArchive";
 import type { CreateArchiveRequest } from "@/api/archives";
+import { catalogApi, flattenUnits } from "@/api/catalog";
+import { governanceApi } from "@/api/governance";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const archiveSchema = z.object({
   titleAr: z.string().min(1, "العنوان بالعربية مطلوب"),
@@ -23,6 +28,8 @@ const archiveSchema = z.object({
   description: z.string().optional(),
   date: z.string().optional(),
   institution: z.string().optional(),
+  institutionId: z.string().optional(),
+  archivalUnitId: z.string().optional(),
   creator: z.string().optional(),
   collection: z.string().optional(),
   subjects: z.string().optional(),
@@ -49,6 +56,7 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
   const createArchive = useCreateArchive();
   const updateArchive = useUpdateArchive();
   const uploadFiles = useUploadFiles();
+  const { user } = useAuth();
 
   const form = useForm<ArchiveFormData>({
     resolver: zodResolver(archiveSchema),
@@ -60,6 +68,8 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
       description: initialData?.description || "",
       date: initialData?.date || "",
       institution: initialData?.institution || "",
+      institutionId: initialData?.institutionId || user?.institutionId || "",
+      archivalUnitId: initialData?.archivalUnitId || "",
       creator: initialData?.creator || "",
       collection: initialData?.collection || "",
       subjects: initialData?.subjects || "",
@@ -72,6 +82,14 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
   });
 
   const titleAr = form.watch("titleAr");
+  const institutionId = form.watch("institutionId");
+  const { data: institutions = [] } = useQuery({ queryKey: ["institutions"], queryFn: catalogApi.institutions });
+  const { data: hierarchy } = useQuery({
+    queryKey: ["archive-hierarchy", institutionId],
+    queryFn: () => catalogApi.hierarchy(institutionId!),
+    enabled: Boolean(institutionId),
+  });
+  const units = flattenUnits(hierarchy?.units || []);
 
   const steps = [
     { number: 1, title: t("dashboard.newArchive.steps.upload") },
@@ -86,7 +104,7 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
     return true;
   };
 
-  const onSubmit = async (data: ArchiveFormData, status: "draft" | "published") => {
+  const onSubmit = async (data: ArchiveFormData, intent: "draft" | "submit") => {
     try {
       const subjectsArray = data.subjects
         ? data.subjects.split(",").map((s) => s.trim()).filter(Boolean)
@@ -99,6 +117,8 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
         description: data.description,
         date: data.date,
         institution: data.institution,
+        institutionId: data.institutionId,
+        archivalUnitId: data.archivalUnitId,
         creator: data.creator,
         collection: data.collection,
         place: data.place,
@@ -106,14 +126,16 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
         rights: data.rights,
         materialType: data.materialType || "document",
         subjects: subjectsArray,
-        accessLevel: (data.accessLevel || "public") as "public" | "sensitive" | "private",
-        status,
+        accessLevel: (data.accessLevel || "public") as "public" | "sensitive" | "sovereign",
+        status: "draft",
       };
 
+      let savedArchiveId = archiveId;
       if (archiveId) {
         await updateArchive.mutateAsync({ id: archiveId, data: payload });
       } else {
         const archive = await createArchive.mutateAsync(payload);
+        savedArchiveId = archive.id;
 
         if (files.length > 0) {
           await uploadFiles.mutateAsync({
@@ -122,6 +144,11 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
             onProgress: setUploadProgress,
           });
         }
+      }
+
+      if (intent === "submit" && savedArchiveId) {
+        await governanceApi.transition(savedArchiveId, "submit");
+        toast.success(t("dashboard.newArchive.review.submitSuccess"));
       }
 
       onSuccess?.();
@@ -202,10 +229,18 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
                 type="date"
                 {...form.register("date")}
               />
-              <Input
-                label={t("dashboard.newArchive.info.institution")}
-                {...form.register("institution")}
-              />
+              <div>
+                <Label className="mb-1.5 block">{t("dashboard.newArchive.info.institution")}</Label>
+                <Select value={institutionId} onValueChange={(value) => {
+                  const institution = institutions.find((item) => item.id === value);
+                  form.setValue("institutionId", value);
+                  form.setValue("institution", institution?.nameAr || "");
+                  form.setValue("archivalUnitId", "");
+                }}>
+                  <SelectTrigger><SelectValue placeholder={t("auth.register.selectInstitution")} /></SelectTrigger>
+                  <SelectContent>{institutions.map((institution) => <SelectItem key={institution.id} value={institution.id}>{institution.nameAr}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -216,6 +251,13 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
                 label={t("dashboard.newArchive.info.collection")}
                 {...form.register("collection")}
               />
+            </div>
+            <div>
+              <Label className="mb-1.5 block">{t("dashboard.newArchive.info.archivalUnit")}</Label>
+              <Select value={form.watch("archivalUnitId")} onValueChange={(value) => form.setValue("archivalUnitId", value)} disabled={!institutionId}>
+                <SelectTrigger><SelectValue placeholder={t("dashboard.newArchive.info.selectArchivalUnit")} /></SelectTrigger>
+                <SelectContent>{units.map((unit) => <SelectItem key={unit.id} value={unit.id}>{"—".repeat(unit.depth)} {unit.titleAr} {unit.referenceCode ? `(${unit.referenceCode})` : ""}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
             <Input
               label={t("dashboard.newArchive.classify.subjects")}
@@ -380,10 +422,10 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
                 {t("dashboard.newArchive.review.saveDraft")}
               </Button>
               <Button
-                onClick={() => form.handleSubmit((data) => onSubmit(data, "published"))()}
+                onClick={() => form.handleSubmit((data) => onSubmit(data, "submit"))()}
                 disabled={createArchive.isPending || updateArchive.isPending}
               >
-                {t("dashboard.newArchive.review.publish")}
+                {t("dashboard.newArchive.review.submit")}
               </Button>
             </>
           )}

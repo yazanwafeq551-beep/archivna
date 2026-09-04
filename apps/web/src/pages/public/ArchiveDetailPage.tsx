@@ -19,6 +19,8 @@ import { filesApi } from "@/api/files";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDate, formatFileSize } from "@/lib/utils";
 import { toast } from "sonner";
+import { governanceApi } from "@/api/governance";
+import { Textarea } from "@/components/ui/textarea";
 
 export function ArchiveDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +28,7 @@ export function ArchiveDetailPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
+  const [accessReason, setAccessReason] = useState("");
 
   const { data: archive, isLoading, error } = useArchive(id!);
   const { data: relatedArchives } = useRelatedArchives(id!, 4);
@@ -44,24 +47,31 @@ export function ArchiveDetailPage() {
     },
   });
 
+  const requestAccess = useMutation({
+    mutationFn: () => governanceApi.requestAccess(id!, { reason: accessReason }),
+    onSuccess: () => {
+      setAccessReason("");
+      toast.success(t("archive.accessRequestSent"));
+    },
+    onError: () => toast.error(t("archive.accessRequestError")),
+  });
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     toast.success(t("common.copied"));
   };
 
-  const handleDownload = (fileId: string) => {
-    const url = filesApi.getDownloadUrl(fileId);
-    const a = document.createElement("a");
-    a.href = url;
-    a.click();
+  const handleDownload = async (fileId: string, filename: string) => {
+    await filesApi.download(fileId, filename);
   };
 
   if (isLoading) return <PageLoader />;
   if (error) return <ErrorState onRetry={() => window.location.reload()} />;
   if (!archive) return <ErrorState title={t("archive.notFound")} />;
 
-  const canAccessFile = archive.accessLevel === "public" || user?.id === archive.ownerId;
+  const canAccessFile = archive.accessGranted ?? (archive.accessLevel === "public" || user?.id === archive.ownerId);
   const canEdit = user?.id === archive.ownerId;
+  const allowDownload = archive.accessLevel === "public" || canEdit;
 
   return (
     <div className="container-app py-8">
@@ -76,7 +86,7 @@ export function ArchiveDetailPage() {
         {/* File Preview */}
         <div className="lg:col-span-2 space-y-6">
           {archive.files && archive.files.length > 0 ? (
-            <FilePreview file={archive.files[0]} canAccess={canAccessFile} />
+            <FilePreview file={archive.files[0]} canAccess={canAccessFile} allowDownload={allowDownload} protectedAccess={archive.accessLevel !== "public"} watermarkLabel={canAccessFile && archive.accessPolicy?.watermarkEnabled && !canEdit ? `ARSHEEFNA · ${user?.email || "ACCESS COPY"}` : undefined} />
           ) : (
             <Card className="flex items-center justify-center h-64 bg-muted-bg">
               <p className="text-muted">{t("archive.noFiles")}</p>
@@ -90,7 +100,7 @@ export function ArchiveDetailPage() {
                 {archive.files.map((file) => (
                   <button
                     key={file.id}
-                    onClick={() => handleDownload(file.id)}
+                    onClick={() => handleDownload(file.id, file.originalFilename)}
                     className="rounded-lg border border-border p-3 text-start hover:bg-muted-bg transition-colors"
                   >
                     <p className="text-sm font-medium truncate">{file.originalFilename}</p>
@@ -107,6 +117,30 @@ export function ArchiveDetailPage() {
               <CardContent className="p-6">
                 <h3 className="mb-3 font-semibold text-foreground">{t("archive.detail.description")}</h3>
                 <p className="text-muted leading-relaxed">{archive.descriptionAr}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {!canAccessFile && archive.accessLevel === "sensitive" && (
+            <Card className="border-gold/30 bg-gold-light/10">
+              <CardContent className="space-y-4 p-6">
+                <div className="flex items-start gap-3">
+                  <Lock className="mt-0.5 h-5 w-5 text-gold-dark" />
+                  <div>
+                    <h3 className="font-semibold">{t("archive.requestAccessTitle")}</h3>
+                    <p className="mt-1 text-sm text-muted">{t("archive.requestAccessDescription")}</p>
+                  </div>
+                </div>
+                {isAuthenticated ? (
+                  <>
+                    <Textarea value={accessReason} onChange={(event) => setAccessReason(event.target.value)} placeholder={t("archive.accessReasonPlaceholder")} rows={3} />
+                    <Button onClick={() => requestAccess.mutate()} disabled={accessReason.trim().length < 10 || requestAccess.isPending}>
+                      {t("archive.sendAccessRequest")}
+                    </Button>
+                  </>
+                ) : (
+                  <Button asChild><Link to="/login">{t("archive.loginToRequest")}</Link></Button>
+                )}
               </CardContent>
             </Card>
           )}
@@ -145,8 +179,8 @@ export function ArchiveDetailPage() {
               <Link2 className="ms-1 h-4 w-4" />
               {t("archive.detail.copyLink")}
             </Button>
-            {canAccessFile && archive.files?.[0] && (
-              <Button variant="outline" size="sm" onClick={() => handleDownload(archive.files[0].id)}>
+            {canAccessFile && allowDownload && archive.files?.[0] && (
+              <Button variant="outline" size="sm" onClick={() => handleDownload(archive.files[0].id, archive.files[0].originalFilename)}>
                 <Download className="ms-1 h-4 w-4" />
                 {t("archive.detail.download")}
               </Button>
@@ -181,13 +215,19 @@ export function ArchiveDetailPage() {
                   </div>
                 </div>
               )}
-              {archive.institutionName && (
+              {(archive.institution?.nameAr || archive.institutionName) && (
                 <div className="flex items-center gap-2">
                   <Building className="h-4 w-4 text-muted shrink-0" />
                   <div>
                     <span className="text-xs text-muted">{t("archive.detail.institution")}</span>
-                    <p className="text-sm font-medium">{archive.institutionName}</p>
+                    <p className="text-sm font-medium">{archive.institution?.nameAr || archive.institutionName}</p>
                   </div>
+                </div>
+              )}
+              {archive.archivalUnit && (
+                <div>
+                  <span className="text-xs text-muted">{t("archive.archivalContext")}</span>
+                  <p className="text-sm font-medium">{archive.archivalUnit.titleAr}{archive.archivalUnit.referenceCode ? ` · ${archive.archivalUnit.referenceCode}` : ""}</p>
                 </div>
               )}
               {archive.collectionName && (

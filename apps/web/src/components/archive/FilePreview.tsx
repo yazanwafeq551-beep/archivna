@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,23 +10,44 @@ import type { ArchiveFile } from "@/api/archives";
 interface FilePreviewProps {
   file: ArchiveFile;
   canAccess?: boolean;
+  allowDownload?: boolean;
+  watermarkLabel?: string;
+  protectedAccess?: boolean;
 }
 
-export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
+export function FilePreview({ file, canAccess = true, allowDownload = true, watermarkLabel, protectedAccess = false }: FilePreviewProps) {
   const { t } = useTranslation();
-  const fileUrl = file.secureUrl || (file as ArchiveFile & { thumbnailUrl?: string }).thumbnailUrl || filesApi.getDownloadUrl(file.id);
+  const [protectedUrl, setProtectedUrl] = useState<string>();
+  const directUrl = file.secureUrl || (file as ArchiveFile & { thumbnailUrl?: string }).thumbnailUrl || filesApi.getDownloadUrl(file.id);
+  const fileUrl = protectedAccess ? protectedUrl : directUrl;
 
-  const handleDownload = () => {
-    const a = document.createElement("a");
-    a.href = fileUrl;
-    a.download = file.originalFilename;
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  useEffect(() => {
+    if (!protectedAccess || !canAccess) return;
+    let active = true;
+    let objectUrl: string | undefined;
+    filesApi.getContentBlob(file.id).then((url) => {
+      objectUrl = url;
+      if (active) setProtectedUrl(url);
+      else URL.revokeObjectURL(url);
+    }).catch(() => {
+      if (active) setProtectedUrl(undefined);
+    });
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [canAccess, file.id, protectedAccess]);
+
+  const handleDownload = async () => {
+    await filesApi.download(file.id, file.originalFilename);
   };
 
   const filename = file.originalFilename;
+  const watermark = watermarkLabel ? (
+    <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center overflow-hidden" aria-hidden="true">
+      <span className="-rotate-12 select-none rounded border border-white/40 bg-primary/45 px-5 py-2 text-sm font-semibold tracking-widest text-white shadow">{watermarkLabel}</span>
+    </div>
+  ) : null;
 
   if (!canAccess) {
     return (
@@ -35,7 +57,15 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
-        <p className="text-sm text-muted">{t("archive.privateFile")}</p>
+        <p className="text-sm text-muted">{t("archive.restrictedFile")}</p>
+      </Card>
+    );
+  }
+
+  if (protectedAccess && !fileUrl) {
+    return (
+      <Card className="flex min-h-64 items-center justify-center bg-muted-bg p-8 text-center">
+        <p className="text-sm text-muted">{t("common.loading")}</p>
       </Card>
     );
   }
@@ -43,6 +73,7 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
   if (isImageFile(filename)) {
     return (
       <div className="relative overflow-hidden rounded-lg border border-border bg-white">
+        {watermark}
         <img
           src={fileUrl}
           alt={filename}
@@ -52,10 +83,10 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-white truncate">{filename}</span>
-            <Button size="sm" variant="secondary" onClick={handleDownload}>
+            {allowDownload && <Button size="sm" variant="secondary" onClick={handleDownload}>
               <Download className="ms-1 h-4 w-4" />
               {t("archive.detail.download")}
-            </Button>
+            </Button>}
           </div>
         </div>
       </div>
@@ -64,7 +95,8 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
 
   if (isPdfFile(filename)) {
     return (
-      <div className="rounded-lg border border-border overflow-hidden bg-white">
+      <div className="relative rounded-lg border border-border overflow-hidden bg-white">
+        {watermark}
         <iframe
           src={fileUrl}
           className="w-full h-[600px]"
@@ -72,10 +104,10 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
         />
         <div className="flex items-center justify-between border-t border-border p-3">
           <span className="text-sm text-muted truncate">{filename}</span>
-          <Button size="sm" variant="outline" onClick={handleDownload}>
+          {allowDownload && <Button size="sm" variant="outline" onClick={handleDownload}>
             <Download className="ms-1 h-4 w-4" />
             {t("archive.detail.download")}
-          </Button>
+          </Button>}
         </div>
       </div>
     );
@@ -100,10 +132,10 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
             <p className="text-sm font-medium">{filename}</p>
             <p className="text-xs text-muted">{formatFileSize(file.fileSize)}</p>
           </div>
-          <Button size="sm" variant="outline" onClick={handleDownload}>
+          {allowDownload && <Button size="sm" variant="outline" onClick={handleDownload}>
             <Download className="ms-1 h-4 w-4" />
             {t("archive.detail.download")}
-          </Button>
+          </Button>}
         </div>
       </Card>
     );
@@ -111,17 +143,18 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
 
   if (isVideoFile(filename)) {
     return (
-      <div className="rounded-lg border border-border overflow-hidden bg-black">
+      <div className="relative rounded-lg border border-border overflow-hidden bg-black">
+        {watermark}
         <video controls className="w-full max-h-[600px]" preload="metadata">
           <source src={fileUrl} />
           {t("archive.browserNoVideo")}
         </video>
         <div className="flex items-center justify-between border-t border-border bg-white p-3">
           <span className="text-sm text-muted truncate">{filename}</span>
-          <Button size="sm" variant="outline" onClick={handleDownload}>
+          {allowDownload && <Button size="sm" variant="outline" onClick={handleDownload}>
             <Download className="ms-1 h-4 w-4" />
             {t("archive.detail.download")}
-          </Button>
+          </Button>}
         </div>
       </div>
     );
@@ -136,10 +169,10 @@ export function FilePreview({ file, canAccess = true }: FilePreviewProps) {
       </div>
       <p className="mb-1 text-sm font-medium">{filename}</p>
       <p className="mb-4 text-xs text-muted">{formatFileSize(file.fileSize)}</p>
-      <Button onClick={handleDownload}>
+      {allowDownload && <Button onClick={handleDownload}>
         <Download className="ms-1 h-4 w-4" />
         {t("archive.detail.download")}
-      </Button>
+      </Button>}
     </Card>
   );
 }

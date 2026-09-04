@@ -55,7 +55,7 @@ export function getAccessLabel(access: string): string {
   const labels: Record<string, string> = {
     public: "عام",
     sensitive: "حساس",
-    private: "خاص",
+    sovereign: "سيادي",
   };
   return labels[access] || access;
 }
@@ -64,7 +64,7 @@ export function getAccessColor(access: string): string {
   const colors: Record<string, string> = {
     public: "bg-green-100 text-green-800",
     sensitive: "bg-amber-100 text-amber-800",
-    private: "bg-red-100 text-red-800",
+    sovereign: "bg-red-100 text-red-800",
   };
   return colors[access] || "bg-gray-100 text-gray-800";
 }

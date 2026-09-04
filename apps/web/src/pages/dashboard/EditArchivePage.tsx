@@ -30,6 +30,8 @@ export function EditArchivePage() {
           description: archive.descriptionAr,
           date: archive.dateText,
           institution: archive.institutionName,
+          institutionId: archive.institutionId,
+          archivalUnitId: archive.archivalUnitId,
           creator: archive.creatorName,
           collection: archive.collectionName,
           materialType: archive.materialType,

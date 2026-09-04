@@ -35,6 +35,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         account_status: true,
         created_at: true,
         updated_at: true,
+        institution_id: true,
+        account_type: true,
+        role_assignments: {
+          where: { is_active: true },
+          select: { id: true, role: true, institution_id: true },
+        },
       },
     });
 

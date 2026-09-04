@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInstitutionDto } from './dto/create-institution.dto';
+import { AuthorizationService } from '../common/authorization/authorization.service';
 
 @Injectable()
 export class InstitutionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private authorization: AuthorizationService,
+  ) {}
 
   async findAll(q?: string) {
     const where = q
@@ -19,6 +23,7 @@ export class InstitutionsService {
 
     return this.prisma.institution.findMany({
       where,
+      include: { _count: { select: { archive_records: true, archival_units: true } } },
       orderBy: { name_ar: 'asc' },
       take: 100,
     });
@@ -31,6 +36,7 @@ export class InstitutionsService {
   }
 
   async create(dto: CreateInstitutionDto, userId: string) {
+    this.authorization.assert(await this.authorization.isSystemAdmin(userId), 'إنشاء المؤسسات متاح لمدير النظام فقط');
     const slug = this.slugify(dto.name_ar);
 
     const existing = await this.prisma.institution.findUnique({ where: { slug } });

@@ -21,6 +21,8 @@ A complete full-stack digital archive platform for Palestinian archival material
 - NestJS + TypeScript
 - PostgreSQL
 - Prisma ORM
+- Institution-scoped RBAC and archival workflow
+- Archival hierarchy and controlled access requests
 - Passport.js + JWT
 - bcrypt (password hashing)
 - Multer (file uploads)
@@ -76,13 +78,13 @@ cp apps/api/.env.example apps/api/.env
 
 ### 4. Run Migrations
 ```bash
-npm run generate
-npm run migrate
+npm run prisma:generate -w apps/api
+npx prisma migrate deploy --schema apps/api/prisma/schema.prisma
 ```
 
 ### 5. Seed Database
 ```bash
-npm run seed
+npm run prisma:seed -w apps/api
 ```
 
 ### 6. Start Development
@@ -98,11 +100,10 @@ npm run dev
 | `npm run dev:api` | Start backend only |
 | `npm run dev:web` | Start frontend only |
 | `npm run build` | Build both for production |
-| `npm run migrate` | Run database migrations |
-| `npm run seed` | Seed the database |
-| `npm run generate` | Generate Prisma client |
-| `npm run test` | Run backend tests |
-| `npm run lint` | Lint all packages |
+| `npx prisma migrate deploy --schema apps/api/prisma/schema.prisma` | Apply database migrations |
+| `npm run prisma:seed -w apps/api` | Seed the database |
+| `npm run prisma:generate -w apps/api` | Generate Prisma client |
+| `npm test -w apps/api -- --runInBand` | Run backend tests |
 
 ## Environment Variables
 
@@ -158,7 +159,19 @@ Swagger UI provides complete API documentation for all endpoints.
 
 ### Default Development Credentials
 After seeding, you can register new accounts or use seeded users:
-- Email: `admin@archivna.dev` / Password: `DevPass123!`
+- Email: `admin@example.com` / Password: `password123`
+
+## Archival Core
+
+The first archival-core release provides:
+
+- Institution → fonds/collection → series → file → item hierarchy.
+- Institution-scoped roles for depositors, catalogers, reviewers, and institution administrators, plus central system and sovereignty roles.
+- Draft → processing → cataloging → review → approval → publication workflow with a complete event and audit trail.
+- Public, sensitive, and sovereign access levels. Sensitive files require an approved, time-limited access request; sovereign material is restricted to the sovereign custodian and system administrator.
+- Separate records for access policies, people/organizations, controlled terms, descriptive metadata, technical metadata, and digital files.
+- Dublin Core, RiC-compatible, and EAD-compatible metadata export endpoints.
+- A bilingual archive-management dashboard for workflow queues, access requests, hierarchy, and team roles.
 
 ## Search Implementation
 

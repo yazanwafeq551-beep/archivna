@@ -122,15 +122,15 @@ export function usePublishArchive() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => archivesApi.publish(id),
+    mutationFn: (id: string) => archivesApi.transition(id, "submit"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myArchives"] });
       queryClient.invalidateQueries({ queryKey: ["drafts"] });
       queryClient.invalidateQueries({ queryKey: ["published"] });
-      toast.success(i18n.t("archive.publishSuccess"));
+      toast.success(i18n.t("archive.submitSuccess"));
     },
     onError: () => {
-      toast.error(i18n.t("archive.publishError"));
+      toast.error(i18n.t("archive.submitError"));
     },
   });
 }

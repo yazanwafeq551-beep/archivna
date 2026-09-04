@@ -9,6 +9,8 @@ import * as path from 'path';
 import * as mime from 'mime-types';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from './storage/storage.service';
+import { AuthorizationService } from '../common/authorization/authorization.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class FilesService {
@@ -17,6 +19,8 @@ export class FilesService {
   constructor(
     private prisma: PrismaService,
     private storageService: StorageService,
+    private authorization: AuthorizationService,
+    private audit: AuditService,
   ) {}
 
   async uploadFile(
@@ -36,7 +40,7 @@ export class FilesService {
       throw new NotFoundException('السجل الأرشيفي غير موجود');
     }
 
-    if (archive.owner_id !== userId) {
+    if (!(await this.authorization.canEditArchive(archive, userId))) {
       throw new ForbiddenException('ليس لديك صلاحية رفع ملفات لهذا السجل');
     }
 
@@ -79,6 +83,7 @@ export class FilesService {
         checksum,
       },
     });
+    await this.audit.log({ userId, action: 'archive.file_uploaded', entityType: 'ArchiveFile', entityId: archiveFile.id, metadata: { archiveRecordId, mimeType } });
 
     return {
       id: archiveFile.id,
@@ -103,11 +108,7 @@ export class FilesService {
       throw new NotFoundException('السجل الأرشيفي غير موجود');
     }
 
-    if (archive.status !== 'published' || archive.access_level !== 'public') {
-      if (!userId || archive.owner_id !== userId) {
-        throw new NotFoundException('السجل الأرشيفي غير موجود');
-      }
-    }
+    const canRead = await this.authorization.canReadFile(archive, userId);
 
     const files = await this.prisma.archiveFile.findMany({
       where: { archive_record_id: archiveRecordId },
@@ -126,7 +127,9 @@ export class FilesService {
       orderBy: { created_at: 'asc' },
     });
 
-    return files;
+    return canRead
+      ? files.map((file) => ({ ...file, access_granted: true }))
+      : files.map(({ secure_url, public_id, ...file }) => ({ ...file, access_granted: false }));
   }
 
   async getFileForDownload(archiveRecordId: string, userId?: string) {
@@ -138,11 +141,10 @@ export class FilesService {
       throw new NotFoundException('السجل الأرشيفي غير موجود');
     }
 
-    if (archive.status !== 'published' || archive.access_level !== 'public') {
-      if (!userId || archive.owner_id !== userId) {
-        throw new NotFoundException('السجل الأرشيفي غير موجود');
-      }
-    }
+    this.authorization.assert(
+      await this.authorization.canReadFile(archive, userId),
+      'تحتاج إلى موافقة سارية للوصول إلى هذا الملف',
+    );
 
     const files = await this.prisma.archiveFile.findMany({
       where: { archive_record_id: archiveRecordId },
@@ -171,13 +173,25 @@ export class FilesService {
     }
 
     const archive = file.archive_record;
-    if (archive.status !== 'published' || archive.access_level !== 'public') {
-      if (!userId || archive.owner_id !== userId) {
-        throw new NotFoundException('الملف غير موجود');
-      }
-    }
+    this.authorization.assert(
+      await this.authorization.canReadFile({ id: file.archive_record_id, ...archive }, userId),
+      'تحتاج إلى موافقة سارية للوصول إلى هذا الملف',
+    );
 
     return file;
+  }
+
+  resolveDelivery(file: { secure_url: string | null; storage_path: string; resource_type: string | null }) {
+    if (file.secure_url?.startsWith('/uploads/') || file.resource_type === 'local') {
+      const uploadsRoot = path.resolve(process.cwd(), 'uploads');
+      const filePath = path.resolve(uploadsRoot, file.storage_path);
+      if (filePath !== uploadsRoot && !filePath.startsWith(`${uploadsRoot}${path.sep}`)) {
+        throw new ForbiddenException('مسار الملف غير صالح');
+      }
+      return { kind: 'local' as const, path: filePath };
+    }
+    if (file.secure_url) return { kind: 'remote' as const, url: file.secure_url };
+    throw new NotFoundException('الملف غير موجود');
   }
 
   async deleteFile(archiveRecordId: string, userId: string) {
@@ -189,7 +203,7 @@ export class FilesService {
       throw new NotFoundException('السجل الأرشيفي غير موجود');
     }
 
-    if (archive.owner_id !== userId) {
+    if (!(await this.authorization.canEditArchive(archive, userId))) {
       throw new ForbiddenException('ليس لديك صلاحية حذف ملفات هذا السجل');
     }
 

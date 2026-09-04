@@ -58,4 +58,25 @@ export const filesApi = {
   getDownloadUrl: (fileId: string): string => {
     return `/api/v1/archives/file/${fileId}/download`;
   },
+
+  getContentBlob: async (fileId: string): Promise<string> => {
+    const response = await apiClient.get(`/archives/file/${fileId}/content`, {
+      responseType: "blob",
+    });
+    return URL.createObjectURL(response.data);
+  },
+
+  download: async (fileId: string, filename: string): Promise<void> => {
+    const response = await apiClient.get(`/archives/file/${fileId}/download`, {
+      responseType: "blob",
+    });
+    const objectUrl = URL.createObjectURL(response.data);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(objectUrl);
+  },
 };

@@ -29,15 +29,28 @@ export class QueryArchiveDto {
   @IsEnum(['relevance', 'newest', 'oldest'])
   sort?: string;
 
-  @ApiPropertyOptional({ enum: ['document', 'image', 'audio', 'video'] })
+  @ApiPropertyOptional({
+    enum: ['document', 'image', 'audio', 'video', 'map', 'manuscript'],
+  })
   @IsOptional()
   @IsString()
+  @IsEnum(['document', 'image', 'audio', 'video', 'map', 'manuscript'])
   material_type?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   institution?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  institution_id?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  archival_unit_id?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -69,13 +82,14 @@ export class QueryArchiveDto {
   @IsString()
   language?: string;
 
-  @ApiPropertyOptional({ enum: ['public', 'private'] })
+  @ApiPropertyOptional({ enum: ['public', 'sensitive', 'sovereign'] })
   @IsOptional()
   @IsString()
   access_level?: string;
 
-  @ApiPropertyOptional({ enum: ['draft', 'published', 'archived'] })
+  @ApiPropertyOptional({ enum: ['draft', 'processing', 'cataloging', 'in_review', 'approved', 'published', 'archived'] })
   @IsOptional()
   @IsString()
+  @IsEnum(['draft', 'processing', 'cataloging', 'in_review', 'approved', 'published', 'archived'])
   status?: string;
 }

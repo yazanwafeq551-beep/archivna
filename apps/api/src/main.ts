@@ -11,10 +11,27 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { SnakeToCamelInterceptor } from './common/interceptors/snake-to-camel.interceptor';
 import { CamelToSnakePipe } from './common/pipes/camel-to-snake.pipe';
+import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  const prisma = app.get(PrismaService);
+  app.use(async (req, res, next) => {
+    if (!req.path.startsWith('/uploads/')) return next();
+    const file = await prisma.archiveFile.findFirst({
+      where: { secure_url: req.path },
+      select: {
+        archive_record: {
+          select: { status: true, access_level: true },
+        },
+      },
+    });
+    if (file && (file.archive_record.status !== 'published' || file.archive_record.access_level !== 'public')) {
+      return res.status(403).json({ message: 'يجب الوصول إلى الملف من خلال المسار الآمن' });
+    }
+    return next();
+  });
   app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
   app.setGlobalPrefix('api/v1');

@@ -70,6 +70,7 @@ const FIELD_MAP: Record<string, string> = {
 };
 
 function snakeToCamel(str: string): string {
+  if (str.startsWith('_')) return str;
   if (FIELD_MAP[str]) return FIELD_MAP[str];
   return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 }

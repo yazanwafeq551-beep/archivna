@@ -1128,6 +1128,15 @@ async function main() {
   const institutions: Record<string, string> = {};
   const institutionSeeds = [
     {
+      name_ar: 'التجمع الأرشيفي الفلسطيني',
+      name_en: 'Palestinian Archival Collective',
+      slug: 'palestinian-archival-collective',
+      institution_type: 'archival_collective',
+      email: 'archive@arsheefna.ps',
+      website: 'https://arsheefna.ps',
+      city: 'فلسطين',
+    },
+    {
       name_ar: 'جامعة النجاح الوطنية',
       name_en: 'An-Najah National University',
       slug: 'an-najah',
@@ -1173,6 +1182,39 @@ async function main() {
     });
     institutions[seed.slug] = inst.id;
   }
+
+  const institutionByName = new Map(
+    (await prisma.institution.findMany({ select: { id: true, name_ar: true } }))
+      .map((institution) => [institution.name_ar, institution.id]),
+  );
+  for (const seed of userSeeds) {
+    const institutionId = seed.institution_name
+      ? institutionByName.get(seed.institution_name)
+      : institutions['palestinian-archival-collective'];
+    if (institutionId) {
+      await prisma.user.update({ where: { email: seed.email }, data: { institution_id: institutionId } });
+    }
+  }
+
+  const ensureRole = async (email: string, role: string, institutionId?: string) => {
+    const userId = users[email];
+    const existing = await prisma.roleAssignment.findFirst({
+      where: { user_id: userId, role, institution_id: institutionId || null },
+    });
+    if (existing) {
+      await prisma.roleAssignment.update({ where: { id: existing.id }, data: { is_active: true } });
+    } else {
+      await prisma.roleAssignment.create({ data: { user_id: userId, role, institution_id: institutionId } });
+    }
+  };
+  for (const email of Object.keys(users)) await ensureRole(email, 'researcher');
+  await ensureRole('admin@example.com', 'system_admin');
+  await ensureRole('admin@example.com', 'sovereignty_custodian');
+  await ensureRole('admin@example.com', 'institution_admin', institutions['palestinian-archival-collective']);
+  await ensureRole('fatma@example.com', 'depositor', institutions['palestinian-archival-collective']);
+  await ensureRole('mohammed@example.com', 'cataloger', institutions['pcch']);
+  await ensureRole('sara@example.com', 'institution_admin', institutions['birzeit']);
+  await ensureRole('reem@example.com', 'reviewer', institutions['palestinian-archival-collective']);
 
   // News categories (upsert by slug)
   const newsCategories: Record<string, string> = {};
@@ -1282,7 +1324,7 @@ async function main() {
       language: 'العربية',
       material_type: 'document',
       date_text: '1920-1930',
-      access_level: 'private',
+      access_level: 'sensitive',
       status: 'published',
       published_at: new Date('2024-05-10'),
     },
@@ -1402,7 +1444,7 @@ async function main() {
       language: 'العربية',
       material_type: 'document',
       date_text: '2020',
-      access_level: 'private',
+      access_level: 'sensitive',
       status: 'published',
       published_at: new Date('2024-08-15'),
     },
@@ -1631,6 +1673,74 @@ async function main() {
         checksum: crypto.createHash('sha256').update(buffer).digest('hex'),
         ...('duration_seconds' in media ? { duration_seconds: media.duration_seconds } : {}),
       } });
+    }
+  }
+
+  // Link every record to an institution and a valid fonds, preserving all data.
+  const pilotInstitutionId = institutions['palestinian-archival-collective'];
+  const allInstitutions = await prisma.institution.findMany({ select: { id: true, name_ar: true } });
+  const defaultFonds = new Map<string, string>();
+  for (const institution of allInstitutions) {
+    let fonds = await prisma.archivalUnit.findFirst({
+      where: { institution_id: institution.id, parent_id: null, reference_code: 'GF-001' },
+    });
+    if (!fonds) {
+      fonds = await prisma.archivalUnit.create({
+        data: {
+          institution_id: institution.id,
+          level: 'fonds',
+          title_ar: 'الرصيد العام',
+          title_en: 'General Fonds',
+          reference_code: 'GF-001',
+          description_ar: 'رصيد افتراضي لحفظ السجلات الحالية حتى استكمال ترتيبها',
+          created_by: users['admin@example.com'],
+        },
+      });
+    }
+    defaultFonds.set(institution.id, fonds.id);
+  }
+
+  const archivalRecords = await prisma.archiveRecord.findMany();
+  for (const record of archivalRecords) {
+    const matchedInstitution = record.institution_name
+      ? allInstitutions.find((institution) => institution.name_ar === record.institution_name)?.id
+      : undefined;
+    const institutionId = record.institution_id || matchedInstitution || pilotInstitutionId;
+    const accessLevel = record.access_level === 'private' ? 'sensitive' : record.access_level;
+    await prisma.archiveRecord.update({
+      where: { id: record.id },
+      data: {
+        institution_id: institutionId,
+        archival_unit_id: record.archival_unit_id || defaultFonds.get(institutionId),
+        access_level: accessLevel,
+      },
+    });
+    await prisma.accessPolicy.upsert({
+      where: { archive_record_id: record.id },
+      create: {
+        archive_record_id: record.id,
+        access_level: accessLevel,
+        metadata_visibility: accessLevel === 'sovereign' ? 'restricted' : 'public',
+        requires_reason: accessLevel !== 'public',
+        watermark_enabled: accessLevel === 'sensitive',
+      },
+      update: {
+        access_level: accessLevel,
+        metadata_visibility: accessLevel === 'sovereign' ? 'restricted' : 'public',
+        requires_reason: accessLevel !== 'public',
+        watermark_enabled: accessLevel === 'sensitive',
+      },
+    });
+    const workflowExists = await prisma.archiveWorkflowEvent.findFirst({ where: { archive_record_id: record.id } });
+    if (!workflowExists) {
+      await prisma.archiveWorkflowEvent.create({
+        data: {
+          archive_record_id: record.id,
+          actor_id: record.owner_id,
+          to_status: record.status,
+          note: 'ترحيل السجل مع الحفاظ على حالة النشر الحالية',
+        },
+      });
     }
   }
 

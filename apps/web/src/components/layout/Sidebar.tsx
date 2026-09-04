@@ -12,6 +12,7 @@ import {
   Settings,
   GraduationCap,
   BookOpenCheck,
+  ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 import { DASHBOARD_SIDEBAR_ITEMS } from "@/lib/constants";
@@ -29,6 +30,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Settings: <Settings className="h-5 w-5" />,
   GraduationCap: <GraduationCap className="h-5 w-5" />,
   BookOpenCheck: <BookOpenCheck className="h-5 w-5" />,
+  ShieldCheck: <ShieldCheck className="h-5 w-5" />,
 };
 
 const labelKeyMap: Record<string, string> = {
@@ -43,6 +45,7 @@ const labelKeyMap: Record<string, string> = {
   profile: "dashboard.profile.title",
   settings: "dashboard.settings.title",
   courseAdmin: "dashboard.coursesAdmin",
+  archiveManagement: "dashboard.archiveManagement",
 };
 
 interface SidebarProps {
@@ -53,6 +56,7 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
+  const canDeposit = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin", "depositor", "cataloger"].includes(assignment.role));
   const isActive = (path: string) => {
     if (path === "/dashboard") {
       return location.pathname === "/dashboard";
@@ -69,7 +73,11 @@ export function Sidebar({ unreadCount = 0 }: SidebarProps) {
       </div>
       <nav className="flex-1 overflow-y-auto p-4" aria-label={t("common.dashboardMenu")}>
         <ul className="space-y-1">
-          {DASHBOARD_SIDEBAR_ITEMS.filter((item) => !("adminOnly" in item) || user?.email === "admin@example.com").map((item) => (
+          {DASHBOARD_SIDEBAR_ITEMS.filter((item) => {
+            if ("adminOnly" in item && !user?.roleAssignments?.some((assignment) => assignment.role === "system_admin")) return false;
+            if (item.key === "new" && !canDeposit) return false;
+            return true;
+          }).map((item) => (
             <li key={item.key}>
               <Link
                 to={item.path}

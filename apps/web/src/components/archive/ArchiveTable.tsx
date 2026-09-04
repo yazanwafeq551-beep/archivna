@@ -98,7 +98,7 @@ export function ArchiveTable({
                         : "secondary"
                     }
                   >
-                    {archive.status === "published" ? t("archiveTable.published") : archive.status === "draft" ? t("archiveTable.draft") : t("archiveTable.archived")}
+                    {t(`workflowStatuses.${archive.status}`, { defaultValue: archive.status })}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -118,17 +118,17 @@ export function ArchiveTable({
                         {t("dashboard.archives.edit")}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      {archive.status === "draft" ? (
+                      {archive.status === "draft" && onPublish ? (
                         <DropdownMenuItem onClick={() => onPublish?.(archive)}>
                           <Globe className="ms-2 h-4 w-4" />
-                          {t("dashboard.archives.publish")}
+                          {t("dashboard.archives.submitReview")}
                         </DropdownMenuItem>
-                      ) : (
+                      ) : archive.status === "published" && onUnpublish ? (
                         <DropdownMenuItem onClick={() => onUnpublish?.(archive)}>
                           <FileEdit className="ms-2 h-4 w-4" />
                           {t("dashboard.archives.unpublish")}
                         </DropdownMenuItem>
-                      )}
+                      ) : null}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onDelete?.(archive)}

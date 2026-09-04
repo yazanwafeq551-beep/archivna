@@ -117,6 +117,8 @@ export default {
     "deleteError": "Error deleting archive",
     "publishSuccess": "Archive published successfully",
     "publishError": "Error publishing archive",
+    "submitSuccess": "The record was submitted to the review workflow",
+    "submitError": "The record could not be submitted to the review workflow",
     "unpublishSuccess": "Archive unpublished successfully",
     "unpublishError": "Error unpublishing archive",
     "uploadSuccess": "File uploaded successfully",
@@ -129,7 +131,16 @@ export default {
     "removeFavorite": "Removed from favorites",
     "fileTooLarge": "File exceeds maximum size ({{size}})",
     "fileTypeNotSupported": "File type not supported",
-    "privateFile": "This file is private. Only the owner can access it.",
+    "privateFile": "This file is restricted and requires access approval.",
+    "restrictedFile": "This file is restricted and requires a valid access grant.",
+    "requestAccessTitle": "Request access",
+    "requestAccessDescription": "Descriptive metadata is public, while the digital object requires approval from the owning institution.",
+    "accessReasonPlaceholder": "Explain the research or educational purpose of this request...",
+    "sendAccessRequest": "Send access request",
+    "loginToRequest": "Sign in to request access",
+    "accessRequestSent": "Your access request was sent for review",
+    "accessRequestError": "The request could not be sent, or an active request already exists",
+    "archivalContext": "Archival context",
     "browserNoAudio": "Your browser does not support audio playback.",
     "browserNoVideo": "Your browser does not support video playback."
   },
@@ -141,6 +152,7 @@ export default {
   },
   "dashboard": {
     "coursesAdmin": "Manage Courses",
+    "archiveManagement": "Archive Management",
     "overview": {
       "title": "Overview",
       "totalArchives": "Total Archives",
@@ -167,6 +179,7 @@ export default {
       "view": "View",
       "edit": "Edit",
       "publish": "Publish",
+      "submitReview": "Submit for review",
       "unpublish": "Unpublish",
       "delete": "Delete",
       "confirmDelete": "Are you sure you want to delete this file?",
@@ -225,7 +238,9 @@ export default {
       "review": {
         "title": "Review Information",
         "saveDraft": "Save as Draft",
-        "publish": "Publish",
+        "publish": "Submit for review",
+        "submit": "Submit to review workflow",
+        "submitSuccess": "The record was submitted for processing and review",
         "titleArLabel": "Title in Arabic",
         "titleEnLabel": "Title in English",
         "referenceLabel": "Reference Number",
@@ -245,6 +260,8 @@ export default {
       "email": "Email",
       "phone": "Phone Number",
       "institution": "Institution",
+      "archivalUnit": "Parent archival unit",
+      "selectArchivalUnit": "Select a fonds, series, or file...",
       "bio": "Bio",
       "avatar": "Profile Picture",
       "changePassword": "Change Password",
@@ -532,7 +549,17 @@ export default {
   "accessLevels": {
     "public": "Public",
     "sensitive": "Sensitive",
-    "private": "Private"
+    "private": "Sensitive",
+    "sovereign": "Sovereign"
+  },
+  "workflowStatuses": {
+    "draft": "Draft",
+    "processing": "Processing",
+    "cataloging": "Cataloging",
+    "inReview": "In review",
+    "approved": "Approved",
+    "published": "Published",
+    "archived": "Archived"
   },
   "sort": {
     "relevance": "Most Relevant",

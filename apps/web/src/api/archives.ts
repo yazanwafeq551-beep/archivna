@@ -10,7 +10,8 @@ export interface Archive {
   descriptionAr?: string;
   descriptionEn?: string;
   materialType: string;
-  accessLevel: "public" | "sensitive" | "private";
+  accessLevel: "public" | "sensitive" | "sovereign";
+  accessGranted?: boolean;
   dateText?: string;
   dateFrom?: string;
   dateTo?: string;
@@ -28,7 +29,13 @@ export interface Archive {
     avatar?: string;
     avatarUrl?: string;
   };
-  status: "draft" | "published" | "archived";
+  status: "draft" | "processing" | "cataloging" | "inReview" | "approved" | "published" | "archived";
+  institutionId?: string;
+  archivalUnitId?: string;
+  institution?: { id: string; nameAr: string; nameEn?: string; slug: string };
+  archivalUnit?: { id: string; titleAr: string; titleEn?: string; level: string; referenceCode?: string };
+  accessPolicy?: { requiresReason: boolean; watermarkEnabled: boolean; metadataVisibility: string };
+  workflowEvents?: Array<{ id: string; fromStatus?: string; toStatus: string; note?: string; createdAt: string; actor?: { id: string; fullName: string } }>;
   files: ArchiveFile[];
   subjects?: { id: string; subject: string }[];
   _count?: { files: number; favorites: number };
@@ -80,7 +87,7 @@ export interface CreateArchiveRequest {
   referenceNumber?: string;
   description?: string;
   materialType: string;
-  accessLevel: "public" | "sensitive" | "private";
+  accessLevel: "public" | "sensitive" | "sovereign";
   date?: string;
   institution?: string;
   creator?: string;
@@ -89,7 +96,10 @@ export interface CreateArchiveRequest {
   place?: string;
   language?: string;
   rights?: string;
-  status?: "draft" | "published";
+  institutionId?: string;
+  archivalUnitId?: string;
+  metadata?: Record<string, unknown>;
+  status?: "draft";
 }
 
 export interface SearchParams {
@@ -149,6 +159,11 @@ export const archivesApi = {
 
   unpublish: async (id: string): Promise<Archive> => {
     const response = await apiClient.post(`/archives/${id}/unpublish`);
+    return response.data;
+  },
+
+  transition: async (id: string, action: string, note?: string): Promise<Archive> => {
+    const response = await apiClient.post(`/archives/${id}/workflow`, { action, note });
     return response.data;
   },
 

@@ -34,8 +34,7 @@ apps/api/uploads/archives/real/*
 !apps/api/uploads/archives/real/fedai.ogg
 !apps/api/uploads/archives/real/palestinian-dabke.webm
 
-# Prisma
-apps/api/prisma/migrations/
+# Prisma migrations are part of the deployable schema history.
 
 # Logs
 *.log

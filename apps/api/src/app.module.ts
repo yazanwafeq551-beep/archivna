@@ -14,6 +14,9 @@ import { SettingsModule } from './settings/settings.module';
 import { AuditModule } from './audit/audit.module';
 import { InstitutionsModule } from './institutions/institutions.module';
 import { LmsModule } from './lms/lms.module';
+import { AuthorizationModule } from './common/authorization/authorization.module';
+import { CatalogModule } from './catalog/catalog.module';
+import { GovernanceModule } from './governance/governance.module';
 
 @Module({
   imports: [
@@ -25,6 +28,7 @@ import { LmsModule } from './lms/lms.module';
       ],
     }),
     PrismaModule,
+    AuthorizationModule,
     AuthModule,
     ProfileModule,
     ArchivesModule,
@@ -37,6 +41,8 @@ import { LmsModule } from './lms/lms.module';
     AuditModule,
     InstitutionsModule,
     LmsModule,
+    CatalogModule,
+    GovernanceModule,
   ],
 })
 export class AppModule {}

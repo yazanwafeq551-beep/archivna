@@ -5,6 +5,8 @@ export interface ArchiveQueryParams {
   q?: string;
   material_type?: string;
   institution?: string;
+  institution_id?: string;
+  archival_unit_id?: string;
   collection?: string;
   place?: string;
   language?: string;
@@ -24,12 +26,12 @@ export function buildArchiveWhere(
   if (userId) {
     andClauses.push({
       OR: [
-        { status: 'published', access_level: 'public' },
+        { status: 'published', access_level: { in: ['public', 'sensitive'] } },
         { owner_id: userId },
       ],
     });
   } else {
-    andClauses.push({ status: 'published', access_level: 'public' });
+    andClauses.push({ status: 'published', access_level: { in: ['public', 'sensitive'] } });
   }
 
   if (params.q) {
@@ -77,6 +79,10 @@ export function buildArchiveWhere(
             mode: 'insensitive',
           },
         },
+        { institution: { name_ar: { contains: normalizedQuery, mode: 'insensitive' } } },
+        { institution: { name_en: { contains: normalizedQuery, mode: 'insensitive' } } },
+        { archival_unit: { title_ar: { contains: normalizedQuery, mode: 'insensitive' } } },
+        { archival_unit: { title_en: { contains: normalizedQuery, mode: 'insensitive' } } },
         {
           collection_name: {
             contains: normalizedQuery,
@@ -108,7 +114,21 @@ export function buildArchiveWhere(
 
   if (params.institution) {
     andClauses.push({
-      institution_name: { contains: params.institution, mode: 'insensitive' },
+      OR: [
+        { institution_name: { contains: params.institution, mode: 'insensitive' } },
+        { institution: { name_ar: { contains: params.institution, mode: 'insensitive' } } },
+        { institution: { name_en: { contains: params.institution, mode: 'insensitive' } } },
+      ],
+    });
+  }
+
+  if (params.institution_id) andClauses.push({ institution_id: params.institution_id });
+  if (params.archival_unit_id) {
+    andClauses.push({
+      OR: [
+        { archival_unit_id: params.archival_unit_id },
+        { archival_unit: { parent_id: params.archival_unit_id } },
+      ],
     });
   }
 

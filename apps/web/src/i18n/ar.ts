@@ -117,6 +117,8 @@ export default {
     "deleteError": "حدث خطأ أثناء حذف الملف",
     "publishSuccess": "تم نشر الملف بنجاح",
     "publishError": "حدث خطأ أثناء نشر الملف",
+    "submitSuccess": "تم إرسال السجل إلى سير المراجعة",
+    "submitError": "تعذر إرسال السجل إلى سير المراجعة",
     "unpublishSuccess": "تم إلغاء نشر الملف بنجاح",
     "unpublishError": "حدث خطأ أثناء إلغاء النشر",
     "uploadSuccess": "تم رفع الملف بنجاح",
@@ -129,7 +131,16 @@ export default {
     "removeFavorite": "تمت الإزالة من المفضلة",
     "fileTooLarge": "الملف يتجاوز الحد الأقصى ({{size}})",
     "fileTypeNotSupported": "نوع الملف غير مدعوم",
-    "privateFile": "هذا الملف خاص. يمكن للمالك فقط الوصول إليه.",
+    "privateFile": "هذا الملف مقيّد ويتطلب موافقة للوصول إليه.",
+    "restrictedFile": "هذا الملف مقيّد ويتطلب موافقة سارية للوصول إليه.",
+    "requestAccessTitle": "طلب الوصول إلى المادة",
+    "requestAccessDescription": "البيانات الوصفية متاحة، أما الملف الرقمي فيحتاج إلى موافقة المؤسسة المالكة.",
+    "accessReasonPlaceholder": "اشرح سبب الطلب والغرض البحثي أو التعليمي...",
+    "sendAccessRequest": "إرسال طلب الوصول",
+    "loginToRequest": "تسجيل الدخول لإرسال طلب",
+    "accessRequestSent": "تم إرسال طلب الوصول للمراجعة",
+    "accessRequestError": "تعذر إرسال الطلب أو يوجد طلب نشط مسبقاً",
+    "archivalContext": "السياق الأرشيفي",
     "browserNoAudio": "المتصفح لا يدعم تشغيل الصوت.",
     "browserNoVideo": "المتصفح لا يدعم تشغيل الفيديو."
   },
@@ -141,6 +152,7 @@ export default {
   },
   "dashboard": {
     "coursesAdmin": "إدارة الدورات",
+    "archiveManagement": "إدارة الأرشيف والوصول",
     "overview": {
       "title": "نظرة عامة",
       "totalArchives": "إجمالي الأرشيفات",
@@ -167,6 +179,7 @@ export default {
       "view": "عرض",
       "edit": "تعديل",
       "publish": "نشر",
+      "submitReview": "إرسال للمراجعة",
       "unpublish": "إلغاء النشر",
       "delete": "حذف",
       "confirmDelete": "هل أنت متأكد من حذف هذا الملف؟",
@@ -225,7 +238,9 @@ export default {
       "review": {
         "title": "مراجعة المعلومات",
         "saveDraft": "حفظ كمسودة",
-        "publish": "نشر",
+        "publish": "إرسال للمراجعة",
+        "submit": "إرسال إلى سير المراجعة",
+        "submitSuccess": "تم إرسال السجل إلى المعالجة والمراجعة",
         "titleArLabel": "العنوان بالعربية",
         "titleEnLabel": "العنوان بالإنجليزية",
         "referenceLabel": "الرقم المرجعي",
@@ -245,6 +260,8 @@ export default {
       "email": "البريد الإلكتروني",
       "phone": "رقم الهاتف",
       "institution": "المؤسسة",
+      "archivalUnit": "الوحدة الأرشيفية الأب",
+      "selectArchivalUnit": "اختر الرصيد أو السلسلة أو الملف...",
       "bio": "نبذة شخصية",
       "avatar": "الصورة الشخصية",
       "changePassword": "تغيير كلمة المرور",
@@ -532,7 +549,17 @@ export default {
   "accessLevels": {
     "public": "عام",
     "sensitive": "حساس",
-    "private": "خاص"
+    "private": "حساس",
+    "sovereign": "سيادي"
+  },
+  "workflowStatuses": {
+    "draft": "مسودة",
+    "processing": "قيد المعالجة",
+    "cataloging": "قيد الفهرسة",
+    "inReview": "قيد المراجعة",
+    "approved": "معتمد",
+    "published": "منشور",
+    "archived": "مؤرشف"
   },
   "sort": {
     "relevance": "الأكثر صلة",

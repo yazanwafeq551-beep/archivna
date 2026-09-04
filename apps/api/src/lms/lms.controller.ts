@@ -10,7 +10,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { LmsService } from './lms.service';
@@ -20,14 +19,15 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard, Public, OptionalAuth } from '../auth/auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CreateCourseDto } from './dto/create-course.dto';
+import { AuthorizationService } from '../common/authorization/authorization.service';
 
 @ApiTags('LMS')
 @Controller('lms')
 export class LmsController {
-  constructor(private lmsService: LmsService) {}
+  constructor(private lmsService: LmsService, private authorization: AuthorizationService) {}
 
-  private requireAdmin(email?: string) {
-    if (email !== 'admin@example.com') throw new ForbiddenException('Admin access required');
+  private async requireAdmin(userId?: string) {
+    this.authorization.assert(await this.authorization.isSystemAdmin(userId), 'Admin access required');
   }
 
   // === Categories ===
@@ -43,16 +43,16 @@ export class LmsController {
   @Get('admin/courses')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAdminCourses(@CurrentUser('email') email: string) {
-    this.requireAdmin(email);
+  async findAdminCourses(@CurrentUser('id') userId: string) {
+    await this.requireAdmin(userId);
     return this.lmsService.findAdminCourses();
   }
 
   @Post('admin/courses')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async createAdminCourse(@Body() dto: CreateCourseDto, @CurrentUser('email') email: string) {
-    this.requireAdmin(email);
+  async createAdminCourse(@Body() dto: CreateCourseDto, @CurrentUser('id') userId: string) {
+    await this.requireAdmin(userId);
     return this.lmsService.createAdminCourse(dto);
   }
 
@@ -60,8 +60,8 @@ export class LmsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteAdminCourse(@Param('courseId') courseId: string, @CurrentUser('email') email: string) {
-    this.requireAdmin(email);
+  async deleteAdminCourse(@Param('courseId') courseId: string, @CurrentUser('id') userId: string) {
+    await this.requireAdmin(userId);
     await this.lmsService.deleteAdminCourse(courseId);
   }
 

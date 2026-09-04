@@ -10,6 +10,14 @@ import { parsePage, parseLimit } from '../common/utils/pagination';
 export class SearchController {
   constructor(private searchService: SearchService) {}
 
+  @Get('suggestions')
+  @OptionalAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'اقتراحات البحث العربي' })
+  async suggestions(@Query('q') q?: string, @CurrentUser('id') userId?: string) {
+    return this.searchService.suggestions(q || '', userId);
+  }
+
   @Get()
   @OptionalAuth()
   @UseGuards(JwtAuthGuard)
@@ -22,6 +30,8 @@ export class SearchController {
     @Query('material_type') material_type?: string,
     @Query('institution_name') institution?: string,
     @Query('institution') institutionAlt?: string,
+    @Query('institution_id') institution_id?: string,
+    @Query('archival_unit_id') archival_unit_id?: string,
     @Query('collection') collection?: string,
     @Query('date_from') date_from?: string,
     @Query('date_to') date_to?: string,
@@ -38,6 +48,8 @@ export class SearchController {
       sort,
       material_type,
       institution_name: institution || institutionAlt,
+      institution_id,
+      archival_unit_id,
       collection_name: collection,
       date_from,
       date_to,

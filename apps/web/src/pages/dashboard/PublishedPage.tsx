@@ -11,6 +11,7 @@ import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { usePublished, useDeleteArchive, useUnpublishArchive } from "@/hooks/useArchive";
 import type { Archive } from "@/api/archives";
+import { useAuth } from "@/hooks/useAuth";
 
 export function PublishedPage() {
   const { t } = useTranslation();
@@ -18,6 +19,8 @@ export function PublishedPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Archive | null>(null);
+  const { user } = useAuth();
+  const canUnpublish = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin"].includes(assignment.role));
 
   const { data, isLoading, error } = usePublished({
     page,
@@ -69,7 +72,7 @@ export function PublishedPage() {
             archives={data.data}
             onView={(a) => navigate(`/archives/${a.id}`)}
             onEdit={(a) => navigate(`/dashboard/archives/${a.id}/edit`)}
-            onUnpublish={(a) => unpublishMutation.mutate(a.id)}
+            onUnpublish={canUnpublish ? (a) => unpublishMutation.mutate(a.id) : undefined}
             onDelete={setDeleteTarget}
           />
           {data.meta.totalPages > 1 && (

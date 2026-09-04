@@ -36,7 +36,7 @@ export function ArchiveCard({ archive, viewMode = "grid" }: ArchiveCardProps) {
   const rawThumbnailUrl = playableFile?.mimeType?.startsWith("image/")
     ? playableFile.secureUrl
     : firstFile?.thumbnailPath || (firstFile as typeof firstFile & { thumbnailUrl?: string })?.thumbnailUrl || (firstFile?.mimeType?.startsWith("image/") ? firstFile.secureUrl : undefined);
-  const thumbnailUrl = resolveMediaUrl(rawThumbnailUrl) || (firstFile ? filesApi.getDownloadUrl(firstFile.id) : undefined);
+  const thumbnailUrl = resolveMediaUrl(rawThumbnailUrl) || (firstFile && (archive.accessLevel === "public" || archive.accessGranted) ? filesApi.getDownloadUrl(firstFile.id) : undefined);
 
   const stopCardNavigation = (event: React.SyntheticEvent) => {
     event.preventDefault();

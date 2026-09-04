@@ -39,6 +39,7 @@ import { NotificationsPage } from "@/pages/dashboard/NotificationsPage";
 import { ProfilePage } from "@/pages/dashboard/ProfilePage";
 import { SettingsPage } from "@/pages/dashboard/SettingsPage";
 import { AdminCoursesPage } from "@/pages/dashboard/AdminCoursesPage";
+import { ArchiveManagementPage } from "@/pages/dashboard/ArchiveManagementPage";
 
 // System Pages
 import { NotFoundPage } from "@/pages/system/NotFoundPage";
@@ -60,6 +61,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
+  return <>{children}</>;
+}
+
+function RoleRoute({ roles, children }: { roles: string[]; children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) return <div className="flex min-h-screen items-center justify-center"><BrandLoader className="h-16 w-16" /></div>;
+  if (!user?.roleAssignments?.some((assignment) => roles.includes(assignment.role))) return <Navigate to="/unauthorized" replace />;
   return <>{children}</>;
 }
 
@@ -112,7 +120,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardOverview /> },
       { path: "archives", element: <MyArchivesPage /> },
-      { path: "archives/new", element: <NewArchivePage /> },
+      { path: "archives/new", element: <RoleRoute roles={["system_admin", "institution_admin", "depositor", "cataloger"]}><NewArchivePage /></RoleRoute> },
       { path: "archives/:id/edit", element: <EditArchivePage /> },
       { path: "drafts", element: <DraftsPage /> },
       { path: "published", element: <PublishedPage /> },
@@ -120,7 +128,8 @@ export const router = createBrowserRouter([
       { path: "notifications", element: <NotificationsPage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "settings", element: <SettingsPage /> },
-      { path: "courses", element: <AdminCoursesPage /> },
+      { path: "courses", element: <RoleRoute roles={["system_admin"]}><AdminCoursesPage /></RoleRoute> },
+      { path: "archive-management", element: <ArchiveManagementPage /> },
     ],
   },
   { path: "/404", element: <NotFoundPage /> },

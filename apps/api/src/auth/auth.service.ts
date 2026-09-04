@@ -39,6 +39,9 @@ export class AuthService {
         app_settings: {
           create: {},
         },
+        role_assignments: {
+          create: { role: 'researcher' },
+        },
       },
       select: {
         id: true,
@@ -54,11 +57,12 @@ export class AuthService {
       },
     });
 
+    const userWithRoles = await this.getMe(user.id);
     const tokens = await this.generateTokens(user.id, user.email);
     await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     return {
-      user,
+      user: userWithRoles,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
@@ -93,7 +97,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user.id, user.email);
     await this.storeRefreshToken(user.id, tokens.refreshToken);
 
-    const { password_hash, ...userResult } = user;
+    const userResult = await this.getMe(user.id);
 
     return {
       user: userResult,
@@ -108,28 +112,7 @@ export class AuthService {
       data: { is_revoked: true },
     });
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        full_name: true,
-        email: true,
-        phone: true,
-        institution_name: true,
-        institution_id: true,
-        account_type: true,
-        avatar_path: true,
-        bio: true,
-        preferred_language: true,
-        theme: true,
-        text_size: true,
-        reduced_motion: true,
-        account_status: true,
-        created_at: true,
-        updated_at: true,
-        last_login_at: true,
-      },
-    });
+    const user = await this.getMe(userId);
 
     if (!user || user.id !== userId) {
       throw new UnauthorizedException('المستخدم غير موجود');
@@ -176,6 +159,10 @@ export class AuthService {
         created_at: true,
         updated_at: true,
         last_login_at: true,
+        role_assignments: {
+          where: { is_active: true },
+          select: { id: true, role: true, institution_id: true },
+        },
       },
     });
 

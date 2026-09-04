@@ -26,7 +26,11 @@ model Institution {
   created_at         DateTime @default(now())
   updated_at         DateTime @default(now()) @updatedAt
 
-  users User[]
+  users            User[]
+  archival_units   ArchivalUnit[]
+  archive_records  ArchiveRecord[]
+  role_assignments RoleAssignment[]
+  access_requests  AccessRequest[]
 }
 
 model User {
@@ -59,6 +63,11 @@ model User {
   app_settings    AppSetting?
   audit_logs      AuditLog[]
   archive_files   ArchiveFile[]
+  role_assignments         RoleAssignment[]      @relation("AssignedRoles")
+  role_assignments_created RoleAssignment[]      @relation("RoleAssigner")
+  access_requests          AccessRequest[]        @relation("AccessRequester")
+  access_decisions         AccessRequest[]        @relation("AccessDecisionMaker")
+  workflow_events          ArchiveWorkflowEvent[]
 
   course_enrollments CourseEnrollment[]
   lesson_progress    LessonProgress[]
@@ -83,6 +92,8 @@ model RefreshToken {
 model ArchiveRecord {
   id                   String         @id @default(uuid())
   owner_id             String
+  institution_id       String?
+  archival_unit_id     String?
   title_ar             String
   title_en             String?
   alternative_title_ar String?
@@ -106,14 +117,180 @@ model ArchiveRecord {
   ocr_status           String         @default("not_started")
   ocr_text_ar          String?
   ocr_text_en          String?
+  metadata             Json?
+  technical_metadata   Json?
+  submitted_at         DateTime?
+  reviewed_at          DateTime?
+  reviewed_by          String?
+  approved_at          DateTime?
+  approved_by          String?
   published_at         DateTime?
   created_at           DateTime       @default(now())
   updated_at           DateTime       @default(now()) @updatedAt
 
   owner     User              @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  institution Institution?    @relation(fields: [institution_id], references: [id], onDelete: SetNull)
+  archival_unit ArchivalUnit? @relation(fields: [archival_unit_id], references: [id], onDelete: SetNull)
   files     ArchiveFile[]
   subjects  ArchiveSubject[]
   favorites Favorite[]
+  access_policy AccessPolicy?
+  access_requests AccessRequest[]
+  workflow_events ArchiveWorkflowEvent[]
+  agents ArchiveAgent[]
+  controlled_terms ArchiveRecordTerm[]
+
+  @@index([institution_id, status])
+  @@index([archival_unit_id])
+  @@index([access_level, status])
+}
+
+/// A node in the archival hierarchy. ArchiveRecord represents the final item level.
+model ArchivalUnit {
+  id             String   @id @default(uuid())
+  institution_id String
+  parent_id      String?
+  level          String
+  title_ar       String
+  title_en       String?
+  reference_code String?
+  description_ar String?
+  description_en String?
+  sort_order     Int      @default(0)
+  created_by     String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+
+  institution Institution    @relation(fields: [institution_id], references: [id], onDelete: Cascade)
+  parent      ArchivalUnit?   @relation("ArchivalUnitTree", fields: [parent_id], references: [id], onDelete: Cascade)
+  children    ArchivalUnit[]  @relation("ArchivalUnitTree")
+  records     ArchiveRecord[]
+
+  @@index([institution_id, level])
+  @@index([parent_id, sort_order])
+}
+
+model RoleAssignment {
+  id             String   @id @default(uuid())
+  user_id        String
+  role           String
+  institution_id String?
+  assigned_by_id String?
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+
+  user         User         @relation("AssignedRoles", fields: [user_id], references: [id], onDelete: Cascade)
+  assigned_by  User?        @relation("RoleAssigner", fields: [assigned_by_id], references: [id], onDelete: SetNull)
+  institution Institution?  @relation(fields: [institution_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, role, institution_id])
+  @@index([institution_id, role])
+}
+
+model AccessPolicy {
+  id                  String   @id @default(uuid())
+  archive_record_id   String   @unique
+  access_level        String   @default("public")
+  metadata_visibility String   @default("public")
+  requires_reason     Boolean  @default(false)
+  watermark_enabled   Boolean  @default(false)
+  default_grant_hours Int      @default(72)
+  sovereign_region    String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @default(now()) @updatedAt
+
+  archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
+}
+
+model AccessRequest {
+  id                String    @id @default(uuid())
+  archive_record_id String
+  requester_id      String
+  institution_id    String?
+  reason            String
+  intended_use      String?
+  status            String    @default("pending")
+  decision_note     String?
+  decided_by_id     String?
+  decided_at        DateTime?
+  expires_at        DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @default(now()) @updatedAt
+
+  archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
+  requester      User          @relation("AccessRequester", fields: [requester_id], references: [id], onDelete: Cascade)
+  decided_by     User?         @relation("AccessDecisionMaker", fields: [decided_by_id], references: [id], onDelete: SetNull)
+  institution    Institution?  @relation(fields: [institution_id], references: [id], onDelete: SetNull)
+
+  @@index([requester_id, status])
+  @@index([institution_id, status])
+  @@index([archive_record_id, status])
+}
+
+model ArchiveWorkflowEvent {
+  id                String   @id @default(uuid())
+  archive_record_id String
+  actor_id          String?
+  from_status       String?
+  to_status         String
+  note              String?
+  created_at        DateTime @default(now())
+
+  archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
+  actor          User?         @relation(fields: [actor_id], references: [id], onDelete: SetNull)
+
+  @@index([archive_record_id, created_at])
+}
+
+model Agent {
+  id                  String   @id @default(uuid())
+  name_ar             String
+  name_en             String?
+  agent_type          String
+  authority_reference String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @default(now()) @updatedAt
+
+  archive_records ArchiveAgent[]
+}
+
+model ArchiveAgent {
+  archive_record_id String
+  agent_id          String
+  role              String
+
+  archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
+  agent          Agent         @relation(fields: [agent_id], references: [id], onDelete: Cascade)
+
+  @@id([archive_record_id, agent_id, role])
+}
+
+model ControlledTerm {
+  id          String   @id @default(uuid())
+  scheme      String
+  label_ar    String
+  label_en    String?
+  code        String?
+  broader_id  String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  broader  ControlledTerm?  @relation("ControlledTermTree", fields: [broader_id], references: [id], onDelete: SetNull)
+  narrower ControlledTerm[]  @relation("ControlledTermTree")
+  records  ArchiveRecordTerm[]
+
+  @@index([scheme, label_ar])
+}
+
+model ArchiveRecordTerm {
+  archive_record_id String
+  term_id           String
+
+  archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
+  term           ControlledTerm @relation(fields: [term_id], references: [id], onDelete: Cascade)
+
+  @@id([archive_record_id, term_id])
 }
 
 model ArchiveFile {

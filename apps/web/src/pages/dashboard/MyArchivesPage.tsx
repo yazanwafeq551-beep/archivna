@@ -12,6 +12,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { useMyArchives, useDeleteArchive, usePublishArchive, useUnpublishArchive } from "@/hooks/useArchive";
 import type { Archive } from "@/api/archives";
+import { useAuth } from "@/hooks/useAuth";
 
 export function MyArchivesPage() {
   const { t } = useTranslation();
@@ -19,6 +20,9 @@ export function MyArchivesPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Archive | null>(null);
+  const { user } = useAuth();
+  const canDeposit = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin", "depositor", "cataloger"].includes(assignment.role));
+  const canUnpublish = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin"].includes(assignment.role));
 
   const { data, isLoading, error } = useMyArchives({
     page,
@@ -44,10 +48,10 @@ export function MyArchivesPage() {
         <h2 className="text-2xl font-heading font-bold text-foreground">
           {t("dashboard.archives.title")}
         </h2>
-        <Button onClick={() => navigate("/dashboard/archives/new")}>
+        {canDeposit && <Button onClick={() => navigate("/dashboard/archives/new")}>
           <Plus className="ms-1 h-4 w-4" />
           {t("dashboard.archives.new")}
-        </Button>
+        </Button>}
       </div>
 
       <div className="flex items-center gap-3">
@@ -80,7 +84,7 @@ export function MyArchivesPage() {
             onView={(a) => navigate(`/archives/${a.id}`)}
             onEdit={(a) => navigate(`/dashboard/archives/${a.id}/edit`)}
             onPublish={(a) => publishMutation.mutate(a.id)}
-            onUnpublish={(a) => unpublishMutation.mutate(a.id)}
+            onUnpublish={canUnpublish ? (a) => unpublishMutation.mutate(a.id) : undefined}
             onDelete={setDeleteTarget}
           />
           {data.meta.totalPages > 1 && (
@@ -95,10 +99,10 @@ export function MyArchivesPage() {
         <EmptyState
           title={t("empty.myArchives")}
           description={t("empty.myArchivesDesc")}
-          action={{
+          action={canDeposit ? {
             label: t("dashboard.archives.new"),
             onClick: () => navigate("/dashboard/archives/new"),
-          }}
+          } : undefined}
         />
       )}
 

@@ -64,12 +64,7 @@ export class FilesController {
     @CurrentUser('id') userId?: string,
   ) {
     const file = await this.filesService.getFileForDownload(id, userId);
-
-    if (file.secure_url) {
-      return res.redirect(file.secure_url);
-    }
-
-    return res.status(404).json({ message: 'الملف غير موجود' });
+    return this.deliver(file, res, false);
   }
 
   @Delete(':id/file')
@@ -94,11 +89,34 @@ export class FilesController {
     @CurrentUser('id') userId?: string,
   ) {
     const file = await this.filesService.getFileById(fileId, userId);
+    return this.deliver(file, res, false);
+  }
 
-    if (file.secure_url) {
-      return res.redirect(file.secure_url);
-    }
+  @Get('file/:fileId/content')
+  @OptionalAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'عرض محتوى الملف بعد التحقق من صلاحية الوصول' })
+  async viewFileById(
+    @Param('fileId') fileId: string,
+    @Res() res: Response,
+    @CurrentUser('id') userId?: string,
+  ) {
+    const file = await this.filesService.getFileById(fileId, userId);
+    return this.deliver(file, res, true);
+  }
 
-    return res.status(404).json({ message: 'الملف غير موجود' });
+  private deliver(
+    file: { secure_url: string | null; storage_path: string; resource_type: string | null; mime_type: string; original_filename: string },
+    res: Response,
+    inline: boolean,
+  ) {
+    const delivery = this.filesService.resolveDelivery(file);
+    if (delivery.kind === 'remote') return res.redirect(delivery.url);
+    res.type(file.mime_type);
+    res.setHeader(
+      'Content-Disposition',
+      `${inline ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(file.original_filename)}`,
+    );
+    return res.sendFile(delivery.path);
   }
 }
