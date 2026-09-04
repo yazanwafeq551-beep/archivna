@@ -193,21 +193,77 @@ export interface LmsStats {
   totalLearningHours: number;
 }
 
+export interface LessonAttachmentInput {
+  titleAr: string;
+  titleEn?: string;
+  url: string;
+  type?: string;
+  mimeType?: string;
+  fileSize?: number;
+}
+
+export interface LessonInput {
+  titleAr: string;
+  titleEn?: string;
+  contentAr?: string;
+  contentEn?: string;
+  summaryAr?: string;
+  summaryEn?: string;
+  videoUrl?: string;
+  videoDuration?: number;
+  estimatedReadingTime?: number;
+  status?: string;
+  attachments?: LessonAttachmentInput[];
+}
+
 export interface CreateCourseInput {
   titleAr: string;
   titleEn?: string;
   instructorName: string;
+  instructorBio?: string;
   shortDescAr?: string;
+  shortDescEn?: string;
   fullDescAr?: string;
+  fullDescEn?: string;
   thumbnailUrl?: string;
+  categoryId?: string;
   difficulty?: string;
   duration?: number;
   isFeatured?: boolean;
-  lessonTitleAr: string;
-  lessonTitleEn?: string;
-  lessonContentAr?: string;
-  lessonSummaryAr?: string;
-  lessonVideoUrl?: string;
+  status?: "draft" | "published";
+  lessons: LessonInput[];
+}
+
+export type UpdateCourseInput = Partial<Omit<CreateCourseInput, "lessons">>;
+
+export interface UploadedMedia {
+  url: string;
+  publicId: string;
+  mimeType: string;
+  fileSize: number;
+  originalFilename: string;
+  /** Set for videos when the storage provider can render a frame. */
+  posterUrl: string | null;
+}
+
+export interface Certificate {
+  id: string;
+  serial: string;
+  courseId: string;
+  recipientName: string;
+  courseTitleAr: string;
+  courseTitleEn?: string;
+  instructorName?: string;
+  lessonsCount: number;
+  learningHours: number;
+  issuedAt: string;
+  course?: {
+    id: string;
+    slug: string;
+    titleAr: string;
+    titleEn?: string;
+    thumbnailUrl?: string;
+  };
 }
 
 export const lmsApi = {
@@ -216,13 +272,93 @@ export const lmsApi = {
     return response.data;
   },
 
+  getAdminCourse: async (courseId: string): Promise<Course> => {
+    const response = await apiClient.get(`/lms/admin/courses/${courseId}`);
+    return response.data;
+  },
+
   createAdminCourse: async (data: CreateCourseInput): Promise<Course> => {
     const response = await apiClient.post("/lms/admin/courses", data);
     return response.data;
   },
 
+  updateAdminCourse: async (courseId: string, data: UpdateCourseInput): Promise<Course> => {
+    const response = await apiClient.patch(`/lms/admin/courses/${courseId}`, data);
+    return response.data;
+  },
+
   deleteAdminCourse: async (courseId: string): Promise<void> => {
     await apiClient.delete(`/lms/admin/courses/${courseId}`);
+  },
+
+  addLesson: async (courseId: string, data: LessonInput): Promise<Lesson> => {
+    const response = await apiClient.post(`/lms/admin/courses/${courseId}/lessons`, data);
+    return response.data;
+  },
+
+  updateLesson: async (
+    courseId: string,
+    lessonId: string,
+    data: LessonInput
+  ): Promise<Lesson> => {
+    const response = await apiClient.patch(
+      `/lms/admin/courses/${courseId}/lessons/${lessonId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteLesson: async (courseId: string, lessonId: string): Promise<void> => {
+    await apiClient.delete(`/lms/admin/courses/${courseId}/lessons/${lessonId}`);
+  },
+
+  reorderLessons: async (courseId: string, lessonIds: string[]): Promise<Course> => {
+    const response = await apiClient.patch(
+      `/lms/admin/courses/${courseId}/lessons-order`,
+      { lessonIds }
+    );
+    return response.data;
+  },
+
+  /** Uploads a lesson video, a course cover or a handout. */
+  uploadMedia: async (
+    file: File,
+    onProgress?: (percentage: number) => void
+  ): Promise<UploadedMedia> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await apiClient.post("/lms/admin/media", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (event) => {
+        if (onProgress && event.total) {
+          onProgress(Math.round((event.loaded * 100) / event.total));
+        }
+      },
+    });
+    return response.data;
+  },
+
+  completeLesson: async (courseId: string, lessonId: string): Promise<LessonProgress> => {
+    const response = await apiClient.post(
+      `/lms/courses/${courseId}/lessons/${lessonId}/complete`
+    );
+    return response.data;
+  },
+
+  getMyCertificates: async (): Promise<Certificate[]> => {
+    const response = await apiClient.get("/lms/certificates");
+    return response.data;
+  },
+
+  getCourseCertificate: async (courseId: string): Promise<Certificate> => {
+    const response = await apiClient.get(`/lms/courses/${courseId}/certificate`);
+    return response.data;
+  },
+
+  verifyCertificate: async (serial: string): Promise<Certificate> => {
+    const response = await apiClient.get(`/lms/certificates/${serial}`);
+    return response.data;
   },
 
   getCategories: async (): Promise<CourseCategory[]> => {

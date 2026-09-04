@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, formatCourseDuration } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/sanitize";
 
 const difficultyColors: Record<string, string> = {
@@ -170,7 +170,7 @@ export function CourseDetailPage() {
                 {duration && (
                   <span className="flex items-center gap-1.5">
                     <Clock className="h-4 w-4" />
-                    {duration} {t("lms.courseDetail.hours")}
+                    {formatCourseDuration(duration)}
                   </span>
                 )}
                 <span className="flex items-center gap-1.5">

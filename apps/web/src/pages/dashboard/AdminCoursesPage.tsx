@@ -1,93 +1,174 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BookOpenCheck, Plus, Trash2, Video } from "lucide-react";
+import { BookOpenCheck, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
-import { lmsApi, type Course, type CreateCourseInput } from "@/api/lms";
+import { lmsApi, type Course } from "@/api/lms";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-
-const initialForm: CreateCourseInput = {
-  titleAr: "", titleEn: "", instructorName: "", shortDescAr: "", fullDescAr: "",
-  thumbnailUrl: "", difficulty: "beginner", duration: 60, isFeatured: false,
-  lessonTitleAr: "", lessonTitleEn: "", lessonContentAr: "", lessonSummaryAr: "", lessonVideoUrl: "",
-};
+import { EmptyState } from "@/components/shared/EmptyState";
+import { CourseEditor } from "@/components/lms/admin/CourseEditor";
+import { getApiErrorMessage } from "@/lib/apiError";
+import { resolveMediaUrl } from "@/api/files";
+import { primaryText } from "@/lib/utils";
 
 export function AdminCoursesPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<CreateCourseInput>(initialForm);
+  const [editing, setEditing] = useState<{ courseId?: string } | null>(null);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
-  const { data: courses = [], isLoading } = useQuery({ queryKey: ["admin-courses"], queryFn: lmsApi.getAdminCourses });
-  const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["admin-courses"] });
-    queryClient.invalidateQueries({ queryKey: ["courses"] });
-  };
-  const createCourse = useMutation({
-    mutationFn: lmsApi.createAdminCourse,
-    onSuccess: () => { refresh(); setForm(initialForm); toast.success("تم نشر الدورة وإضافة الدرس الأول"); },
-    onError: () => toast.error("تعذر إنشاء الدورة. تحقق من الحقول وحاول مجددًا."),
+
+  const { data: courses = [], isLoading } = useQuery({
+    queryKey: ["admin-courses"],
+    queryFn: lmsApi.getAdminCourses,
   });
+
   const deleteCourse = useMutation({
     mutationFn: lmsApi.deleteAdminCourse,
-    onSuccess: () => { refresh(); setCourseToDelete(null); toast.success("تم حذف الدورة"); },
-    onError: () => toast.error("تعذر حذف الدورة"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      setCourseToDelete(null);
+      toast.success(t("lms.admin.deleted"));
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error)),
   });
-  const setField = <K extends keyof CreateCourseInput>(key: K, value: CreateCourseInput[K]) => setForm((current) => ({ ...current, [key]: value }));
-  const handleSubmit = (event: FormEvent) => { event.preventDefault(); createCourse.mutate(form); };
+
+  if (editing) {
+    return (
+      <div className="space-y-6">
+        <CourseEditor
+          courseId={editing.courseId}
+          onDone={() => setEditing(null)}
+          onCancel={() => setEditing(null)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6" dir="rtl">
-      <div className="rounded-2xl bg-primary px-6 py-7 text-white shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-white/10 p-3"><BookOpenCheck className="h-7 w-7 text-gold" /></div>
-          <div><h1 className="text-2xl font-bold">إدارة دورات بناء القدرات</h1><p className="mt-1 text-sm text-white/75">أضف دورة منشورة مع درسها الأول، أو احذف دورة موجودة.</p></div>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-heading font-bold text-foreground">
+            {t("lms.admin.title")}
+          </h2>
+          <p className="mt-1 text-sm text-muted">{t("lms.admin.subtitle")}</p>
         </div>
+        <Button onClick={() => setEditing({})}>
+          <Plus className="me-1 h-4 w-4" />
+          {t("lms.admin.newCourse")}
+        </Button>
       </div>
-      <div className="grid gap-6 xl:grid-cols-[1.05fr_.95fr]">
-        <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Plus className="h-5 w-5 text-gold" />إضافة دورة جديدة</CardTitle></CardHeader>
-          <CardContent>
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              <div className="grid gap-4 md:grid-cols-2">
-                <Input label="اسم الدورة بالعربية *" value={form.titleAr} onChange={(e) => setField("titleAr", e.target.value)} required />
-                <Input label="اسم الدورة بالإنجليزية" value={form.titleEn} onChange={(e) => setField("titleEn", e.target.value)} dir="ltr" />
-                <Input label="اسم المدرب أو الجهة *" value={form.instructorName} onChange={(e) => setField("instructorName", e.target.value)} required />
-                <Input label="مدة الدورة بالدقائق" type="number" min={1} value={form.duration} onChange={(e) => setField("duration", Number(e.target.value))} />
-              </div>
-              <Textarea label="وصف مختصر" value={form.shortDescAr} onChange={(e) => setField("shortDescAr", e.target.value)} />
-              <Textarea label="وصف الدورة الكامل" value={form.fullDescAr} onChange={(e) => setField("fullDescAr", e.target.value)} className="min-h-28" />
-              <Input label="رابط صورة الغلاف" value={form.thumbnailUrl} onChange={(e) => setField("thumbnailUrl", e.target.value)} placeholder="/uploads/... أو https://..." dir="ltr" />
-              <div className="rounded-xl border border-gold/25 bg-gold-light/15 p-4">
-                <h2 className="mb-4 flex items-center gap-2 font-semibold"><Video className="h-5 w-5 text-primary" />الدرس الأول</h2>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Input label="عنوان الدرس بالعربية *" value={form.lessonTitleAr} onChange={(e) => setField("lessonTitleAr", e.target.value)} required />
-                  <Input label="عنوان الدرس بالإنجليزية" value={form.lessonTitleEn} onChange={(e) => setField("lessonTitleEn", e.target.value)} dir="ltr" />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpenCheck className="h-5 w-5 text-gold" />
+            {t("lms.admin.allCourses")}
+            <Badge variant="secondary">{courses.length}</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {isLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="h-24 animate-pulse rounded-xl bg-muted-bg/60" />
+              ))}
+            </div>
+          ) : courses.length === 0 ? (
+            <EmptyState
+              title={t("lms.admin.emptyTitle")}
+              description={t("lms.admin.emptyDesc")}
+              icon={<BookOpenCheck className="h-9 w-9" strokeWidth={1.5} />}
+              action={{ label: t("lms.admin.newCourse"), onClick: () => setEditing({}) }}
+            />
+          ) : (
+            courses.map((course) => (
+              <div
+                key={course.id}
+                className="flex flex-wrap items-center gap-4 rounded-xl border border-border bg-surface p-4"
+              >
+                {course.thumbnailUrl ? (
+                  <img
+                    src={resolveMediaUrl(course.thumbnailUrl)}
+                    alt=""
+                    className="h-16 w-24 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="grid h-16 w-24 place-items-center rounded-lg bg-primary/10">
+                    <BookOpenCheck className="h-6 w-6 text-primary" />
+                  </div>
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-semibold text-foreground">
+                      {primaryText(course.titleAr, course.titleEn)}
+                    </h3>
+                    <Badge variant={course.status === "published" ? "success" : "warning"}>
+                      {t(
+                        course.status === "published"
+                          ? "lms.admin.statusPublished"
+                          : "lms.admin.statusDraft"
+                      )}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted">
+                    <span>{course.instructorName}</span>
+                    <span>
+                      {t("lms.admin.lessonsCount", { count: course._count?.lessons ?? 0 })}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users className="h-3.5 w-3.5" />
+                      {course._count?.enrollments ?? 0}
+                    </span>
+                  </p>
                 </div>
-                <Textarea label="محتوى الدرس" value={form.lessonContentAr} onChange={(e) => setField("lessonContentAr", e.target.value)} className="mt-4 min-h-32" />
-                <Textarea label="ملخص الدرس" value={form.lessonSummaryAr} onChange={(e) => setField("lessonSummaryAr", e.target.value)} className="mt-4" />
-                <Input label="رابط فيديو مباشر (MP4 أو WebM)" value={form.lessonVideoUrl} onChange={(e) => setField("lessonVideoUrl", e.target.value)} className="mt-4" placeholder="/uploads/.../video.webm" dir="ltr" />
+
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to={`/lms/courses/${course.slug}`}>{t("lms.admin.view")}</Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditing({ courseId: course.id })}
+                    aria-label={t("lms.admin.editCourse")}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive"
+                    onClick={() => setCourseToDelete(course)}
+                    aria-label={t("lms.admin.deleteCourse")}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <Button type="submit" className="w-full sm:w-auto" isLoading={createCourse.isPending}>نشر الدورة</Button>
-            </form>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader><CardTitle>الدورات المنشورة <Badge variant="secondary" className="me-2">{courses.length}</Badge></CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {isLoading ? <p className="text-muted">جارٍ تحميل الدورات…</p> : courses.map((course) => (
-              <div key={course.id} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
-                {course.thumbnailUrl ? <img src={course.thumbnailUrl} alt="" className="h-16 w-20 rounded-lg object-cover" /> : <div className="grid h-16 w-20 place-items-center rounded-lg bg-primary/10"><BookOpenCheck className="h-6 w-6 text-primary" /></div>}
-                <div className="min-w-0 flex-1"><h3 className="font-semibold text-foreground">{course.titleAr}</h3><p className="mt-1 text-sm text-muted">{course.instructorName} · {course._count?.lessons ?? 0} دروس</p></div>
-                <Button variant="ghost" size="icon" className="text-destructive" aria-label="حذف الدورة" onClick={() => setCourseToDelete(course)}><Trash2 className="h-4 w-4" /></Button>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-      <ConfirmDialog open={!!courseToDelete} onOpenChange={(open) => !open && setCourseToDelete(null)} title="حذف الدورة؟" description={`سيتم حذف «${courseToDelete?.titleAr ?? ""}» ودروسها وبيانات التسجيل المرتبطة بها نهائيًا.`} confirmLabel="حذف الدورة" variant="destructive" isLoading={deleteCourse.isPending} onConfirm={() => courseToDelete && deleteCourse.mutate(courseToDelete.id)} />
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={!!courseToDelete}
+        onOpenChange={(open) => !open && setCourseToDelete(null)}
+        title={t("lms.admin.deleteCourse")}
+        description={t("lms.admin.deleteWarning", {
+          title: courseToDelete?.titleAr ?? "",
+        })}
+        confirmLabel={t("lms.admin.deleteCourse")}
+        variant="destructive"
+        isLoading={deleteCourse.isPending}
+        onConfirm={() => courseToDelete && deleteCourse.mutate(courseToDelete.id)}
+      />
     </div>
   );
 }

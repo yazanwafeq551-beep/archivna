@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Star, Clock, Users, BookOpen, PlayCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCourseDuration } from "@/lib/utils";
 import { type Course } from "@/api/lms";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -119,7 +119,7 @@ export function CourseCard({ course, className }: CourseCardProps) {
           {duration && (
             <span className="flex items-center gap-1 text-xs text-muted">
               <Clock className="h-3 w-3" />
-              {duration} {t("lms.courseCard.hours")}
+              {formatCourseDuration(duration)}
             </span>
           )}
 

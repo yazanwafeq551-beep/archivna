@@ -4,9 +4,15 @@ import { useTranslation } from "react-i18next";
 import {
   ChevronLeft, ChevronRight, CheckCircle2, Lock, Play, Pause,
   FileText, Download, ExternalLink, BookOpen, Clock, Maximize,
-  Volume2, SkipBack, SkipForward, Sparkles
+  Volume2, SkipBack, SkipForward, Sparkles, Award, CheckCheck
 } from "lucide-react";
-import { useLesson, useUpdateProgress, useCourseBySlug } from "@/hooks/useLms";
+import {
+  useLesson,
+  useUpdateProgress,
+  useCourseBySlug,
+  useCompleteLesson,
+} from "@/hooks/useLms";
+import { getApiErrorMessage } from "@/lib/apiError";
 import { useAuth } from "@/hooks/useAuth";
 import { LessonSidebar } from "@/components/lms/LessonSidebar";
 import { LessonContent } from "@/components/lms/LessonContent";
@@ -46,6 +52,8 @@ export function LessonPage() {
     lessonId ?? ""
   );
   const updateProgressMutation = useUpdateProgress();
+  const completeLessonMutation = useCompleteLesson();
+  const [courseFinished, setCourseFinished] = useState(false);
 
   const lessons = course?.lessons ?? [];
   const currentIndex = lessons.findIndex((l) => l.id === lessonId);
@@ -82,9 +90,16 @@ export function LessonPage() {
 
     if (percentage >= 95 && !hasCompleted) {
       setHasCompleted(true);
-      setShowCompletion(true);
       saveProgress(totalWatchTimeRef.current, 100, video.currentTime);
-      setTimeout(() => setShowCompletion(false), 4000);
+
+      // Finishing the last lesson finishes the course, so the learner is sent
+      // to the certificate rather than a generic "well done".
+      if (!nextLesson) {
+        setCourseFinished(true);
+      } else {
+        setShowCompletion(true);
+        setTimeout(() => setShowCompletion(false), 4000);
+      }
     }
   };
 
@@ -141,6 +156,31 @@ export function LessonPage() {
       }
     }
   }, [lesson]);
+
+
+  // A lesson without a video is finished by reading it; without this the
+  // course - and its certificate - could never be completed.
+  const handleMarkComplete = async () => {
+    if (!course?.id || !lessonId) return;
+    if (!isAuthenticated) {
+      setShowGuestModal(true);
+      return;
+    }
+
+    try {
+      await completeLessonMutation.mutateAsync({ courseId: course.id, lessonId });
+      setHasCompleted(true);
+      const isLast = !nextLesson;
+      if (isLast) {
+        setCourseFinished(true);
+      } else {
+        setShowCompletion(true);
+      }
+      await refetchLesson();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
+    }
+  };
 
   const handleNextLesson = () => {
     if (nextLesson && hasCompleted) {
@@ -281,6 +321,44 @@ export function LessonPage() {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Video Player */}
+              {!lesson.videoUrl && (
+                <div className="rounded-2xl border border-gold-light/40 bg-surface p-6 shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-11 w-11 place-items-center rounded-xl bg-gold-light/40 text-gold-deep">
+                        <BookOpen className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">
+                          {t("lms.lessonActions.readingLesson")}
+                        </p>
+                        {lesson.estimatedReadingTime ? (
+                          <p className="text-sm text-muted">
+                            {lesson.estimatedReadingTime} {t("lms.lesson.minutes")}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    {hasCompleted ? (
+                      <span className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-sm font-medium text-success">
+                        <CheckCheck className="h-4 w-4" />
+                        {t("lms.lessonActions.completed")}
+                      </span>
+                    ) : (
+                      <Button
+                        onClick={handleMarkComplete}
+                        isLoading={completeLessonMutation.isPending}
+                        variant="gold"
+                      >
+                        <CheckCircle2 className="me-1 h-4 w-4" />
+                        {t("lms.lessonActions.markComplete")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {lesson.videoUrl && (
                 <div className="relative overflow-hidden rounded-2xl bg-black shadow-xl" onClick={handleVideoClick}>
                   <video
@@ -474,6 +552,35 @@ export function LessonPage() {
           </div>
         )}
       </div>
+
+      {/* Finishing the last lesson: the certificate is waiting. */}
+      {courseFinished && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="flex max-w-md flex-col items-center rounded-2xl bg-surface p-8 text-center shadow-2xl">
+            <div className="mb-4 grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-gold to-amber-500 shadow-lg shadow-gold/30">
+              <Award className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="mb-2 text-xl font-bold text-foreground">
+              {t("lms.completion.title")}
+            </h2>
+            <p className="mb-6 text-sm text-muted">
+              {t("lms.completion.description", { course: courseTitle })}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button
+                variant="gold"
+                onClick={() => navigate("/dashboard/learning/certificates")}
+              >
+                <Award className="me-1 h-4 w-4" />
+                {t("lms.completion.viewCertificate")}
+              </Button>
+              <Button variant="outline" onClick={() => setCourseFinished(false)}>
+                {t("lms.lesson.continue")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Completion Animation */}
       {showCompletion && (

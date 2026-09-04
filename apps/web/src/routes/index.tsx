@@ -91,6 +91,7 @@ export const router = createBrowserRouter([
       { path: "register", lazy: page(() => import("@/pages/auth/RegisterPage"), "RegisterPage") },
       { path: "forgot-password", lazy: page(() => import("@/pages/auth/ForgotPasswordPage"), "ForgotPasswordPage") },
       { path: "reset-password/:token", lazy: page(() => import("@/pages/auth/ResetPasswordPage"), "ResetPasswordPage") },
+      { path: "certificates/:serial", lazy: page(() => import("@/pages/lms/CertificatePage"), "CertificatePage") },
     ],
   },
   {
@@ -102,19 +103,12 @@ export const router = createBrowserRouter([
       { path: "courses/:courseSlug/lessons/:lessonId", lazy: page(() => import("@/pages/lms/LessonPage"), "LessonPage") },
     ],
   },
+  { path: "/lms/dashboard", element: <Navigate to="/dashboard/learning" replace /> },
+  { path: "/lms/dashboard/courses", element: <Navigate to="/dashboard/learning/courses" replace /> },
+  { path: "/lms/dashboard/saved", element: <Navigate to="/dashboard/learning/saved" replace /> },
   {
-    path: "/lms/dashboard",
-    element: (
-      <ProtectedRoute>
-        <LmsLayout dashboard />
-      </ProtectedRoute>
-    ),
-    children: [
-      { index: true, lazy: page(() => import("@/pages/lms/LmsDashboardPage"), "LmsDashboardPage") },
-      { path: "courses", lazy: page(() => import("@/pages/lms/MyCoursesPage"), "MyCoursesPage") },
-      { path: "saved", lazy: page(() => import("@/pages/lms/SavedCoursesPage"), "SavedCoursesPage") },
-      { path: "achievements", lazy: page(() => import("@/pages/lms/AchievementsPage"), "AchievementsPage") },
-    ],
+    path: "/lms/dashboard/achievements",
+    element: <Navigate to="/dashboard/learning/achievements" replace />,
   },
   {
     path: "/dashboard",
@@ -141,6 +135,11 @@ export const router = createBrowserRouter([
         path: "courses",
         lazy: guardedPage(() => import("@/pages/dashboard/AdminCoursesPage"), "AdminCoursesPage", ["system_admin"]),
       },
+      { path: "learning", lazy: page(() => import("@/pages/lms/LmsDashboardPage"), "LmsDashboardPage") },
+      { path: "learning/courses", lazy: page(() => import("@/pages/lms/MyCoursesPage"), "MyCoursesPage") },
+      { path: "learning/saved", lazy: page(() => import("@/pages/lms/SavedCoursesPage"), "SavedCoursesPage") },
+      { path: "learning/achievements", lazy: page(() => import("@/pages/lms/AchievementsPage"), "AchievementsPage") },
+      { path: "learning/certificates", lazy: page(() => import("@/pages/lms/MyCertificatesPage"), "MyCertificatesPage") },
       { path: "archive-management", lazy: page(() => import("@/pages/dashboard/ArchiveManagementPage"), "ArchiveManagementPage") },
     ],
   },

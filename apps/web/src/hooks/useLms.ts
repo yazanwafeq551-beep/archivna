@@ -149,3 +149,28 @@ export function useCourseProgress(courseId: string) {
     enabled: !!courseId,
   });
 }
+
+/** Completing a lesson that has no video to watch. */
+export function useCompleteLesson() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseId, lessonId }: { courseId: string; lessonId: string }) =>
+      lmsApi.completeLesson(courseId, lessonId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["lesson", variables.courseId] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["certificates"] });
+      queryClient.invalidateQueries({ queryKey: ["courseProgress", variables.courseId] });
+    },
+  });
+}
+
+export function useCourseCertificate(courseId: string, enabled = true) {
+  return useQuery({
+    queryKey: ["certificate", "course", courseId],
+    queryFn: () => lmsApi.getCourseCertificate(courseId),
+    enabled: enabled && !!courseId,
+    retry: false,
+  });
+}

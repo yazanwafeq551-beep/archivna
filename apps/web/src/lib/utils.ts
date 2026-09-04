@@ -144,3 +144,18 @@ export function debounce<T extends (...args: any[]) => any>(
     timeout = setTimeout(() => func(...args), wait);
   };
 }
+
+/**
+ * Course length is stored in minutes. It used to be printed next to an "hours"
+ * label, so a 30 minute course advertised itself as 30 hours.
+ */
+export function formatCourseDuration(minutes?: number | null): string {
+  if (!minutes || minutes <= 0) return "";
+
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+
+  if (hours === 0) return i18n.t("lms.duration.minutes", { count: rest });
+  if (rest === 0) return i18n.t("lms.duration.hours", { count: hours });
+  return `${i18n.t("lms.duration.hours", { count: hours })} ${i18n.t("lms.duration.minutes", { count: rest })}`;
+}
