@@ -1,7 +1,13 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
+/**
+ * Empty in development and wherever the API is proxied under the same domain;
+ * set to the API's origin when the two are deployed separately.
+ */
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
 const apiClient = axios.create({
-  baseURL: "/api/v1",
+  baseURL: `${API_ORIGIN}/api/v1`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -58,7 +64,7 @@ function isSessionEndpoint(url?: string) {
 export function refreshSession(): Promise<Session> {
   if (!refreshRequest) {
     refreshRequest = axios
-      .post("/api/v1/auth/refresh", {}, { withCredentials: true })
+      .post(`${API_ORIGIN}/api/v1/auth/refresh`, {}, { withCredentials: true })
       .then((response) => {
         const session = response.data as Session;
         setAccessToken(session.accessToken);

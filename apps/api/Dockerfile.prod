@@ -1,0 +1,25 @@
+# Production image for the API: build once, run the compiled output.
+FROM node:20-alpine AS build
+
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/ ./packages/
+RUN npm ci --workspace=apps/api --include-workspace-root
+
+COPY apps/api/ ./apps/api/
+WORKDIR /app/apps/api
+RUN npx prisma generate && npm run build
+
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/apps/api ./apps/api
+
+WORKDIR /app/apps/api
+EXPOSE 3000
+
+# Migrations run before the server so a fresh deployment has its schema.
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]

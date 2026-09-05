@@ -27,6 +27,19 @@ const REFRESH_COOKIE = 'refresh_token';
 const REFRESH_COOKIE_PATH = '/api/v1/auth';
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
+/**
+ * Same-site by default. A deployment that serves the site and the API from
+ * different domains has to mark the cookie cross-site, and browsers only
+ * accept that over HTTPS.
+ */
+function refreshCookiePolicy() {
+  const crossSite = process.env.CROSS_SITE_COOKIES === 'true';
+  return {
+    sameSite: (crossSite ? 'none' : 'strict') as 'none' | 'strict',
+    secure: crossSite || process.env.NODE_ENV === 'production',
+  };
+}
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -43,9 +56,8 @@ export class AuthController {
   private setRefreshCookie(res: Response, token: string, remember = true) {
     res.cookie(REFRESH_COOKIE, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
       path: REFRESH_COOKIE_PATH,
+      ...refreshCookiePolicy(),
       ...(remember ? { maxAge: REFRESH_COOKIE_MAX_AGE } : {}),
     });
   }
@@ -53,9 +65,8 @@ export class AuthController {
   private clearRefreshCookie(res: Response) {
     res.clearCookie(REFRESH_COOKIE, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
       path: REFRESH_COOKIE_PATH,
+      ...refreshCookiePolicy(),
     });
   }
 
