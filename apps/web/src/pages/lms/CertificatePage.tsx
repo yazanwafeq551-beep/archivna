@@ -52,7 +52,7 @@ export function CertificatePage() {
             {t("lms.certificate.print")}
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/dashboard/learning/certificates">
+            <Link to="/lms/me/certificates">
               {t("lms.certificate.backToLearning")}
             </Link>
           </Button>

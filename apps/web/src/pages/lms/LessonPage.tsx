@@ -148,14 +148,19 @@ export function LessonPage() {
     };
   }, [isPlaying, duration, watchPercentage, saveProgress]);
 
+  /**
+   * Moving to another lesson resets the per-lesson state. It used to only ever
+   * set completion, so the next lesson opened already marked as finished.
+   */
   useEffect(() => {
-    if (lesson?.userProgress?.watchPercentage) {
-      setWatchPercentage(lesson.userProgress.watchPercentage);
-      if (lesson.userProgress.isCompleted) {
-        setHasCompleted(true);
-      }
-    }
-  }, [lesson]);
+    setHasCompleted(!!lesson?.userProgress?.isCompleted);
+    setWatchPercentage(lesson?.userProgress?.watchPercentage ?? 0);
+    setCurrentTime(0);
+    setIsPlaying(false);
+    setShowCompletion(false);
+    setCourseFinished(false);
+    totalWatchTimeRef.current = lesson?.userProgress?.totalWatchTime ?? 0;
+  }, [lesson?.id, lesson?.userProgress?.isCompleted, lesson?.userProgress?.watchPercentage]);
 
 
   // A lesson without a video is finished by reading it; without this the
@@ -573,7 +578,7 @@ export function LessonPage() {
             <div className="flex flex-wrap justify-center gap-2">
               <Button
                 variant="gold"
-                onClick={() => navigate("/dashboard/learning/certificates")}
+                onClick={() => navigate("/lms/me/certificates")}
               >
                 <Award className="me-1 h-4 w-4" />
                 {t("lms.completion.viewCertificate")}

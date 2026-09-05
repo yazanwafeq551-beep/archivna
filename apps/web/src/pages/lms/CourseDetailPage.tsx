@@ -58,6 +58,17 @@ export function CourseDetailPage() {
   const rating = course?.avgRating ?? 0;
   const duration = course?.duration ?? course?.estimatedStudyTime;
 
+  /**
+   * Resuming means the lesson the learner stopped at - the first one they have
+   * not completed - not the first lesson of the course.
+   */
+  const resumeLesson =
+    lessons.find((lesson) => !lesson.userProgress?.isCompleted) ??
+    lessons.find(
+      (lesson) => lesson.lessonNumber === course?.enrollment?.currentLessonNumber
+    ) ??
+    lessons[0];
+
   const handleEnroll = async () => {
     if (!isAuthenticated) {
       setShowGuestModal(true);
@@ -149,9 +160,6 @@ export function CourseDetailPage() {
                 {course.isPopular && (
                   <Badge className="bg-purple-600 text-white">{t("lms.courseDetail.popular")}</Badge>
                 )}
-                {course.isFree && (
-                  <Badge className="bg-emerald-600 text-white">{t("lms.courseDetail.free")}</Badge>
-                )}
                 {course.difficulty && (
                   <Badge className={difficultyColors[course.difficulty] || ""}>
                     {t(`lms.difficulty.${course.difficulty}`)}
@@ -209,17 +217,13 @@ export function CourseDetailPage() {
                   )}
                 </div>
                 <div className="p-5">
-                  <div className="mb-4 flex items-center gap-2 text-lg font-bold text-primary">
-                    {t("lms.courseDetail.free")}
-                  </div>
                   <Button
                     size="lg"
                     variant={isEnrolled ? "outline" : "gold"}
                     className="w-full text-base font-semibold"
                     onClick={isEnrolled ? () => {
-                      const firstLesson = lessons[0];
-                      if (firstLesson) {
-                        navigate(`/lms/courses/${course.slug}/lessons/${firstLesson.id}`);
+                      if (resumeLesson) {
+                        navigate(`/lms/courses/${course.slug}/lessons/${resumeLesson.id}`);
                       }
                     } : handleEnroll}
                     isLoading={enrollMutation.isPending}

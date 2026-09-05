@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, useLocation } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LmsLayout } from "@/components/layout/LmsLayout";
@@ -101,15 +101,28 @@ export const router = createBrowserRouter([
       { index: true, lazy: page(() => import("@/pages/lms/CoursesPage"), "CoursesPage") },
       { path: "courses/:slug", lazy: page(() => import("@/pages/lms/CourseDetailPage"), "CourseDetailPage") },
       { path: "courses/:courseSlug/lessons/:lessonId", lazy: page(() => import("@/pages/lms/LessonPage"), "LessonPage") },
+      {
+        path: "me",
+        element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+        children: [
+          { index: true, lazy: page(() => import("@/pages/lms/LmsDashboardPage"), "LmsDashboardPage") },
+          { path: "courses", lazy: page(() => import("@/pages/lms/MyCoursesPage"), "MyCoursesPage") },
+          { path: "saved", lazy: page(() => import("@/pages/lms/SavedCoursesPage"), "SavedCoursesPage") },
+          { path: "achievements", lazy: page(() => import("@/pages/lms/AchievementsPage"), "AchievementsPage") },
+          { path: "certificates", lazy: page(() => import("@/pages/lms/MyCertificatesPage"), "MyCertificatesPage") },
+        ],
+      },
     ],
   },
-  { path: "/lms/dashboard", element: <Navigate to="/dashboard/learning" replace /> },
-  { path: "/lms/dashboard/courses", element: <Navigate to="/dashboard/learning/courses" replace /> },
-  { path: "/lms/dashboard/saved", element: <Navigate to="/dashboard/learning/saved" replace /> },
-  {
-    path: "/lms/dashboard/achievements",
-    element: <Navigate to="/dashboard/learning/achievements" replace />,
-  },
+  { path: "/lms/dashboard", element: <Navigate to="/lms/me" replace /> },
+  { path: "/lms/dashboard/courses", element: <Navigate to="/lms/me/courses" replace /> },
+  { path: "/lms/dashboard/saved", element: <Navigate to="/lms/me/saved" replace /> },
+  { path: "/lms/dashboard/achievements", element: <Navigate to="/lms/me/achievements" replace /> },
+  { path: "/dashboard/learning", element: <Navigate to="/lms/me" replace /> },
+  { path: "/dashboard/learning/courses", element: <Navigate to="/lms/me/courses" replace /> },
+  { path: "/dashboard/learning/saved", element: <Navigate to="/lms/me/saved" replace /> },
+  { path: "/dashboard/learning/achievements", element: <Navigate to="/lms/me/achievements" replace /> },
+  { path: "/dashboard/learning/certificates", element: <Navigate to="/lms/me/certificates" replace /> },
   {
     path: "/dashboard",
     element: (
@@ -135,11 +148,6 @@ export const router = createBrowserRouter([
         path: "courses",
         lazy: guardedPage(() => import("@/pages/dashboard/AdminCoursesPage"), "AdminCoursesPage", ["system_admin"]),
       },
-      { path: "learning", lazy: page(() => import("@/pages/lms/LmsDashboardPage"), "LmsDashboardPage") },
-      { path: "learning/courses", lazy: page(() => import("@/pages/lms/MyCoursesPage"), "MyCoursesPage") },
-      { path: "learning/saved", lazy: page(() => import("@/pages/lms/SavedCoursesPage"), "SavedCoursesPage") },
-      { path: "learning/achievements", lazy: page(() => import("@/pages/lms/AchievementsPage"), "AchievementsPage") },
-      { path: "learning/certificates", lazy: page(() => import("@/pages/lms/MyCertificatesPage"), "MyCertificatesPage") },
       { path: "archive-management", lazy: page(() => import("@/pages/dashboard/ArchiveManagementPage"), "ArchiveManagementPage") },
     ],
   },

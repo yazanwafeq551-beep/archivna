@@ -69,8 +69,12 @@ export function useUpdateProgress() {
     }) => lmsApi.updateProgress(courseId, lessonId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["lesson", variables.courseId] });
-      queryClient.invalidateQueries({ queryKey: ["course", variables.courseId] });
+      // The course is cached by slug, so it has to be invalidated by prefix -
+      // keying it by id left the lesson list showing the next lesson as locked
+      // right after finishing the current one.
+      queryClient.invalidateQueries({ queryKey: ["course"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
       queryClient.invalidateQueries({ queryKey: ["courseProgress", variables.courseId] });
     },
   });

@@ -21,7 +21,6 @@ const badgeStyles: Record<string, string> = {
   new: "bg-primary text-white",
   popular: "bg-gold text-white",
   featured: "bg-purple-600 text-white",
-  free: "bg-emerald-600 text-white",
 };
 
 export function CourseCard({ course, className }: CourseCardProps) {
@@ -39,7 +38,6 @@ export function CourseCard({ course, className }: CourseCardProps) {
   const rating = course.avgRating ?? 0;
 
   const getBadge = () => {
-    if (course.isFree) return { type: "free", label: t("lms.courseCard.free") };
     if (course.isFeatured) return { type: "featured", label: t("lms.courseCard.featured") };
     return null;
   };

@@ -45,9 +45,6 @@ export const API_BASE_URL = "/api/v1";
 
 export const DASHBOARD_SIDEBAR_ITEMS = [
   { key: "overview", label: "نظرة عامة", path: "/dashboard", icon: "LayoutDashboard" },
-  { key: "learning", label: "لوحة تعلمي", labelEn: "My Learning", path: "/dashboard/learning", icon: "GraduationCap" },
-  { key: "myCourses", label: "دوراتي", labelEn: "My Courses", path: "/dashboard/learning/courses", icon: "BookOpen" },
-  { key: "certificates", label: "شهاداتي", labelEn: "My Certificates", path: "/dashboard/learning/certificates", icon: "Award" },
   { key: "archives", label: "ملفاتي الأرشيفية", path: "/dashboard/archives", icon: "FolderOpen" },
   { key: "new", label: "إضافة مادة أرشيفية", path: "/dashboard/archives/new", icon: "Plus" },
   { key: "archiveManagement", label: "إدارة الأرشيف والوصول", labelEn: "Archive Management", path: "/dashboard/archive-management", icon: "ShieldCheck" },
@@ -63,7 +60,6 @@ export const DASHBOARD_SIDEBAR_ITEMS = [
 /** Translation key for each dashboard sidebar entry, shared by every surface. */
 export const SIDEBAR_LABEL_KEYS: Record<string, string> = {
   overview: "dashboard.overview.title",
-  learning: "lms.dashboard.title",
   archives: "dashboard.archives.title",
   new: "dashboard.newArchive.title",
   archiveManagement: "dashboard.archiveManagement",
@@ -74,8 +70,6 @@ export const SIDEBAR_LABEL_KEYS: Record<string, string> = {
   profile: "dashboard.profile.title",
   settings: "dashboard.settings.title",
   courseAdmin: "dashboard.coursesAdmin",
-  myCourses: "lms.sidebar.myCourses",
-  certificates: "lms.certificate.myCertificates",
 };
 
 export const NAV_LINKS = [

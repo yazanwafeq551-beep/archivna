@@ -74,7 +74,7 @@ export function CoursesPage() {
       setShowGuestModal(true);
       return;
     }
-    navigate("/dashboard/learning");
+    navigate("/lms/me");
   };
 
   const handleFilterChange = (setter: (val: string) => void) => (val: string) => {

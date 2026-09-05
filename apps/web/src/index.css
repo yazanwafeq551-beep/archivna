@@ -49,9 +49,11 @@
    * lifted so they keep their contrast against it.
    */
   .dark {
-    --color-primary: 74 168 151;
-    --color-primary-dark: 40 110 99;
-    --color-primary-light: 108 197 179;
+    /* Deep enough to read as the brand green rather than mint, and still
+       clears contrast against the dark ground and under white label text. */
+    --color-primary: 53 140 124;
+    --color-primary-dark: 32 90 80;
+    --color-primary-light: 95 179 161;
     --color-gold: 214 180 116;
     /* Stays light: it is used both as a tint (bg/border at low opacity over
        the dark ground) and as text on the dark hero and footer. */
@@ -116,11 +118,10 @@
 
 @layer components {
   /*
-   * The brand fills are light in dark mode, so label text that is white on a
-   * light theme flips to ink instead of washing out.
+   * Gold and the status colours stay light in dark mode, so label text that is
+   * white on a light theme flips to ink instead of washing out. The green is
+   * dark enough to keep its white text.
    */
-  .dark .bg-primary.text-white,
-  .dark .bg-primary-light.text-white,
   .dark .bg-gold.text-white,
   .dark .bg-gold-deep.text-white,
   .dark .bg-destructive.text-white,

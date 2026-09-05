@@ -339,11 +339,19 @@ export class LmsService {
     const courseProgress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
     const isCompleted = courseProgress >= 100;
 
-    const lastLesson = await this.prisma.lessonProgress.findFirst({
+    // How far the learner has actually got: the furthest lesson they finished,
+    // not the one they touched most recently. Ordering by updatedAt sent the
+    // pointer backwards whenever an earlier lesson was revisited, which then
+    // locked lessons the learner had already unlocked.
+    const furthestCompleted = await this.prisma.lessonProgress.findFirst({
       where: { userId, courseId, isCompleted: true },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { lesson: { lessonNumber: 'desc' } },
       include: { lesson: true },
     });
+
+    const currentLessonNumber = furthestCompleted
+      ? Math.min(furthestCompleted.lesson.lessonNumber + 1, Math.max(totalLessons, 1))
+      : 1;
 
     await this.prisma.courseEnrollment.update({
       where: { userId_courseId: { userId, courseId } },
@@ -353,9 +361,7 @@ export class LmsService {
         isCompleted,
         completedAt: isCompleted ? new Date() : null,
         lastActivityAt: new Date(),
-        currentLessonNumber: lastLesson
-          ? Math.min(lastLesson.lesson.lessonNumber + 1, totalLessons)
-          : 1,
+        currentLessonNumber,
       },
     });
 
