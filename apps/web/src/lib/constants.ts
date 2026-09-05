@@ -48,6 +48,7 @@ export const DASHBOARD_SIDEBAR_ITEMS = [
   { key: "archives", label: "ملفاتي الأرشيفية", path: "/dashboard/archives", icon: "FolderOpen" },
   { key: "new", label: "إضافة مادة أرشيفية", path: "/dashboard/archives/new", icon: "Plus" },
   { key: "archiveManagement", label: "إدارة الأرشيف والوصول", labelEn: "Archive Management", path: "/dashboard/archive-management", icon: "ShieldCheck" },
+  { key: "supportInbox", label: "صندوق الاستشارات", labelEn: "Support inbox", path: "/dashboard/support-inbox", icon: "Inbox", staffOnly: true },
   { key: "courseAdmin", label: "إدارة الدورات", labelEn: "Manage Courses", path: "/dashboard/courses", icon: "BookOpenCheck", adminOnly: true },
   { key: "drafts", label: "المسودات", path: "/dashboard/drafts", icon: "FileEdit" },
   { key: "published", label: "المواد المنشورة", path: "/dashboard/published", icon: "Globe" },
@@ -70,14 +71,25 @@ export const SIDEBAR_LABEL_KEYS: Record<string, string> = {
   profile: "dashboard.profile.title",
   settings: "dashboard.settings.title",
   courseAdmin: "dashboard.coursesAdmin",
+  supportInbox: "supportInbox.title",
 };
 
-export const NAV_LINKS = [
-  { key: "home", label: "الرئيسية", path: "/" },
-  { key: "search", label: "استكشف الأرشيف", path: "/search" },
-  { key: "news", label: "الأخبار", path: "/news" },
-  { key: "about", label: "عن أرشيفنا", path: "/about" },
+/**
+ * The seven services of the platform, numbered as the project owner set them
+ * out. The same list drives the top tabs, the mobile drawer and the home hub,
+ * so they can never drift apart.
+ */
+export const PLATFORM_SECTIONS = [
+  { key: "search", number: 1, path: "/search", icon: "Search" },
+  { key: "capacity", number: 2, path: "/lms", icon: "GraduationCap" },
+  { key: "support", number: 3, path: "/support", icon: "Headphones" },
+  { key: "deposit", number: 4, path: "/deposit", icon: "UploadCloud" },
+  { key: "news", number: 5, path: "/news", icon: "Newspaper" },
+  { key: "feedback", number: 6, path: "/feedback", icon: "ClipboardList" },
+  { key: "about", number: 7, path: "/about", icon: "Landmark" },
 ] as const;
+
+export type PlatformSectionKey = (typeof PLATFORM_SECTIONS)[number]["key"];
 
 export const COURSE_DIFFICULTIES = [
   { value: "beginner", label: "مبتدئ", labelEn: "Beginner" },

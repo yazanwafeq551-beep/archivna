@@ -85,6 +85,9 @@ export const router = createBrowserRouter([
       { path: "news", lazy: page(() => import("@/pages/public/NewsListPage"), "NewsListPage") },
       { path: "news/:slug", lazy: page(() => import("@/pages/public/NewsDetailPage"), "NewsDetailPage") },
       { path: "about", lazy: page(() => import("@/pages/public/AboutPage"), "AboutPage") },
+      { path: "support", lazy: page(() => import("@/pages/public/SupportPage"), "SupportPage") },
+      { path: "feedback", lazy: page(() => import("@/pages/public/FeedbackPage"), "FeedbackPage") },
+      { path: "deposit", lazy: page(() => import("@/pages/public/DepositPage"), "DepositPage") },
       { path: "privacy", lazy: page(() => import("@/pages/public/PrivacyPage"), "PrivacyPage") },
       { path: "terms", lazy: page(() => import("@/pages/public/TermsPage"), "TermsPage") },
       { path: "login", lazy: page(() => import("@/pages/auth/LoginPage"), "LoginPage") },
@@ -149,6 +152,14 @@ export const router = createBrowserRouter([
         lazy: guardedPage(() => import("@/pages/dashboard/AdminCoursesPage"), "AdminCoursesPage", ["system_admin"]),
       },
       { path: "archive-management", lazy: page(() => import("@/pages/dashboard/ArchiveManagementPage"), "ArchiveManagementPage") },
+      {
+        path: "support-inbox",
+        lazy: guardedPage(
+          () => import("@/pages/dashboard/SupportInboxPage"),
+          "SupportInboxPage",
+          ["system_admin", "institution_admin", "reviewer"]
+        ),
+      },
     ],
   },
   { path: "/404", lazy: page(() => import("@/pages/system/NotFoundPage"), "NotFoundPage") },

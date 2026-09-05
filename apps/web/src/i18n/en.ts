@@ -59,6 +59,130 @@ export default {
       "description": "Archivna is a Palestinian digital platform dedicated to preserving, documenting, and providing access to Palestinian archival materials for current and future generations."
     }
   },
+  "deposit": {
+    "steps": {
+      "account": { "title": "Create your account", "description": "Register as an individual or as the representative of an institution." },
+      "upload": { "title": "Upload the material", "description": "Add the files with their metadata: title, date, source and rights." },
+      "review": { "title": "Archival review", "description": "The cataloguing team checks the description and access level before publication." },
+      "publish": { "title": "Access", "description": "The material is published to researchers at the access level you choose." }
+    },
+    "readyTitle": "Ready to deposit",
+    "readyDesc": "Start adding your archival material now.",
+    "start": "Add archival material",
+    "needRoleTitle": "Your account cannot deposit yet",
+    "needRoleDesc": "Ask the platform team to enable depositing for you or your institution.",
+    "requestRole": "Request deposit access",
+    "joinTitle": "Join to deposit your material",
+    "joinDesc": "Create an account or sign in to start depositing."
+  },
+  "sections": {
+    "title": "Platform services",
+    "subtitle": "Everything you need to reach Palestinian memory and add to it",
+    "search": {
+      "short": "Search archives",
+      "title": "Search the archives",
+      "description": "Search everything, or browse by institution and archival collection."
+    },
+    "capacity": {
+      "short": "Capacity building",
+      "title": "Archival capacity building",
+      "description": "Ready courses in archival science and digital preservation, with a certificate."
+    },
+    "support": {
+      "short": "Ask for support",
+      "title": "Request advice and knowledge support",
+      "description": "Ask the Arsheefna team about cataloguing, preservation or usage rights."
+    },
+    "deposit": {
+      "short": "Deposit material",
+      "title": "Deposit archival material",
+      "description": "Share your documents, photographs and recordings for preservation and access."
+    },
+    "news": {
+      "short": "News",
+      "title": "Archive world news",
+      "description": "Platform news and what is happening in the field, locally and globally."
+    },
+    "feedback": {
+      "short": "Notes & complaints",
+      "title": "Notes and complaints",
+      "description": "Your feedback shapes the platform: send a note, a suggestion or a complaint."
+    },
+    "about": {
+      "short": "About us",
+      "title": "About Arsheefna",
+      "description": "Who we are, and our mission to preserve Palestinian memory."
+    }
+  },
+  "support": {
+    "title": "Request advice and knowledge support",
+    "subtitle": "The Arsheefna team answers on cataloguing, digital preservation, usage rights and building an institutional archive.",
+    "formTitle": "Write your request",
+    "topic": "Area",
+    "selectTopic": "Choose an area...",
+    "topics": {
+      "cataloging": "Cataloguing and description",
+      "preservation": "Digital preservation",
+      "rights": "Rights and sensitivity",
+      "institutional": "Building an institutional archive",
+      "platform": "Using the platform",
+      "other": "Something else"
+    },
+    "subject": "Subject",
+    "subjectPlaceholder": "e.g. How do I catalogue a family photo collection?",
+    "message": "Details",
+    "messagePlaceholder": "Describe your case and the support you need...",
+    "contactEmail": "Alternative email (optional)",
+    "send": "Send request",
+    "sent": "We received your request and will reply on your account",
+    "myRequests": "My previous requests",
+    "empty": "No requests yet",
+    "emptyDesc": "Write your first request and the team will follow it up",
+    "loginTitle": "Sign in to send your request",
+    "loginDesc": "We need your account to track the request and send you the reply.",
+    "response": "Team reply",
+    "awaiting": "Awaiting reply"
+  },
+  "feedback": {
+    "title": "Notes and complaints",
+    "subtitle": "Your notes, suggestions and complaints reach the team directly and are followed to closure.",
+    "formTitle": "Send your note",
+    "kind": "Message type",
+    "kinds": {
+      "feedback": "Note",
+      "suggestion": "Suggestion",
+      "complaint": "Complaint"
+    },
+    "subject": "Subject",
+    "subjectPlaceholder": "e.g. Trouble downloading a file",
+    "message": "Details",
+    "messagePlaceholder": "Tell us what happened in detail...",
+    "send": "Send",
+    "sent": "Thank you, we received your message",
+    "mySubmissions": "My previous messages",
+    "empty": "No messages yet",
+    "emptyDesc": "Send your first note or suggestion to improve the platform"
+  },
+  "supportInbox": {
+    "title": "Support and feedback inbox",
+    "subtitle": "Requests and notes coming from users",
+    "all": "All",
+    "empty": "No requests",
+    "emptyDesc": "Everything users send will appear here",
+    "from": "From",
+    "respond": "Reply to the request",
+    "responsePlaceholder": "Write your reply...",
+    "sendResponse": "Send reply",
+    "responded": "Reply sent",
+    "close": "Close request",
+    "closed": "Request closed",
+    "statuses": {
+      "new": "New",
+      "in_review": "In review",
+      "answered": "Answered",
+      "closed": "Closed"
+    }
+  },
   "search": {
     "title": "Search Archive",
     "placeholder": "Type your search...",

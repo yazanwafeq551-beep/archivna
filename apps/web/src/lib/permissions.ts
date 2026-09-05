@@ -41,10 +41,18 @@ export function canEditArchive(
   );
 }
 
+export const STAFF_ROLES = ["system_admin", "institution_admin", "reviewer"];
+
+/** Anyone who handles other people's submissions. */
+export function isStaff(user: User | null | undefined): boolean {
+  return hasRole(user, STAFF_ROLES);
+}
+
 /** Single source of truth for the desktop sidebar and the mobile drawer. */
 export function visibleSidebarItems(user: User | null | undefined) {
   return DASHBOARD_SIDEBAR_ITEMS.filter((item) => {
     if ("adminOnly" in item && !isSystemAdmin(user)) return false;
+    if ("staffOnly" in item && !isStaff(user)) return false;
     if (item.key === "new" && !canDeposit(user)) return false;
     return true;
   });

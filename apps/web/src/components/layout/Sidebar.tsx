@@ -13,6 +13,7 @@ import {
   GraduationCap,
   BookOpen,
   Award,
+  Inbox,
   BookOpenCheck,
   ShieldCheck,
 } from "lucide-react";
@@ -35,6 +36,7 @@ const iconMap: Record<string, React.ReactNode> = {
   BookOpenCheck: <BookOpenCheck className="h-5 w-5" />,
   BookOpen: <BookOpen className="h-5 w-5" />,
   Award: <Award className="h-5 w-5" />,
+  Inbox: <Inbox className="h-5 w-5" />,
   ShieldCheck: <ShieldCheck className="h-5 w-5" />,
 };
 

@@ -68,39 +68,111 @@ export function LmsDashboardPage() {
 
   return (
     <div className="space-y-10">
-      {/* Welcome Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            {t("lms.dashboard.welcome")}, {user?.fullName || t("lms.dashboard.learner")}
-          </h1>
-          <p className="text-sm text-muted">{t("lms.dashboard.welcomeMessage")}</p>
-        </div>
-        <Button variant="gold" asChild className="shadow-lg shadow-gold/20">
-          <Link to="/lms">
-            <BookOpen className="me-2 h-4 w-4" />
-            {t("lms.dashboard.browseCourses")}
-          </Link>
-        </Button>
-      </div>
+      {/* A banner that carries the learner's progress, not just their name. */}
+      <section className="relative overflow-hidden rounded-3xl bg-primary-dark p-6 text-white md:p-8">
+        <div
+          className="absolute inset-0 opacity-[.07]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, rgba(255,255,255,.9) 1px, transparent 0)",
+            backgroundSize: "22px 22px",
+          }}
+        />
+        <div className="relative flex flex-wrap items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-14 w-14 border border-gold/40">
+              <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
+              <AvatarFallback className="bg-white/10 text-white">
+                {getInitials(user?.fullName || "")}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="font-heading text-2xl font-bold">
+                {t("lms.dashboard.welcome")}, {user?.fullName || t("lms.dashboard.learner")}
+              </h1>
+              <p className="mt-1 text-sm text-white/70">{t("lms.dashboard.welcomeMessage")}</p>
+            </div>
+          </div>
 
-      {/* Stats Row */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="gold" asChild>
+              <Link to="/lms">
+                <BookOpen className="me-2 h-4 w-4" />
+                {t("lms.dashboard.browseCourses")}
+              </Link>
+            </Button>
+            {activeCourse && continueCourse && (
+              <Button
+                variant="outline"
+                asChild
+                className="border-white/25 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              >
+                <Link
+                  to={`/lms/courses/${continueCourse.slug}/lessons/${currentLesson?.id || ""}`}
+                >
+                  <PlayCircle className="me-2 h-4 w-4" />
+                  {t("lms.dashboard.resume")}
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {activeCourse && (
+          <div className="relative mt-6">
+            <div className="mb-2 flex items-center justify-between text-sm">
+              <span className="text-white/70">{t("lms.dashboard.progress")}</span>
+              <span className="font-semibold text-gold-light">
+                {Math.round(activeCourse.courseProgress)}%
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-white/15">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-gold to-gold-light transition-all duration-500"
+                style={{ width: `${Math.round(activeCourse.courseProgress)}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Stats on the brand palette, so they hold up in both themes. */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { icon: CheckCircle2, value: completedCourses, label: "lms.dashboard.stats.completed", color: "text-green-600 bg-green-100" },
-          { icon: Clock, value: totalLearningHours, label: "lms.dashboard.stats.hours", color: "text-gold bg-gold-light/40" },
-          { icon: BarChart3, value: activeCourse ? `${Math.round(activeCourse.courseProgress)}%` : "—", label: "lms.dashboard.stats.progress", color: "text-primary bg-primary/10" },
-          { icon: Award, value: achievements?.length ?? 0, label: "lms.dashboard.stats.achievements", color: "text-purple-600 bg-purple-100" },
+          {
+            icon: CheckCircle2,
+            value: completedCourses,
+            label: "lms.dashboard.stats.completed",
+            tint: "bg-success/10 text-success",
+          },
+          {
+            icon: Clock,
+            value: totalLearningHours,
+            label: "lms.dashboard.stats.hours",
+            tint: "bg-gold-light/30 text-gold-deep",
+          },
+          {
+            icon: BarChart3,
+            value: activeCourse ? `${Math.round(activeCourse.courseProgress)}%` : "—",
+            label: "lms.dashboard.stats.progress",
+            tint: "bg-primary/10 text-primary",
+          },
+          {
+            icon: Award,
+            value: achievements?.length ?? 0,
+            label: "lms.dashboard.stats.achievements",
+            tint: "bg-burgundy/10 text-burgundy",
+          },
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.label} className="border-gold-light/30 bg-surface p-5 shadow-sm">
+            <Card key={stat.label} className="p-5">
               <div className="flex items-center gap-4">
-                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl", stat.color)}>
+                <div className={cn("grid h-12 w-12 place-items-center rounded-xl", stat.tint)}>
                   <Icon className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                  <p className="font-heading text-2xl font-bold text-foreground">{stat.value}</p>
                   <p className="text-xs text-muted">{t(stat.label)}</p>
                 </div>
               </div>

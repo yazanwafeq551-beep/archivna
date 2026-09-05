@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Search, FileText, Image, Headphones, Video, Map, ScrollText, Users, Download, Building, Archive, BookOpen, ArrowUpLeft } from "lucide-react";
+import { Search, Users, Download, Building, Archive, BookOpen, ArrowUpLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,40 +11,12 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useLatestArchives, useFeaturedArchives, useArchiveStats } from "@/hooks/useArchive";
-import { useAuth } from "@/hooks/useAuth";
-import { canDeposit } from "@/lib/permissions";
 import { useQuery } from "@tanstack/react-query";
 import { newsApi } from "@/api/news";
 import { MATERIAL_TYPES } from "@/lib/constants";
+import { PlatformServices } from "@/components/home/PlatformServices";
 import { SectionDecoration } from "@/components/illustrations/SectionDecoration";
 import { ArchivalPattern } from "@/components/illustrations/ArchivalPattern";
-
-const typeIcons: Record<string, React.ReactNode> = {
-  document: <FileText className="h-8 w-8" />,
-  image: <Image className="h-8 w-8" />,
-  audio: <Headphones className="h-8 w-8" />,
-  video: <Video className="h-8 w-8" />,
-  map: <Map className="h-8 w-8" />,
-  manuscript: <ScrollText className="h-8 w-8" />,
-};
-
-const typeGradients: Record<string, string> = {
-  document: "from-amber-50 to-amber-100",
-  image: "from-blue-50 to-blue-100",
-  audio: "from-purple-50 to-purple-100",
-  video: "from-rose-50 to-rose-100",
-  map: "from-emerald-50 to-emerald-100",
-  manuscript: "from-orange-50 to-orange-100",
-};
-
-const typeColors: Record<string, string> = {
-  document: "text-amber-600",
-  image: "text-blue-600",
-  audio: "text-purple-600",
-  video: "text-rose-600",
-  map: "text-emerald-600",
-  manuscript: "text-orange-600",
-};
 
 const statIcons: Record<string, React.ReactNode> = {
   totalRecords: <Archive className="h-8 w-8" />,
@@ -58,7 +30,6 @@ export function HomePage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const isArabic = i18n.language.startsWith("ar");
-  const { user, isAuthenticated } = useAuth();
 
   const { data: latestArchives, isLoading: latestLoading, error: latestError } = useLatestArchives(6);
   const { data: featuredArchives, isLoading: featuredLoading, error: featuredError } = useFeaturedArchives(4);
@@ -103,86 +74,83 @@ export function HomePage() {
         <div className={`absolute inset-0 hidden lg:block ${isArabic ? "bg-gradient-to-l from-primary-dark via-primary-dark/95 to-primary-dark/5" : "bg-gradient-to-r from-primary-dark via-primary-dark/95 to-primary-dark/5"}`} />
         <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/70 via-transparent to-primary-dark/15" />
         <div className="container-app relative z-10 w-full">
-          <div className={`animate-fade-in mx-auto max-w-2xl text-center lg:w-[52%] lg:text-start ${isArabic ? "lg:ml-auto lg:mr-0" : "lg:ml-0 lg:mr-auto"}`}>
-              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-white/[.06] px-4 py-2 text-sm text-gold-light backdrop-blur-sm">
-                <BookOpen className="h-4 w-4" />
-                <span>{t("app.slogan")}</span>
+          <div
+            className={`animate-fade-in mx-auto max-w-2xl text-center lg:w-[56%] lg:text-start ${
+              isArabic ? "lg:ml-auto lg:mr-0" : "lg:ml-0 lg:mr-auto"
+            }`}
+          >
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-white/[.06] px-4 py-1.5 text-xs font-semibold text-gold-light backdrop-blur-sm">
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>{t("app.slogan")}</span>
+            </div>
+
+            <h1 className="mb-4 font-heading text-4xl font-bold leading-[1.15] text-white md:text-5xl lg:text-[3.4rem]">
+              {t("home.hero.title")}
+            </h1>
+            <p className="mx-auto mb-8 max-w-xl text-base leading-8 text-white/75 lg:mx-0">
+              {t("home.hero.description")}
+            </p>
+
+            <form onSubmit={handleSearch} className="mx-auto max-w-xl lg:mx-0">
+              <div className="relative rounded-2xl bg-surface p-1.5 shadow-[0_24px_60px_rgba(0,0,0,.28)]">
+                <Input
+                  type="search"
+                  placeholder={t("home.hero.searchPlaceholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-14 border-0 bg-transparent pe-14 text-base shadow-none focus-visible:ring-0"
+                  dir="auto"
+                  icon={<Search className="h-5 w-5 text-muted" />}
+                />
+                <button
+                  type="submit"
+                  className="absolute end-2 top-2 grid h-11 w-11 place-items-center rounded-xl bg-gold text-primary-dark transition-colors hover:bg-gold-deep hover:text-white"
+                  aria-label={t("nav.search")}
+                >
+                  <ArrowUpLeft className="h-5 w-5" />
+                </button>
               </div>
-              <h1 className="mb-5 text-4xl font-bold leading-[1.12] text-white md:text-5xl lg:text-6xl">
-                {t("home.hero.title")}
-              </h1>
-              <p className="mx-auto mb-8 max-w-xl text-base leading-8 text-white/70 md:text-lg lg:mx-0">
-                {t("home.hero.description")}
-              </p>
-              <form onSubmit={handleSearch} className="mx-auto max-w-xl lg:mx-0">
-                <div className="relative rounded-2xl bg-surface p-1.5 shadow-[0_24px_60px_rgba(0,0,0,.22)]">
-                  <Input
-                    type="search"
-                    placeholder={t("home.hero.searchPlaceholder")}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-14 border-0 bg-transparent pe-14 text-base shadow-none focus-visible:ring-0"
-                    dir="auto"
-                    icon={<Search className="h-5 w-5 text-muted" />}
-                  />
-                  <button type="submit" className="absolute end-2 top-2 grid h-13 w-13 place-items-center rounded-xl bg-gold text-primary-dark transition-colors hover:bg-gold-deep hover:text-white" aria-label={t("nav.search")}>
-                    <ArrowUpLeft className="h-5 w-5" />
-                  </button>
+            </form>
+
+            {/* Straight into the material types, so the search box is not the only way in. */}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              <span className="text-xs text-white/50">{t("home.browse.title")}:</span>
+              {MATERIAL_TYPES.map((type) => (
+                <Link
+                  key={type.value}
+                  to={`/search?type=${type.value}`}
+                  className="rounded-full border border-white/15 bg-white/[.06] px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm transition-colors hover:border-gold/50 hover:text-white"
+                >
+                  {t("materialTypes." + type.value)}
+                </Link>
+              ))}
+            </div>
+
+            {/* What the archive holds right now, rather than a wall of buttons. */}
+            <dl className="mt-9 grid max-w-lg grid-cols-3 gap-3 lg:mx-0">
+              {[
+                { value: stats?.totalRecords, label: t("home.stats.totalRecords") },
+                { value: stats?.totalInstitutions, label: t("home.stats.totalInstitutions") },
+                { value: stats?.totalUsers, label: t("home.stats.totalUsers") },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-2xl border border-white/10 bg-white/[.06] px-4 py-3 text-center backdrop-blur-sm lg:text-start"
+                >
+                  <dt className="text-[11px] text-white/60">{item.label}</dt>
+                  <dd className="mt-0.5 font-heading text-2xl font-bold text-gold-light">
+                    {statsLoading ? "—" : item.value ?? 0}
+                  </dd>
                 </div>
-              </form>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-                {/* Depositing needs a role, so visitors are invited to join
-                    instead of being sent to a page that refuses them. */}
-                {!isAuthenticated ? (
-                  <Button asChild variant="gold">
-                    <Link to="/register">{t("nav.register")}</Link>
-                  </Button>
-                ) : (
-                  canDeposit(user) && (
-                    <Button asChild variant="gold">
-                      <Link to="/dashboard/archives/new">
-                        {t("home.hero.addButton")}
-                      </Link>
-                    </Button>
-                  )
-                )}
-                <Button variant="outline" asChild className="border-white/20 bg-white/[.06] text-white hover:border-gold/50 hover:bg-white/10 hover:text-white">
-                  <Link to="/search">{t("nav.search")}</Link>
-                </Button>
-              </div>
+              ))}
+            </dl>
           </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-px bg-gold/40" />
       </section>
 
-      {/* Browse by Type */}
-      <section className="relative py-16 md:py-20">
-        <div className="container-app">
-          <div className="mb-10 text-center">
-            <SectionDecoration className="mb-4" />
-            <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground">
-              {t("home.browse.title")}
-            </h2>
-            <p className="mt-2 text-muted max-w-lg mx-auto">{t("home.browse.subtitle")}</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {MATERIAL_TYPES.map((type) => (
-              <Link key={type.value} to={`/search?type=${type.value}`}>
-                <Card className="hover-card text-center p-6 h-full group border-0 bg-gradient-to-br from-white to-muted-bg/30 shadow-sm hover:shadow-md">
-                  <div className={`mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br ${typeGradients[type.value]} group-hover:scale-110 transition-transform duration-300`}>
-                    <div className={typeColors[type.value]}>
-                      {typeIcons[type.value]}
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {t("materialTypes." + type.value)}
-                  </h3>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* The platform's seven services, straight under the hero. */}
+      <PlatformServices />
 
       {/* Latest Archives */}
       <section className="py-12 md:py-16 bg-muted-bg/50 relative">

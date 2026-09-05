@@ -22,7 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { changeLanguage } from "@/i18n";
-import { NAV_LINKS } from "@/lib/constants";
+import { PLATFORM_SECTIONS } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
 
 export function Header() {
@@ -38,6 +38,9 @@ export function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isSectionActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const handleLanguageToggle = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";
@@ -63,33 +66,27 @@ export function Header() {
             <Logo variant="full" size="sm" />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1" aria-label={t("common.mainMenu")}>
-            {NAV_LINKS.map((link) => (
+          <nav
+            className="hidden xl:flex items-center gap-0.5"
+            aria-label={t("common.mainMenu")}
+          >
+            {PLATFORM_SECTIONS.map((section) => (
               <Link
-                key={link.key}
-                to={link.path}
-                className={`relative rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  location.pathname === link.path
-                    ? "bg-primary/10 text-primary after:absolute after:inset-x-3 after:-bottom-[17px] after:h-0.5 after:bg-gold"
+                key={section.key}
+                to={section.path}
+                title={t(`sections.${section.key}.title`)}
+                className={`relative rounded-lg px-2.5 py-2 text-[13px] font-semibold transition-colors ${
+                  isSectionActive(section.path)
+                    ? "bg-primary/10 text-primary after:absolute after:inset-x-2.5 after:-bottom-[17px] after:h-0.5 after:bg-gold"
                     : "text-foreground/80 hover:bg-primary/5 hover:text-primary"
                 }`}
               >
-                {t(`nav.${link.key}`)}
+                {t(`sections.${section.key}.short`)}
               </Link>
             ))}
-            <Link
-              to="/lms"
-              className={`relative rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                location.pathname.startsWith("/lms")
-                  ? "bg-primary/10 text-primary after:absolute after:inset-x-3 after:-bottom-[17px] after:h-0.5 after:bg-gold"
-                  : "text-foreground/80 hover:bg-primary/5 hover:text-primary"
-              }`}
-            >
-              {t("lms.title")}
-            </Link>
           </nav>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden xl:flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -159,7 +156,7 @@ export function Header() {
             )}
           </div>
 
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex xl:hidden items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
@@ -186,31 +183,34 @@ export function Header() {
                 </SheetHeader>
                 <div className="mt-6 flex flex-col gap-4">
                   <nav className="flex flex-col gap-1">
-                    {NAV_LINKS.map((link) => (
-                      <Link
-                        key={link.key}
-                        to={link.path}
-                        onClick={() => setMobileOpen(false)}
-                        className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                          location.pathname === link.path
-                            ? "bg-primary/10 text-primary"
-                            : "text-foreground hover:bg-muted-bg"
-                        }`}
-                      >
-                        {t(`nav.${link.key}`)}
-                      </Link>
-                    ))}
                     <Link
-                      to="/lms"
+                      to="/"
                       onClick={() => setMobileOpen(false)}
                       className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        location.pathname.startsWith("/lms")
+                        location.pathname === "/"
                           ? "bg-primary/10 text-primary"
                           : "text-foreground hover:bg-muted-bg"
                       }`}
                     >
-                      {t("lms.title")}
+                      {t("nav.home")}
                     </Link>
+                    {PLATFORM_SECTIONS.map((section) => (
+                      <Link
+                        key={section.key}
+                        to={section.path}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                          isSectionActive(section.path)
+                            ? "bg-primary/10 text-primary"
+                            : "text-foreground hover:bg-muted-bg"
+                        }`}
+                      >
+                        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted-bg text-[11px] font-bold text-muted">
+                          {section.number}
+                        </span>
+                        {t(`sections.${section.key}.title`)}
+                      </Link>
+                    ))}
                   </nav>
 
                   <div className="border-t border-border pt-4">

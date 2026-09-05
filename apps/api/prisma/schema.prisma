@@ -76,6 +76,8 @@ model User {
   course_reviews     CourseReview[]
   saved_courses      SavedCourse[]
   certificates       Certificate[]
+  support_requests   SupportRequest[] @relation("SupportRequester")
+  support_responses  SupportRequest[] @relation("SupportResponder")
 
   institution Institution? @relation(fields: [institution_id], references: [id], onDelete: SetNull)
 }
@@ -675,4 +677,30 @@ model Certificate {
   @@unique([userId, courseId])
   @@index([courseId])
   @@map("certificates")
+}
+
+/// Sections 3 and 6 of the platform: knowledge-support requests and the
+/// notes/complaints channel share one shape - somebody writes in, staff answer.
+model SupportRequest {
+  id            String    @id @default(uuid())
+  /// consultation | feedback | complaint | suggestion
+  kind          String
+  topic         String?
+  subject       String
+  message       String
+  contact_email String?
+  /// new | in_review | answered | closed
+  status        String    @default("new")
+  response      String?
+  responded_by  String?
+  responded_at  DateTime?
+  user_id       String
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now()) @updatedAt
+
+  user      User  @relation("SupportRequester", fields: [user_id], references: [id], onDelete: Cascade)
+  responder User? @relation("SupportResponder", fields: [responded_by], references: [id], onDelete: SetNull)
+
+  @@index([kind, status])
+  @@index([user_id])
 }

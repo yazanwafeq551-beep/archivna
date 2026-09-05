@@ -17,6 +17,7 @@ import { LmsModule } from './lms/lms.module';
 import { AuthorizationModule } from './common/authorization/authorization.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { GovernanceModule } from './governance/governance.module';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { GovernanceModule } from './governance/governance.module';
     LmsModule,
     CatalogModule,
     GovernanceModule,
+    SupportModule,
   ],
 })
 export class AppModule {}
