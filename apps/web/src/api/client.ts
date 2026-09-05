@@ -1,4 +1,4 @@
-import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 
 /**
  * Empty in development and wherever the API is proxied under the same domain;
@@ -91,8 +91,30 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+/**
+ * A misconfigured API origin makes every call land on the SPA's own index.html,
+ * which arrives as a 200 carrying a long HTML string. Callers then treat that
+ * string as their payload - its `.length` is truthy - and the page dies on the
+ * first `.map`. Anything that is not JSON is a failure, not data.
+ */
+function assertJsonResponse(response: AxiosResponse) {
+  const responseType = response.config.responseType;
+  if (responseType && responseType !== "json") return response;
+
+  const contentType = String(response.headers?.["content-type"] ?? "");
+  if (contentType.includes("application/json")) return response;
+
+  throw new AxiosError(
+    `Expected JSON from ${response.config.url ?? "the API"} but received ${contentType || "an unknown content type"}.`,
+    AxiosError.ERR_BAD_RESPONSE,
+    response.config,
+    response.request,
+    response
+  );
+}
+
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => assertJsonResponse(response),
   async (error: AxiosError) => {
     const originalRequest = error.config as
       | (InternalAxiosRequestConfig & { _retry?: boolean })

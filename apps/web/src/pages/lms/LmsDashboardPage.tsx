@@ -306,7 +306,7 @@ export function LmsDashboardPage() {
       )}
 
       {/* Achievements */}
-      {achievements && achievements.length > 0 && (
+      {Array.isArray(achievements) && achievements.length > 0 && (
         <section>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">

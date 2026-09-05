@@ -310,7 +310,7 @@ export function ArchiveDetailPage() {
       </div>
 
       {/* Related Archives */}
-      {relatedArchives && relatedArchives.length > 0 && (
+      {Array.isArray(relatedArchives) && relatedArchives.length > 0 && (
         <section className="mt-12">
           <h2 className="mb-6 text-xl font-heading font-bold text-foreground">
             {t("archive.detail.related")}

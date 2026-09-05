@@ -171,7 +171,7 @@ export function HomePage() {
             <LoadingSpinner />
           ) : latestError ? (
             <ErrorState onRetry={() => window.location.reload()} />
-          ) : latestArchives && latestArchives.length > 0 ? (
+          ) : Array.isArray(latestArchives) && latestArchives.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {latestArchives.map((archive) => (
                 <ArchiveCard key={archive.id} archive={archive} />
@@ -197,7 +197,7 @@ export function HomePage() {
             <LoadingSpinner />
           ) : featuredError ? (
             <ErrorState onRetry={() => window.location.reload()} />
-          ) : featuredArchives && featuredArchives.length > 0 ? (
+          ) : Array.isArray(featuredArchives) && featuredArchives.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredArchives.map((archive) => (
                 <ArchiveCard key={archive.id} archive={archive} />
@@ -261,7 +261,7 @@ export function HomePage() {
           </div>
           {newsLoading ? (
             <LoadingSpinner />
-          ) : latestNews && latestNews.length > 0 ? (
+          ) : Array.isArray(latestNews) && latestNews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {latestNews.map((article) => (
                 <NewsCard key={article.id} article={article} />
