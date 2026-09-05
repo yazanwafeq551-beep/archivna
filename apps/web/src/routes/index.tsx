@@ -1,7 +1,8 @@
-import { createBrowserRouter, Navigate, Outlet, useLocation } from "react-router-dom";
+import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LmsLayout } from "@/components/layout/LmsLayout";
+import { LmsAccountLayout } from "@/components/layout/LmsAccountLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandLoader } from "@/components/shared/BrandLoader";
 
@@ -106,7 +107,7 @@ export const router = createBrowserRouter([
       { path: "courses/:courseSlug/lessons/:lessonId", lazy: page(() => import("@/pages/lms/LessonPage"), "LessonPage") },
       {
         path: "me",
-        element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+        element: <ProtectedRoute><LmsAccountLayout /></ProtectedRoute>,
         children: [
           { index: true, lazy: page(() => import("@/pages/lms/LmsDashboardPage"), "LmsDashboardPage") },
           { path: "courses", lazy: page(() => import("@/pages/lms/MyCoursesPage"), "MyCoursesPage") },
