@@ -148,7 +148,6 @@ export function CoursesPage() {
               { icon: BookOpen, value: stats?.totalCourses ?? 0, label: "lms.hero.stats.courses" },
               { icon: Clock, value: stats?.totalLearningHours ?? 0, label: "lms.hero.stats.hours" },
               { icon: Users, value: stats?.totalEnrollments ?? 0, label: "lms.hero.stats.learners" },
-              { icon: Library, value: stats?.totalLessons ?? 0, label: "lms.hero.stats.resources" },
             ].map((stat) => {
               const Icon = stat.icon;
               return (

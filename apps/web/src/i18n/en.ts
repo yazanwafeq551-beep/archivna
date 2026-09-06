@@ -208,7 +208,8 @@ export default {
     "dateFrom": "From Date",
     "dateTo": "To Date",
     "applyFilters": "Apply Filters",
-    "resetFilters": "Reset"
+    "resetFilters": "Reset",
+    "allInstitutions": "All institutions"
   },
   "archive": {
     "detail": {
@@ -756,8 +757,7 @@ export default {
       "stats": {
         "courses": "Courses",
         "hours": "Learning Hours",
-        "learners": "Active Learners",
-        "resources": "Learning Resources"
+        "learners": "Active Learners"
       }
     },
     "courses": {
@@ -954,14 +954,13 @@ export default {
     "nav": {
       "capacityBuilding": "Archival Capacity Building",
       "courses": "Courses",
-      "myLearning": "My Learning",
+      "myLearning": "Training record",
       "dashboard": "Learning Dashboard"
     },
     "sidebar": {
       "overview": "Overview",
       "myCourses": "My Courses",
-      "saved": "Saved",
-      "achievements": "Achievements"
+      "saved": "Saved"
     },
     "footer": {
       "description": "A specialized platform for capacity building in archival science and digital preservation"
@@ -1022,14 +1021,13 @@ export default {
       "recentlyViewed": "Recently Viewed"
     },
     "dashboard": {
-      "title": "My Learning",
+      "title": "Training record",
       "continueLearning": "Continue Learning",
       "myCourses": "My Courses",
       "completedCourses": "Completed Courses",
       "learningHours": "Learning Hours",
       "recentActivity": "Recent Activity",
       "savedCourses": "Saved Courses",
-      "achievements": "Achievements",
       "recommended": "Recommended for You",
       "overview": "Overview",
       "noActivity": "No recent activity",
@@ -1044,8 +1042,7 @@ export default {
       "stats": {
         "completed": "Completed Courses",
         "hours": "Learning Hours",
-        "progress": "Overall Progress",
-        "achievements": "Achievements"
+        "progress": "Overall Progress"
       },
       "viewCourse": "View Course",
       "currentLesson": "Current Lesson",
@@ -1071,14 +1068,6 @@ export default {
       },
       "login": "Login",
       "register": "Create Account"
-    },
-    "achievements": {
-      "title": "Achievements",
-      "earned": "Achievements You've Earned",
-      "noAchievements": "No achievements earned yet",
-      "keepLearning": "Keep learning to earn achievements!",
-      "earnedOn": "Earned on",
-      "locked": "Locked"
     },
     "search": {
       "placeholder": "Search courses...",

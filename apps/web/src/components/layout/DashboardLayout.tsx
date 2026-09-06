@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, ScrollRestoration, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, Bell, LogOut, User, Settings } from "lucide-react";
 import { Sidebar } from "./Sidebar";
@@ -72,6 +72,7 @@ export function DashboardLayout() {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <ScrollRestoration />
       <Sidebar unreadCount={unreadCount} />
 
       <div className="flex flex-1 flex-col">

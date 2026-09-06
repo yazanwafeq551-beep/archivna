@@ -15,10 +15,12 @@ import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useSearch, useSearchState } from "@/hooks/useSearch";
+import { useQuery } from "@tanstack/react-query";
+import { catalogApi } from "@/api/catalog";
 import { SORT_OPTIONS } from "@/lib/constants";
 
 export function SearchPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -54,6 +56,14 @@ export function SearchPage() {
   }, [filters, setSearchParams]);
 
   const { data, isLoading, error } = useSearch(filters);
+
+  // The institution filter carries an id; the chip has to show its name.
+  const { data: institutions } = useQuery({
+    queryKey: ["institutions"],
+    queryFn: catalogApi.institutions,
+    staleTime: 5 * 60_000,
+  });
+  const institutionName = institutions?.find((i) => i.id === filters.institution);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,7 +216,11 @@ export function SearchPage() {
               ))}
               {filters.institution && (
                 <Badge variant="secondary" className="gap-1">
-                  {filters.institution}
+                  {institutionName
+                    ? i18n.language.startsWith("ar")
+                      ? institutionName.nameAr
+                      : institutionName.nameEn || institutionName.nameAr
+                    : filters.institution}
                   <button onClick={() => updateFilter("institution", "")}>
                     <X className="h-3 w-3" />
                   </button>

@@ -139,12 +139,6 @@ export function useCreateReview() {
   });
 }
 
-export function useAchievements() {
-  return useQuery({
-    queryKey: ["achievements"],
-    queryFn: () => lmsApi.getAchievements(),
-  });
-}
 
 export function useCourseProgress(courseId: string) {
   return useQuery({

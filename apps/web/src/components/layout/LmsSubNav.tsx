@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Award, BookMarked, BookOpen, GraduationCap, Layers, Trophy } from "lucide-react";
+import { Award, BookMarked, BookOpen, GraduationCap, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,7 +20,6 @@ export function LmsSubNav() {
           { to: "/lms/me", label: t("lms.nav.myLearning"), icon: GraduationCap, exact: true },
           { to: "/lms/me/courses", label: t("lms.sidebar.myCourses"), icon: Layers, exact: false },
           { to: "/lms/me/saved", label: t("lms.sidebar.saved"), icon: BookMarked, exact: false },
-          { to: "/lms/me/achievements", label: t("lms.sidebar.achievements"), icon: Trophy, exact: false },
           {
             to: "/lms/me/certificates",
             label: t("lms.certificate.myCertificates"),

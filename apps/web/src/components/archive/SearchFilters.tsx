@@ -1,7 +1,16 @@
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { catalogApi } from "@/api/catalog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { MATERIAL_TYPES, ACCESS_LEVELS } from "@/lib/constants";
@@ -16,7 +25,16 @@ interface SearchFiltersProps {
 }
 
 export function SearchFilters({ filters, onFilterChange, onReset, focusInstitution }: SearchFiltersProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language.startsWith("ar");
+
+  // Every institution on the platform, so the reader picks one instead of
+  // guessing how its name is spelled.
+  const { data: institutions } = useQuery({
+    queryKey: ["institutions"],
+    queryFn: catalogApi.institutions,
+    staleTime: 5 * 60_000,
+  });
 
   const handleTypeToggle = (type: string) => {
     const current = filters.materialType || [];
@@ -36,6 +54,30 @@ export function SearchFilters({ filters, onFilterChange, onReset, focusInstituti
 
   return (
     <div className="space-y-6">
+      {/* Institution - the archive is organised by institution, so this is
+          the filter most readers reach for first. */}
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t("search.institution")}</h3>
+        <Select
+          value={filters.institution || "all"}
+          onValueChange={(value) => onFilterChange("institution", value === "all" ? "" : value)}
+        >
+          <SelectTrigger autoFocus={focusInstitution}>
+            <SelectValue placeholder={t("search.allInstitutions")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("search.allInstitutions")}</SelectItem>
+            {institutions?.map((institution) => (
+              <SelectItem key={institution.id} value={institution.id}>
+                {isArabic ? institution.nameAr : institution.nameEn || institution.nameAr}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Separator />
+
       {/* Material Type */}
       <div>
         <h3 className="mb-3 text-sm font-semibold text-foreground">{t("search.type")}</h3>
@@ -53,19 +95,6 @@ export function SearchFilters({ filters, onFilterChange, onReset, focusInstituti
             </div>
           ))}
         </div>
-      </div>
-
-      <Separator />
-
-      {/* Institution */}
-      <div>
-        <h3 className="mb-3 text-sm font-semibold text-foreground">{t("search.institution")}</h3>
-        <Input
-          autoFocus={focusInstitution}
-          placeholder={t("search.institution")}
-          value={filters.institution || ""}
-          onChange={(e) => onFilterChange("institution", e.target.value)}
-        />
       </div>
 
       <Separator />

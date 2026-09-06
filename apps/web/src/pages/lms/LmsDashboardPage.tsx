@@ -5,10 +5,9 @@ import {
   CheckCircle2, PlayCircle, BarChart3, BookMarked,
   FileText, User, Sparkles, ArrowRight, GraduationCap, Library
 } from "lucide-react";
-import { useDashboard, useAchievements } from "@/hooks/useLms";
+import { useDashboard } from "@/hooks/useLms";
 import { useAuth } from "@/hooks/useAuth";
 import { CourseCard } from "@/components/lms/CourseCard";
-import { AchievementCard } from "@/components/lms/AchievementCard";
 import { LoadingSpinner, ErrorState, EmptyState } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -21,7 +20,6 @@ export function LmsDashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: dashboard, isLoading, isError, refetch } = useDashboard();
-  const { data: achievements } = useAchievements();
 
   const isRtl = i18n.language === "ar";
 
@@ -156,12 +154,6 @@ export function LmsDashboardPage() {
             value: activeCourse ? `${Math.round(activeCourse.courseProgress)}%` : "—",
             label: "lms.dashboard.stats.progress",
             tint: "bg-primary/10 text-primary",
-          },
-          {
-            icon: Award,
-            value: achievements?.length ?? 0,
-            label: "lms.dashboard.stats.achievements",
-            tint: "bg-burgundy/10 text-burgundy",
           },
         ].map((stat) => {
           const Icon = stat.icon;
@@ -300,23 +292,6 @@ export function LmsDashboardPage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {savedCourses.map((saved) => (
               <CourseCard key={saved.courseId} course={saved.course} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Achievements */}
-      {Array.isArray(achievements) && achievements.length > 0 && (
-        <section>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <Award className="h-5 w-5 text-gold" />
-              {t("lms.dashboard.achievements")}
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {achievements.map((ach) => (
-              <AchievementCard key={ach.achievementId} achievement={ach} />
             ))}
           </div>
         </section>

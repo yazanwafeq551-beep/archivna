@@ -208,7 +208,8 @@ export default {
     "dateFrom": "من تاريخ",
     "dateTo": "إلى تاريخ",
     "applyFilters": "تطبيق التصفية",
-    "resetFilters": "إعادة تعيين"
+    "resetFilters": "إعادة تعيين",
+    "allInstitutions": "جميع المؤسسات"
   },
   "archive": {
     "detail": {
@@ -756,8 +757,7 @@ export default {
       "stats": {
         "courses": "دورة تدريبية",
         "hours": "ساعة تعلم",
-        "learners": "متعلم نشط",
-        "resources": "مورد تعليمي"
+        "learners": "متعلم نشط"
       }
     },
     "courses": {
@@ -954,14 +954,13 @@ export default {
     "nav": {
       "capacityBuilding": "بناء القدرات الأرشيفية",
       "courses": "الدورات",
-      "myLearning": "تعلمي",
+      "myLearning": "سجل التدريب",
       "dashboard": "لوحة التعلم"
     },
     "sidebar": {
       "overview": "نظرة عامة",
       "myCourses": "دوراتي",
-      "saved": "المحفوظة",
-      "achievements": "الإنجازات"
+      "saved": "المحفوظة"
     },
     "footer": {
       "description": "منصة متخصصة لبناء القدرات في علم الأرشيف والحفظ الرقمي"
@@ -1022,14 +1021,13 @@ export default {
       "recentlyViewed": "تم العرض مؤخراً"
     },
     "dashboard": {
-      "title": "لوحة تعلمي",
+      "title": "سجل التدريب",
       "continueLearning": "استمر في التعلم",
       "myCourses": "دوراتي",
       "completedCourses": "الدورات المكتملة",
       "learningHours": "ساعات التعلم",
       "recentActivity": "آخر النشاطات",
       "savedCourses": "الدورات المحفوظة",
-      "achievements": "الإنجازات",
       "recommended": "موصى به لك",
       "overview": "نظرة عامة",
       "noActivity": "لا توجد نشاطات حديثة",
@@ -1044,8 +1042,7 @@ export default {
       "stats": {
         "completed": "الدورات المكتملة",
         "hours": "ساعات التعلم",
-        "progress": "التقدم العام",
-        "achievements": "الإنجازات"
+        "progress": "التقدم العام"
       },
       "viewCourse": "عرض الدورة",
       "currentLesson": "الدرس الحالي",
@@ -1071,14 +1068,6 @@ export default {
       },
       "login": "تسجيل الدخول",
       "register": "إنشاء حساب"
-    },
-    "achievements": {
-      "title": "الإنجازات",
-      "earned": "الإنجازات التي حصلت عليها",
-      "noAchievements": "لم تحصل على أي إنجاز بعد",
-      "keepLearning": "استمر في التعلم لكسب الإنجازات!",
-      "earnedOn": "تاريخ الحصول",
-      "locked": "مغلق"
     },
     "search": {
       "placeholder": "ابحث في الدورات...",

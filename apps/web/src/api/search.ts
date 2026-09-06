@@ -4,6 +4,7 @@ import type { Archive, ArchiveListResponse } from "./archives";
 export interface SearchFilters {
   q?: string;
   materialType?: string[];
+  /** Institution id, chosen from the register. */
   institution?: string;
   dateFrom?: string;
   dateTo?: string;
@@ -32,7 +33,7 @@ export const searchApi = {
 
     if (filters.q) rawParams.q = filters.q;
     if (filters.materialType?.length) rawParams.material_type = filters.materialType.join(',');
-    if (filters.institution) rawParams.institution_name = filters.institution;
+    if (filters.institution) rawParams.institution_id = filters.institution;
     if (filters.dateFrom) rawParams.date_from = filters.dateFrom;
     if (filters.dateTo) rawParams.date_to = filters.dateTo;
     if (filters.subject) rawParams.subject = filters.subject;

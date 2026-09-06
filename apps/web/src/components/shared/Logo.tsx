@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 
 /**
- * "brand" is the mark on paper. "onDark" swaps the forest green - which
- * disappears against the dark green bar and footer - for ivory, and keeps the
- * gold, so the lockup survives on a dark surface without a light patch behind it.
+ * "brand" is the wordmark on paper. "onDark" lifts it to ivory for the dark
+ * green bar and footer. The emblem itself carries its own ring and ground, so
+ * it needs no tone of its own.
  */
 type LogoTone = "brand" | "onDark";
 
@@ -14,35 +14,29 @@ interface LogoProps {
   tone?: LogoTone;
 }
 
+/**
+ * The platform emblem, everywhere it appears: the header, the account pages,
+ * the dashboard rail, the certificate. One file, so it can never drift between
+ * places the way a hand-drawn copy would.
+ */
 export function BrandMark({
   className = "",
   ariaLabel,
-  tone = "brand",
 }: {
   className?: string;
   ariaLabel?: string;
+  /** Accepted for call-site symmetry with Logo; the emblem is self-contained. */
   tone?: LogoTone;
 }) {
-  const ink = tone === "onDark" ? "#EADFC4" : "#0F4C45";
-
   return (
-    <svg
-      className={className}
-      viewBox="0 0 96 96"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      role={ariaLabel ? "img" : undefined}
-      aria-label={ariaLabel}
+    <img
+      src="/images/acp-emblem.png"
+      width={152}
+      height={152}
+      alt={ariaLabel ?? ""}
       aria-hidden={ariaLabel ? undefined : true}
-    >
-      <path d="M12 26 45 8v15L25 34v48H12V26Z" fill={ink} />
-      <path d="M30 35 58 20v57L30 87V35Z" fill="#C6A15B" />
-      <path d="M51 45c-10 2-16 8-17 21 8-2 14-8 17-21Zm-16 25c6-8 10-12 16-17" stroke={ink} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="65" y="34" width="9" height="9" rx="1" fill="#C6A15B" />
-      <rect x="72" y="49" width="11" height="11" rx="1" fill="#C6A15B" />
-      <rect x="64" y="64" width="8" height="8" rx="1" fill="#C6A15B" />
-      <rect x="76" y="72" width="6" height="6" rx="1" fill="#C6A15B" />
-    </svg>
+      className={`rounded-full object-cover ${className}`}
+    />
   );
 }
 
@@ -57,12 +51,12 @@ export function Logo({ className = "", variant = "full", size = "md", tone = "br
   const s = sizes[size];
 
   if (variant === "icon") {
-    return <BrandMark className={`${s.iconClass} shrink-0`} ariaLabel={t("app.name")} tone={tone} />;
+    return <BrandMark className={`${s.iconClass} shrink-0`} ariaLabel={t("app.name")} />;
   }
 
   return (
     <div className={`inline-flex items-center gap-2.5 ${className}`} dir={isArabic ? "rtl" : "ltr"}>
-      <BrandMark className={`${s.iconClass} shrink-0`} tone={tone} />
+      <BrandMark className={`${s.iconClass} shrink-0`} />
       <span
         className={`${s.wordmark} whitespace-nowrap font-bold leading-none ${
           tone === "onDark" ? "text-white" : "text-primary"
