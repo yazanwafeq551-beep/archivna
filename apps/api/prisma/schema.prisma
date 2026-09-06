@@ -1,5 +1,8 @@
 generator client {
   provider = "prisma-client-js"
+  // The deployment image is Alpine, so the engines must be the musl build.
+  // "native" keeps local development working on whatever the developer runs.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

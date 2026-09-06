@@ -1,6 +1,9 @@
 # Production image for the API: build once, run the compiled output.
 FROM node:20-alpine AS build
 
+# Prisma links its engines against OpenSSL; Alpine does not ship it.
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY apps/api/package.json ./apps/api/
@@ -12,6 +15,9 @@ WORKDIR /app/apps/api
 RUN npx prisma generate && npm run build
 
 FROM node:20-alpine AS runtime
+
+# The runtime runs migrations before the server, so it needs the engines too.
+RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 ENV NODE_ENV=production
