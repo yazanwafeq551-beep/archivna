@@ -5,6 +5,10 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Pooled connections cannot run migrations: PgBouncer does not keep the
+  // session state Prisma needs for DDL. Queries go through the pool, schema
+  // changes go straight to the database.
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model Institution {

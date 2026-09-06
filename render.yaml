@@ -17,8 +17,12 @@ services:
       - key: NODE_ENV
         value: production
 
-      # From Neon. Use the pooled connection string.
+      # From Neon. Queries go through the pooled endpoint; migrations cannot -
+      # PgBouncer does not keep the session state Prisma needs for DDL - so the
+      # direct endpoint is given separately. Same string, without "-pooler".
       - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_DATABASE_URL
         sync: false
 
       # Generated once by Render and then left alone: rotating either of these
