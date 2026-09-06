@@ -18,6 +18,7 @@ import { AuthorizationModule } from './common/authorization/authorization.module
 import { CatalogModule } from './catalog/catalog.module';
 import { GovernanceModule } from './governance/governance.module';
 import { SupportModule } from './support/support.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SupportModule } from './support/support.module';
       ],
     }),
     PrismaModule,
+    HealthModule,
     AuthorizationModule,
     AuthModule,
     ProfileModule,

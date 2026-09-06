@@ -1,0 +1,70 @@
+# Render Blueprint. Point Render at this repository and it creates the API
+# service described here; the database lives on Neon, so nothing here provisions
+# one - DATABASE_URL is filled in from the Neon connection string.
+#
+# The Dockerfile copies from the repository root (it needs the root lockfile and
+# the workspace layout), so the build context is the root, not apps/api.
+services:
+  - type: web
+    name: archivna-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./apps/api/Dockerfile.prod
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # From Neon. Use the pooled connection string.
+      - key: DATABASE_URL
+        sync: false
+
+      # Generated once by Render and then left alone: rotating either of these
+      # signs every existing session out.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRATION
+        value: 15m
+      - key: REFRESH_TOKEN_EXPIRATION
+        value: 7d
+
+      # The site and the API sit on different domains, so the refresh cookie has
+      # to be SameSite=None over HTTPS or the session dies on every reload.
+      - key: CROSS_SITE_COOKIES
+        value: "true"
+      # Comma-separated: the production domain, and any preview domain that
+      # should be allowed to call the API.
+      - key: FRONTEND_URL
+        sync: false
+
+      # Container filesystems are temporary, so uploads have to go to Cloudinary.
+      - key: STORAGE_DRIVER
+        value: cloudinary
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      # Cloudinary's free plan refuses video over 100MB, so the API should say
+      # so before the upload rather than after it.
+      - key: MAX_IMAGE_SIZE
+        value: "20971520"
+      - key: MAX_DOCUMENT_SIZE
+        value: "104857600"
+      - key: MAX_AUDIO_SIZE
+        value: "104857600"
+      - key: MAX_VIDEO_SIZE
+        value: "104857600"
+      - key: MAX_ZIP_SIZE
+        value: "104857600"
+
+      - key: RATE_LIMIT_MAX
+        value: "600"
+      - key: AUTH_RATE_LIMIT_MAX
+        value: "20"
