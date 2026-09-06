@@ -51,18 +51,19 @@ services:
       - key: CLOUDINARY_API_SECRET
         sync: false
 
-      # Cloudinary's free plan refuses video over 100MB, so the API should say
-      # so before the upload rather than after it.
+      # The ceilings Cloudinary's free plan enforces: 10MB for images and raw
+      # files, 100MB for video - and audio counts as video. Anything higher
+      # here only turns a clear refusal into a failed upload.
       - key: MAX_IMAGE_SIZE
-        value: "20971520"
+        value: "10485760"
       - key: MAX_DOCUMENT_SIZE
-        value: "104857600"
+        value: "10485760"
       - key: MAX_AUDIO_SIZE
         value: "104857600"
       - key: MAX_VIDEO_SIZE
         value: "104857600"
       - key: MAX_ZIP_SIZE
-        value: "104857600"
+        value: "10485760"
 
       - key: RATE_LIMIT_MAX
         value: "600"

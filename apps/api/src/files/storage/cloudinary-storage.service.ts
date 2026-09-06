@@ -22,7 +22,10 @@ export class CloudinaryStorageService extends StorageService {
 
   private getCloudinaryResourceType(mimetype: string): 'image' | 'video' | 'raw' | 'auto' {
     if (mimetype.startsWith('image/')) return 'image';
-    if (mimetype.startsWith('video/')) return 'video';
+    // Cloudinary files audio under its video resource type: that is where
+    // streaming delivery lives, and where the 100MB ceiling applies instead
+    // of the 10MB one that governs raw files.
+    if (mimetype.startsWith('video/') || mimetype.startsWith('audio/')) return 'video';
     return 'raw';
   }
 
