@@ -4,16 +4,10 @@ import { useTranslation } from "react-i18next";
 import { ArrowUpLeft, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SectionDecoration } from "@/components/illustrations/SectionDecoration";
+import { HomeBackdrop } from "./HomeBackdrop";
+import "./HomeHero.css";
 
 const PILLARS = ["past", "present", "future"] as const;
-
-/** Fades the photograph out towards the page centre and towards the fold. */
-const frameMask = (inner: "right" | "left") => ({
-  maskImage: `linear-gradient(to ${inner}, #000 45%, transparent 100%), linear-gradient(to bottom, #000 62%, transparent 100%)`,
-  WebkitMaskImage: `linear-gradient(to ${inner}, #000 45%, transparent 100%), linear-gradient(to bottom, #000 62%, transparent 100%)`,
-  maskComposite: "intersect",
-  WebkitMaskComposite: "source-in",
-});
 
 /**
  * The masthead, and the canvas the service map and the two doors sit on: the
@@ -36,32 +30,8 @@ export function HomeHero({ children }: { children?: ReactNode }) {
   };
 
   return (
-    <section className="relative isolate overflow-hidden bg-background pb-12 pt-12 dark:bg-primary-dark md:pb-16 md:pt-14">
-      <img
-        src="/images/hero-frame-start.jpg"
-        alt=""
-        width={540}
-        height={390}
-        decoding="async"
-        className="pointer-events-none absolute left-0 top-0 -z-10 h-[22rem] w-16 object-cover object-left opacity-90 dark:opacity-40 sm:w-40 sm:h-[28rem] lg:h-[40rem] lg:w-[22rem] xl:w-[27rem]"
-        style={frameMask("right")}
-      />
-      <img
-        src="/images/hero-frame-end.jpg"
-        alt=""
-        width={536}
-        height={390}
-        decoding="async"
-        className="pointer-events-none absolute right-0 top-0 -z-10 h-[22rem] w-16 object-cover object-right opacity-90 dark:opacity-40 sm:w-40 sm:h-[28rem] lg:h-[40rem] lg:w-[22rem] xl:w-[27rem]"
-        style={frameMask("left")}
-      />
-
-      {/* Keeps the masthead legible over the collage at every width, without
-          flattening the artwork at the edges. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(58%_46%_at_50%_34%,rgb(var(--color-background))_42%,transparent_100%)] dark:bg-[radial-gradient(58%_46%_at_50%_34%,rgb(var(--color-primary-dark))_42%,transparent_100%)]"
-      />
+    <section className="relative isolate overflow-hidden bg-background pb-8 pt-8 dark:bg-primary-dark md:pb-12 md:pt-14">
+      <HomeBackdrop />
 
       <div className="container-app relative z-10">
         <div className="animate-fade-in mx-auto max-w-3xl text-center">
@@ -70,19 +40,19 @@ export function HomeHero({ children }: { children?: ReactNode }) {
             alt={t("home.hero.logoAlt")}
             width={168}
             height={168}
-            className="mx-auto h-24 w-24 rounded-full md:h-28 md:w-28"
+            className="mx-auto h-20 w-20 rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28"
           />
 
-          <h1 className="mt-5">
-            <span className="block font-brand text-5xl font-bold leading-[1.05] text-primary md:text-7xl lg:text-8xl">
+          <h1 className="mt-3 md:mt-5">
+            <span className="block font-brand text-4xl font-bold leading-[1.05] text-primary dark:text-foreground sm:text-5xl md:text-7xl lg:text-8xl">
               {t("app.name")}
             </span>
-            <span className="mt-4 block font-heading text-lg font-bold text-primary md:text-2xl">
+            <span className="mt-2 block font-heading text-lg font-bold text-primary dark:text-foreground md:mt-4 md:text-2xl">
               {t("app.slogan")}
             </span>
           </h1>
 
-          <p className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm font-semibold text-gold-deep dark:text-gold md:text-base">
+          <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.6875rem] font-semibold text-gold-deep [text-shadow:0_1px_3px_rgb(var(--color-background)),0_0_8px_rgb(var(--color-background))] dark:text-gold sm:text-sm md:mt-3 md:gap-x-3 md:text-base">
             {PILLARS.map((pillar, index) => (
               <Fragment key={pillar}>
                 {index > 0 && (
@@ -95,13 +65,15 @@ export function HomeHero({ children }: { children?: ReactNode }) {
             ))}
           </p>
 
-          <SectionDecoration className="mt-5" />
+          <SectionDecoration className="mt-3 md:mt-5" />
 
-          <form onSubmit={handleSearch} className="mx-auto mt-5 max-w-xl">
+          <form onSubmit={handleSearch} className="mx-auto mt-3 max-w-xl md:mt-5" role="search">
             <div className="relative rounded-full border border-gold/40 bg-surface/95 p-1.5 shadow-[var(--card-shadow)] backdrop-blur-sm">
               <Input
                 type="search"
-                placeholder={t("home.hero.searchPlaceholder")}
+                placeholder={t("home.hero.searchPlaceholderCompact")}
+                aria-label={t("home.hero.searchPlaceholder")}
+                title={t("home.hero.searchPlaceholder")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="h-12 border-0 bg-transparent pe-14 text-base shadow-none focus-visible:ring-0"

@@ -26,7 +26,7 @@ export function AccessCta() {
       ] as const);
 
   return (
-    <section className="pt-10 md:pt-12">
+    <section className="pt-6 md:pt-8">
       <div className="container-app">
         <div className="mx-auto flex max-w-4xl flex-col items-stretch gap-4 sm:flex-row sm:items-center">
           {doors.map((door, index) => (
@@ -39,7 +39,7 @@ export function AccessCta() {
               <Link
                 to={door.to}
                 className={cn(
-                  "hover-card flex flex-1 items-center justify-center gap-4 rounded-2xl border px-6 py-5",
+                  "hover-card flex flex-1 items-center justify-center gap-4 rounded-2xl border px-5 py-4 sm:px-6 sm:py-5",
                   door.tone === "ink"
                     ? "border-gold/25 bg-primary-dark text-white"
                     : "border-gold/40 bg-gold text-primary-dark"

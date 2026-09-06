@@ -48,7 +48,7 @@ export function PlatformServices() {
   };
 
   return (
-    <section className="relative pt-10 md:pt-12">
+    <section className="relative pt-6 md:pt-8">
       <div className="container-app">
         {/* The design runs the cards straight on from the masthead ornament.
             The heading stays for the document outline and for screen readers,
@@ -81,7 +81,7 @@ export function PlatformServices() {
                   // The seventh card has no partner: full width at two columns,
                   // centred at three, an ordinary cell in the row of seven.
                   section.number === 7
-                    ? "col-span-2 sm:col-span-1 sm:col-start-2 xl:col-span-1 xl:col-start-auto"
+                    ? "col-span-2 max-sm:flex-row max-sm:gap-4 max-sm:text-start max-sm:[&>a]:flex-row max-sm:[&>a]:gap-4 max-sm:[&>div]:w-11 sm:col-span-1 sm:col-start-2 xl:col-span-1 xl:col-start-auto"
                     : undefined
                 }
               />

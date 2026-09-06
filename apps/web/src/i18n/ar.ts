@@ -22,6 +22,7 @@ export default {
   "home": {
     "hero": {
       "searchPlaceholder": "ابحث باسم شخص، مؤسسة، مكان، موضوع أو رقم أرشيفي",
+      "searchPlaceholderCompact": "ابحث في الأرشيف…",
       "logoAlt": "شعار «أرشيفنا»",
       "pillars": {
         "past": "حفظ الماضي",

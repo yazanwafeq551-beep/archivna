@@ -1,0 +1,35 @@
+.home-backdrop-paper {
+  background:
+    radial-gradient(ellipse at 0% 75%, rgb(var(--color-gold) / .16), transparent 48%),
+    radial-gradient(ellipse at 100% 90%, rgb(var(--color-olive) / .12), transparent 45%),
+    linear-gradient(to bottom, transparent 15rem, rgb(var(--color-muted-bg) / .65) 75%, rgb(var(--color-background)));
+}
+
+.home-backdrop-frame {
+  --frame-direction: right;
+  -webkit-mask-image: linear-gradient(to var(--frame-direction), #000 70%, transparent), linear-gradient(to bottom, #000 82%, transparent);
+  mask-image: linear-gradient(to var(--frame-direction), #000 70%, transparent), linear-gradient(to bottom, #000 82%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.home-backdrop-frame-right { --frame-direction: left; }
+
+.home-backdrop-stitches {
+  top: max(8rem, 30vw);
+  bottom: 0;
+  height: calc(100% - max(8rem, 30vw));
+  opacity: .3;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 5rem);
+  mask-image: linear-gradient(to bottom, transparent, #000 5rem);
+}
+
+.home-backdrop-olive { opacity: .95; }
+.dark .home-backdrop-olive { opacity: .7; }
+.home-backdrop-olive-left { left: 0; }
+.home-backdrop-olive-right { right: 0; transform: scaleX(-1); }
+
+@media (max-width: 639px) {
+  .home-backdrop-stitches { opacity: .2; }
+  .home-backdrop-olive { opacity: .85; }
+}

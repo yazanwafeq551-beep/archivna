@@ -22,6 +22,7 @@ export default {
   "home": {
     "hero": {
       "searchPlaceholder": "Search by name, institution, place, subject, or reference number",
+      "searchPlaceholderCompact": "Search the archive…",
       "logoAlt": "Arsheefna emblem",
       "pillars": {
         "past": "Preserving the past",
