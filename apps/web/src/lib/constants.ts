@@ -91,6 +91,37 @@ export const PLATFORM_SECTIONS = [
 
 export type PlatformSectionKey = (typeof PLATFORM_SECTIONS)[number]["key"];
 
+/**
+ * Two of the seven services open onto a short list of their own. The home hub
+ * reveals these under the card that owns them; every other section has none and
+ * shows no disclosure at all.
+ */
+export const PLATFORM_SECTION_CHILDREN: Partial<
+  Record<PlatformSectionKey, ReadonlyArray<{ key: string; code: string; path: string }>>
+> = {
+  search: [
+    { key: "free", code: "1-1", path: "/search" },
+    { key: "byInstitution", code: "1-2", path: "/search?browse=institution" },
+  ],
+  capacity: [
+    { key: "materials", code: "2-1", path: "/lms#programs-materials" },
+    { key: "synchronous", code: "2-2", path: "/lms#programs-live" },
+    { key: "interactive", code: "2-3", path: "/lms#programs-interactive" },
+  ],
+};
+
+/**
+ * The reader's own corner of the platform. The seven services are the home hub
+ * and the footer; the top bar, the mobile drawer and the bottom tab bar all read
+ * this list instead, so the four never drift apart.
+ */
+export const MAIN_NAV = [
+  { key: "home", path: "/", icon: "Home", protected: false },
+  { key: "myArchive", path: "/dashboard/archives", icon: "FolderOpen", protected: true },
+  { key: "notifications", path: "/dashboard/notifications", icon: "Bell", protected: true },
+  { key: "account", path: "/dashboard/profile", icon: "User", protected: true },
+] as const;
+
 export const COURSE_DIFFICULTIES = [
   { value: "beginner", label: "مبتدئ", labelEn: "Beginner" },
   { value: "intermediate", label: "متوسط", labelEn: "Intermediate" },

@@ -2,22 +2,42 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Logo } from "@/components/shared/Logo";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { PLATFORM_SECTIONS } from "@/lib/constants";
 
 export function Footer() {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
+  const email = t("footer.email");
 
   return (
     <footer className="relative overflow-hidden border-t border-gold/30 bg-primary-dark text-white">
       <div className="absolute -end-24 -top-24 h-72 w-72 rounded-full border border-gold/10" />
       <div className="container-app relative py-16">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.35fr_.8fr_.8fr_1fr]">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_.8fr_.7fr_1fr]">
           {/* About */}
           <div className="space-y-4">
-            <div className="inline-flex rounded-xl bg-ivory px-3 py-2"><Logo variant="full" size="md" /></div>
+            <Logo variant="full" size="md" tone="onDark" />
             <p className="text-sm text-white/70 leading-relaxed">
               {t("footer.description")}
             </p>
+          </div>
+
+          {/* The seven services. The top bar carries the reader's own pages now,
+              so this is what keeps the sections reachable from every page. */}
+          <div>
+            <h3 className="mb-5 text-lg font-bold text-gold-light">{t("footer.services")}</h3>
+            <ul className="space-y-2">
+              {PLATFORM_SECTIONS.map((section) => (
+                <li key={section.key}>
+                  <Link
+                    to={section.path}
+                    className="text-sm text-white/70 hover:text-white transition-colors"
+                  >
+                    {t(`sections.${section.key}.short`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Quick Links */}
@@ -49,7 +69,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="mb-5 text-lg font-bold text-gold-light">{t("footer.quickLinks")}</h3>
+            <h3 className="mb-5 text-lg font-bold text-gold-light">{t("footer.legal")}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/privacy" className="text-sm text-white/70 hover:text-white transition-colors">
@@ -68,13 +88,18 @@ export function Footer() {
           <div>
             <h3 className="mb-5 text-lg font-bold text-gold-light">{t("footer.contact")}</h3>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-white/70">
-                <Mail className="h-4 w-4 shrink-0" />
-                <span>info@archivna.ps</span>
+              <li>
+                <a
+                  href={`mailto:${email}`}
+                  className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+                >
+                  <Mail className="h-4 w-4 shrink-0" />
+                  <span dir="ltr">{email}</span>
+                </a>
               </li>
               <li className="flex items-center gap-2 text-sm text-white/70">
                 <Phone className="h-4 w-4 shrink-0" />
-                <span>+970 2 XXX XXXX</span>
+                <span dir="ltr">+970 2 XXX XXXX</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-white/70">
                 <MapPin className="h-4 w-4 shrink-0" />

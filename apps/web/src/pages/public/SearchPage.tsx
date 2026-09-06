@@ -22,9 +22,16 @@ export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  // The home hub offers "search by institution or collection" as its own
+  // entry point; arriving that way should put the reader in the filter, not
+  // leave them hunting for it behind a button.
+  const browsingInstitutions = searchParams.get("browse") === "institution";
+  const [filtersOpen, setFiltersOpen] = useState(browsingInstitutions);
+
   const urlFilters = useMemo(() => ({
     q: searchParams.get("q") || "",
     materialType: searchParams.get("type") ? [searchParams.get("type")!] : [],
+    institution: searchParams.get("institution") || "",
     sort: searchParams.get("sort") || "relevance",
     page: searchParams.get("page") ? parseInt(searchParams.get("page")!, 10) : 1,
   }), []);
@@ -36,6 +43,7 @@ export function SearchPage() {
     const params = new URLSearchParams();
     if (filters.q) params.set("q", filters.q);
     if (filters.materialType?.length) params.set("type", filters.materialType[0]);
+    if (filters.institution) params.set("institution", filters.institution);
     if (filters.page && filters.page > 1) params.set("page", String(filters.page));
     if (filters.sort && filters.sort !== "relevance") params.set("sort", filters.sort);
     setSearchParams(params, { replace: true });
@@ -87,6 +95,7 @@ export function SearchPage() {
               filters={filters}
               onFilterChange={updateFilter}
               onReset={resetFilters}
+              focusInstitution={browsingInstitutions}
             />
           </div>
         </div>
@@ -97,7 +106,7 @@ export function SearchPage() {
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               {/* Mobile Filters */}
-              <Sheet>
+              <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="lg:hidden">
                     <SlidersHorizontal className="ms-1 h-4 w-4" />

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Search, Clock, Users, Star, BookOpen, BarChart3, ArrowRight,
@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
+import { getStoredReducedMotion } from "@/lib/appearance";
+import { CapacityPrograms } from "@/components/lms/CapacityPrograms";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   document: <FileText className="h-5 w-5" />,
@@ -28,6 +30,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 export function CoursesPage() {
+  const { hash } = useLocation();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -41,6 +44,18 @@ export function CoursesPage() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
   const coursesRef = useRef<HTMLDivElement>(null);
+
+  // React Router does not act on a #hash by itself, so /lms#programs-live
+  // would otherwise land at the top of the page.
+  useEffect(() => {
+    if (!hash) return;
+    const target = document.getElementById(hash.slice(1));
+    if (!target) return;
+    const still =
+      getStoredReducedMotion() ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
+  }, [hash]);
 
   const { data: coursesData, isLoading: coursesLoading, isError: coursesError, refetch: refetchCourses } = useCourses({
     page: currentPage,
@@ -151,6 +166,8 @@ export function CoursesPage() {
         </div>
       </section>
 
+      <CapacityPrograms />
+
       {/* Categories */}
       <section className="border-b border-gold-light/30 bg-surface/50">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -201,7 +218,7 @@ export function CoursesPage() {
       </section>
 
       {/* Course Listing */}
-      <section ref={coursesRef} className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <section id="courses" ref={coursesRef} className="scroll-mt-32 mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         {/* Search & Filters */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

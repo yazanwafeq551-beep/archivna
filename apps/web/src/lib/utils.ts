@@ -159,3 +159,13 @@ export function formatCourseDuration(minutes?: number | null): string {
   if (rest === 0) return i18n.t("lms.duration.hours", { count: hours });
   return `${i18n.t("lms.duration.hours", { count: hours })} ${i18n.t("lms.duration.minutes", { count: rest })}`;
 }
+
+/**
+ * Nav highlighting. "/" must match exactly - as a prefix it would light up on
+ * every page - while a section stays active inside its own subtree, so
+ * /dashboard/archives keeps its underline on /dashboard/archives/new.
+ */
+export function isNavActive(pathname: string, path: string): boolean {
+  if (path === "/") return pathname === "/";
+  return pathname === path || pathname.startsWith(path + "/");
+}

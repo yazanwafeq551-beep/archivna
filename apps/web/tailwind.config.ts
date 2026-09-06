@@ -52,6 +52,9 @@ export default {
         brand: ["Almarai", "sans-serif"],
         mono: ["IBM Plex Mono", "monospace"],
       },
+      spacing: {
+        13: "3.25rem",
+      },
       borderRadius: {
         lg: "1rem",
         md: "0.75rem",

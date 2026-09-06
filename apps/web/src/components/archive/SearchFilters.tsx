@@ -11,9 +11,11 @@ interface SearchFiltersProps {
   filters: SearchFiltersType;
   onFilterChange: (key: keyof SearchFiltersType, value: unknown) => void;
   onReset: () => void;
+  /** Focus the institution field on mount, for ?browse=institution. */
+  focusInstitution?: boolean;
 }
 
-export function SearchFilters({ filters, onFilterChange, onReset }: SearchFiltersProps) {
+export function SearchFilters({ filters, onFilterChange, onReset, focusInstitution }: SearchFiltersProps) {
   const { t } = useTranslation();
 
   const handleTypeToggle = (type: string) => {
@@ -59,6 +61,7 @@ export function SearchFilters({ filters, onFilterChange, onReset }: SearchFilter
       <div>
         <h3 className="mb-3 text-sm font-semibold text-foreground">{t("search.institution")}</h3>
         <Input
+          autoFocus={focusInstitution}
           placeholder={t("search.institution")}
           value={filters.institution || ""}
           onChange={(e) => onFilterChange("institution", e.target.value)}

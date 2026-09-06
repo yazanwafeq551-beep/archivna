@@ -1,9 +1,13 @@
+import { useId } from "react";
+
 interface ArchivalPatternProps {
   className?: string;
   variant?: "dots" | "diamond" | "wave";
 }
 
 export function ArchivalPattern({ className = "", variant = "dots" }: ArchivalPatternProps) {
+  // Ids must be unique per instance: the home page renders this more than once.
+  const uid = useId().replace(/:/g, "");
   if (variant === "diamond") {
     return (
       <svg
@@ -15,12 +19,12 @@ export function ArchivalPattern({ className = "", variant = "dots" }: ArchivalPa
         preserveAspectRatio="none"
       >
         <defs>
-          <pattern id="diamond-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <pattern id={`diamond-pattern-${uid}`} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
             <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="#C6A15B" opacity="0.04" />
             <path d="M20 5 L35 20 L20 35 L5 20 Z" fill="#0F4C45" opacity="0.03" />
           </pattern>
         </defs>
-        <rect width="100" height="100" fill="url(#diamond-pattern)" />
+        <rect width="100" height="100" fill={`url(#diamond-pattern-${uid})`} />
       </svg>
     );
   }
@@ -54,11 +58,11 @@ export function ArchivalPattern({ className = "", variant = "dots" }: ArchivalPa
       preserveAspectRatio="none"
     >
       <defs>
-        <pattern id="dot-pattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+        <pattern id={`dot-pattern-${uid}`} x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
           <circle cx="15" cy="15" r="1.5" fill="#C6A15B" opacity="0.06" />
         </pattern>
       </defs>
-      <rect width="100" height="100" fill="url(#dot-pattern)" />
+      <rect width="100" height="100" fill={`url(#dot-pattern-${uid})`} />
     </svg>
   );
 }

@@ -1,6 +1,6 @@
 export default {
   "app": {
-    "name": "Archivna",
+    "name": "Arsheefna",
     "slogan": "Your Digital Gateway to Palestinian Memory",
     "secondary": "Preserving the past, documenting the present, building the future"
   },
@@ -13,31 +13,27 @@ export default {
     "register": "Register",
     "dashboard": "Dashboard",
     "logout": "Logout",
-    "profile": "Profile"
+    "profile": "Profile",
+    "myArchive": "My archive",
+    "notifications": "Notifications",
+    "account": "My account",
+    "loginRequired": "Requires sign-in"
   },
   "home": {
     "hero": {
-      "title": "Our Palestinian memory, preserved and accessible for generations",
-      "description": "A unified digital platform for preserving, searching, and providing access to archival materials.",
       "searchPlaceholder": "Search by name, institution, place, subject, or reference number",
-      "addButton": "Add Archive Material"
+      "logoAlt": "Arsheefna emblem",
+      "pillars": {
+        "past": "Preserving the past",
+        "present": "Documenting the present",
+        "future": "Building the future"
+      }
     },
-    "browse": {
-      "title": "Browse by Type",
-      "subtitle": "Explore our diverse collection of archival materials"
-    },
-    "latest": {
-      "title": "Latest Archive Materials",
-      "subtitle": "Discover the latest additions to our archive",
-      "viewAll": "View All",
-      "emptyTitle": "No archive records yet",
-      "emptyDesc": "The latest archive records will appear here after they are added and published."
-    },
-    "featured": {
-      "title": "Featured Materials",
-      "subtitle": "Carefully selected archival materials",
-      "emptyTitle": "No featured materials yet",
-      "emptyDesc": "Selected materials will appear here once they are added"
+    "cta": {
+      "login": { "label": "Sign in", "sub": "For registered users" },
+      "register": { "label": "New member", "sub": "Create a new account" },
+      "dashboard": { "label": "Dashboard", "sub": "Manage and track your material" },
+      "deposit": { "label": "Deposit material", "sub": "Share your documents with the archive" }
     },
     "stats": {
       "title": "Platform Statistics",
@@ -51,15 +47,10 @@ export default {
       "viewAll": "View All News",
       "empty": "No news available yet",
       "emptyTitle": "No news yet",
-      "emptyDesc": "Follow us for the latest from Archivna",
-      "subtitle": "Latest news from Archivna"
-    },
-    "about": {
-      "title": "About Archivna",
-      "description": "Archivna is a Palestinian digital platform dedicated to preserving, documenting, and providing access to Palestinian archival materials for current and future generations."
+      "emptyDesc": "Follow us for the latest from Arsheefna",
+      "subtitle": "Latest news from Arsheefna"
     }
-  },
-  "deposit": {
+  },  "deposit": {
     "steps": {
       "account": { "title": "Create your account", "description": "Register as an individual or as the representative of an institution." },
       "upload": { "title": "Upload the material", "description": "Add the files with their metadata: title, date, source and rights." },
@@ -77,16 +68,27 @@ export default {
   },
   "sections": {
     "title": "Platform services",
+    "expand": "Show sub-services of {{name}}",
+    "collapse": "Hide sub-services of {{name}}",
     "subtitle": "Everything you need to reach Palestinian memory and add to it",
     "search": {
       "short": "Search archives",
       "title": "Search the archives",
-      "description": "Search everything, or browse by institution and archival collection."
+      "description": "Search everything, or browse by institution and archival collection.",
+      "children": {
+        "free": "Free search across the archives",
+        "byInstitution": "Search by institution or collection"
+      }
     },
     "capacity": {
       "short": "Capacity building",
       "title": "Archival capacity building",
-      "description": "Ready courses in archival science and digital preservation, with a certificate."
+      "description": "Ready courses in archival science and digital preservation, with a certificate.",
+      "children": {
+        "materials": "Training materials",
+        "synchronous": "Live training",
+        "interactive": "Interactive training"
+      }
     },
     "support": {
       "short": "Ask for support",
@@ -528,15 +530,15 @@ export default {
     "emptyDesc": "Latest news will appear here when published."
   },
   "about": {
-    "title": "About Archivna",
+    "title": "About Arsheefna",
     "mission": "Our Mission",
     "missionText": "We work to preserve, document, and make accessible the Palestinian digital heritage for future generations.",
     "vision": "Our Vision",
     "visionText": "To be the leading digital platform for Palestinian memory in the Arab world and beyond.",
     "values": "Our Values",
     "valuesText": "Accuracy, transparency, accessibility, and preservation of Palestinian cultural identity.",
-    "body1": "Archivna is a Palestinian digital platform founded with the aim of preserving, documenting, and making accessible the Palestinian digital heritage. We strive to provide a unified platform that brings together Palestinian archival materials from multiple sources and makes them available to researchers, students, and heritage enthusiasts around the world.",
-    "howItWorks": "How does Archivna work?",
+    "body1": "Arsheefna is a Palestinian digital platform founded with the aim of preserving, documenting, and making accessible the Palestinian digital heritage. We strive to provide a unified platform that brings together Palestinian archival materials from multiple sources and makes them available to researchers, students, and heritage enthusiasts around the world.",
+    "howItWorks": "How does Arsheefna work?",
     "body2": "Users can create a free account and add their own archival materials to the platform. Each archival material goes through a process of description and classification including title, description, subjects, place, time, material type, and access level.",
     "body3": "The platform provides advanced search tools that allow users to search for materials using keywords and multiple classifications. Results can also be filtered by type, institution, time, place, language, and access level.",
     "body4": "We are committed to protecting privacy and data security. Users can control the access level for each archival material: Public (available to everyone), Sensitive (available with restrictions), or Private (available to the owner only)."
@@ -573,11 +575,11 @@ export default {
   },
   "terms": {
     "title": "Terms of Use",
-    "content": "Welcome to Archivna. By using this platform, you agree to the following terms.",
+    "content": "Welcome to Arsheefna. By using this platform, you agree to the following terms.",
     "sections": {
       "acceptance": {
         "title": "Acceptance of Terms",
-        "content": "By using Archivna, you agree to these terms and conditions. If you do not agree to any of these terms, please do not use the platform."
+        "content": "By using Arsheefna, you agree to these terms and conditions. If you do not agree to any of these terms, please do not use the platform."
       },
       "accounts": {
         "title": "Accounts",
@@ -671,6 +673,8 @@ export default {
     "page": "Page {{page}}",
     "pagination": "Pagination",
     "openMenu": "Open menu",
+    "bottomNav": "Bottom navigation",
+    "searchToggle": "Open search",
     "fileSize": {
       "bytes": "B",
       "kb": "KB",
@@ -717,6 +721,13 @@ export default {
     "newPasswordMinLength": "New password must be at least 8 characters"
   },
   "lms": {
+    "programs": {
+      "title": "Capacity-building programmes",
+      "subtitle": "Three tracks for developing your archival skills",
+      "materials": { "title": "Training materials", "description": "Self-paced material on archival science and digital preservation, available any time.", "cta": "Browse courses" },
+      "live": { "title": "Live training", "description": "Live sessions with trainers, on a published schedule.", "cta": "Contact us to register" },
+      "interactive": { "title": "Interactive training", "description": "Hands-on workshops and applied exercises on real archival material.", "cta": "Contact us to register" }
+    },
     "title": "Archival Capacity Building",
     "subtitle": "Develop your knowledge in archival science, records management, digital preservation, and Palestinian documentary heritage through structured professional learning paths.",
     "startLearning": "Start Learning",
@@ -1087,6 +1098,9 @@ export default {
   "footer": {
     "description": "A Palestinian digital platform for preserving, documenting, and providing access to archival materials",
     "quickLinks": "Quick Links",
+    "services": "Platform services",
+    "legal": "Legal",
+    "email": "info@arsheefna.ps",
     "contact": "Contact Us",
     "rights": "All rights reserved",
     "privacyPolicy": "Privacy Policy",

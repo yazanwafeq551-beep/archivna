@@ -1,12 +1,30 @@
 import { useTranslation } from "react-i18next";
 
+/**
+ * "brand" is the mark on paper. "onDark" swaps the forest green - which
+ * disappears against the dark green bar and footer - for ivory, and keeps the
+ * gold, so the lockup survives on a dark surface without a light patch behind it.
+ */
+type LogoTone = "brand" | "onDark";
+
 interface LogoProps {
   className?: string;
   variant?: "full" | "icon";
   size?: "sm" | "md" | "lg";
+  tone?: LogoTone;
 }
 
-export function BrandMark({ className = "", ariaLabel }: { className?: string; ariaLabel?: string }) {
+export function BrandMark({
+  className = "",
+  ariaLabel,
+  tone = "brand",
+}: {
+  className?: string;
+  ariaLabel?: string;
+  tone?: LogoTone;
+}) {
+  const ink = tone === "onDark" ? "#EADFC4" : "#0F4C45";
+
   return (
     <svg
       className={className}
@@ -17,9 +35,9 @@ export function BrandMark({ className = "", ariaLabel }: { className?: string; a
       aria-label={ariaLabel}
       aria-hidden={ariaLabel ? undefined : true}
     >
-      <path d="M12 26 45 8v15L25 34v48H12V26Z" fill="#0F4C45" />
+      <path d="M12 26 45 8v15L25 34v48H12V26Z" fill={ink} />
       <path d="M30 35 58 20v57L30 87V35Z" fill="#C6A15B" />
-      <path d="M51 45c-10 2-16 8-17 21 8-2 14-8 17-21Zm-16 25c6-8 10-12 16-17" stroke="#0F4C45" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M51 45c-10 2-16 8-17 21 8-2 14-8 17-21Zm-16 25c6-8 10-12 16-17" stroke={ink} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       <rect x="65" y="34" width="9" height="9" rx="1" fill="#C6A15B" />
       <rect x="72" y="49" width="11" height="11" rx="1" fill="#C6A15B" />
       <rect x="64" y="64" width="8" height="8" rx="1" fill="#C6A15B" />
@@ -28,7 +46,7 @@ export function BrandMark({ className = "", ariaLabel }: { className?: string; a
   );
 }
 
-export function Logo({ className = "", variant = "full", size = "md" }: LogoProps) {
+export function Logo({ className = "", variant = "full", size = "md", tone = "brand" }: LogoProps) {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language.startsWith("ar");
   const sizes = {
@@ -39,14 +57,16 @@ export function Logo({ className = "", variant = "full", size = "md" }: LogoProp
   const s = sizes[size];
 
   if (variant === "icon") {
-    return <BrandMark className={`${s.iconClass} shrink-0`} ariaLabel={t("app.name")} />;
+    return <BrandMark className={`${s.iconClass} shrink-0`} ariaLabel={t("app.name")} tone={tone} />;
   }
 
   return (
     <div className={`inline-flex items-center gap-2.5 ${className}`} dir={isArabic ? "rtl" : "ltr"}>
-      <BrandMark className={`${s.iconClass} shrink-0`} />
+      <BrandMark className={`${s.iconClass} shrink-0`} tone={tone} />
       <span
-        className={`${s.wordmark} whitespace-nowrap font-bold leading-none text-primary ${isArabic ? "font-brand" : "font-display tracking-[-0.035em]"}`}
+        className={`${s.wordmark} whitespace-nowrap font-bold leading-none ${
+          tone === "onDark" ? "text-white" : "text-primary"
+        } ${isArabic ? "font-brand" : "font-display tracking-[-0.035em]"}`}
       >
         {isArabic ? "أرشيفنا" : "Arsheefna"}
       </span>

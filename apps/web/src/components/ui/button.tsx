@@ -15,6 +15,7 @@ const buttonVariants = cva(
         ghost: "text-foreground hover:bg-primary/5 hover:text-primary",
         link: "text-primary underline-offset-4 hover:underline",
         gold: "bg-gold text-primary-dark shadow-[0_8px_20px_rgba(198,161,91,.22)] hover:bg-gold-deep hover:text-white",
+        outlineOnDark: "border border-gold/60 bg-transparent text-gold hover:bg-gold hover:text-primary-dark",
       },
       size: {
         default: "h-11 px-5 py-2.5",
