@@ -26,7 +26,11 @@ export function SearchPage() {
   // entry point; arriving that way should put the reader in the filter, not
   // leave them hunting for it behind a button.
   const browsingInstitutions = searchParams.get("browse") === "institution";
-  const [filtersOpen, setFiltersOpen] = useState(browsingInstitutions);
+  // Only worth opening the drawer where the filters are actually hidden behind
+  // one; on a wide screen the sidebar is already on the page.
+  const [filtersOpen, setFiltersOpen] = useState(
+    () => browsingInstitutions && window.matchMedia("(max-width: 1023px)").matches
+  );
 
   const urlFilters = useMemo(() => ({
     q: searchParams.get("q") || "",
