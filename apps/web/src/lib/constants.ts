@@ -104,7 +104,7 @@ export const PLATFORM_SECTION_CHILDREN: Partial<
     { key: "byInstitution", code: "1-2", path: "/search?browse=institution" },
   ],
   capacity: [
-    { key: "materials", code: "2-1", path: "/lms#programs-materials" },
+    { key: "materials", code: "2-1", path: "/lms/materials" },
     { key: "synchronous", code: "2-2", path: "/lms#programs-live" },
     { key: "interactive", code: "2-3", path: "/lms#programs-interactive" },
   ],

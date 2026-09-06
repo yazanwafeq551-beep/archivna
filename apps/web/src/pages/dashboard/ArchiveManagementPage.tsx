@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { catalogApi, flattenUnits, type ArchivalUnit } from '@/api/catalog';
 import { governanceApi, type PlatformRole, type WorkflowAction } from '@/api/governance';
 import { useAuth } from '@/hooks/useAuth';
+import { ARCHIVAL_LEVELS, levelLabel, parentLevelOf } from '@/lib/archival-levels';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +21,7 @@ const roleLabels: Record<PlatformRole, [string, string]> = {
 const statusLabels: Record<string, [string, string]> = {
   draft: ['مسودة', 'Draft'], processing: ['قيد المعالجة', 'Processing'], cataloging: ['قيد الفهرسة', 'Cataloging'], inReview: ['قيد المراجعة', 'In review'], in_review: ['قيد المراجعة', 'In review'], approved: ['معتمد', 'Approved'], published: ['منشور', 'Published'],
 };
-const levelLabels: Record<string, [string, string]> = { fonds: ['رصيد', 'Fonds'], collection: ['مجموعة', 'Collection'], series: ['سلسلة', 'Series'], file: ['ملف', 'File'] };
+
 
 export function ArchiveManagementPage() {
   const { i18n } = useTranslation();
@@ -84,6 +85,13 @@ export function ArchiveManagementPage() {
   };
   const flatUnits = flattenUnits(hierarchy?.units || []);
 
+  // A unit belongs to the level directly above it, so those are the only
+  // parents worth offering - and a fonds has none at all.
+  const requiredParentLevel = parentLevelOf(unitForm.level);
+  const parentChoices = requiredParentLevel
+    ? flatUnits.filter((unit) => unit.level === requiredParentLevel)
+    : [];
+
   return (
     <div className="mx-auto max-w-7xl space-y-6" dir={ar ? 'rtl' : 'ltr'}>
       <div className="rounded-2xl bg-primary px-6 py-7 text-white shadow-lg">
@@ -114,8 +122,8 @@ export function ArchiveManagementPage() {
         </TabsContent>
 
         <TabsContent value="hierarchy" className="grid gap-6 pt-4 lg:grid-cols-[.8fr_1.2fr]">
-          <Card><CardHeader><CardTitle>{tr('إضافة وحدة أرشيفية', 'Add archival unit')}</CardTitle></CardHeader><CardContent><form className="space-y-4" onSubmit={(event: FormEvent) => { event.preventDefault(); createUnit.mutate(); }}><Select value={unitForm.level} onValueChange={(value: ArchivalUnit['level']) => setUnitForm({ ...unitForm, level: value })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.entries(levelLabels).map(([value, labels]) => <SelectItem key={value} value={value}>{labels[ar ? 0 : 1]}</SelectItem>)}</SelectContent></Select><Select value={unitForm.parentId || 'root'} onValueChange={(value) => setUnitForm({ ...unitForm, parentId: value === 'root' ? '' : value })}><SelectTrigger><SelectValue placeholder={tr('الوحدة الأب', 'Parent unit')} /></SelectTrigger><SelectContent><SelectItem value="root">{tr('مستوى جذري', 'Root level')}</SelectItem>{flatUnits.map((unit) => <SelectItem key={unit.id} value={unit.id}>{'—'.repeat(unit.depth)} {ar ? unit.titleAr : unit.titleEn || unit.titleAr}</SelectItem>)}</SelectContent></Select><Input label={tr('العنوان بالعربية *', 'Arabic title *')} value={unitForm.titleAr} onChange={(e) => setUnitForm({ ...unitForm, titleAr: e.target.value })} required /><Input label={tr('العنوان بالإنجليزية', 'English title')} value={unitForm.titleEn} onChange={(e) => setUnitForm({ ...unitForm, titleEn: e.target.value })} /><Input label={tr('الرمز المرجعي', 'Reference code')} value={unitForm.referenceCode} onChange={(e) => setUnitForm({ ...unitForm, referenceCode: e.target.value })} /><Button type="submit" disabled={!unitForm.titleAr || createUnit.isPending}>{tr('إضافة الوحدة', 'Add unit')}</Button></form></CardContent></Card>
-          <Card><CardHeader><CardTitle>{tr('التسلسل الحالي', 'Current hierarchy')}</CardTitle></CardHeader><CardContent className="space-y-2">{flatUnits.map((unit) => <div key={unit.id} style={{ paddingInlineStart: `${unit.depth * 24}px` }} className="flex items-center gap-2 rounded-lg border border-border p-3"><ChevronLeft className="h-4 w-4 text-gold" /><div><p className="font-medium">{ar ? unit.titleAr : unit.titleEn || unit.titleAr}</p><p className="text-xs text-muted">{(levelLabels[unit.level] || [unit.level, unit.level])[ar ? 0 : 1]} · {unit.referenceCode || '—'} · {unit._count?.records || 0} {tr('مادة', 'items')}</p></div></div>)}</CardContent></Card>
+          <Card><CardHeader><CardTitle>{tr('إضافة وحدة أرشيفية', 'Add archival unit')}</CardTitle></CardHeader><CardContent><form className="space-y-4" onSubmit={(event: FormEvent) => { event.preventDefault(); createUnit.mutate(); }}><Select value={unitForm.level} onValueChange={(value: ArchivalUnit['level']) => setUnitForm({ ...unitForm, level: value, parentId: '' })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{ARCHIVAL_LEVELS.map((value) => <SelectItem key={value} value={value}>{levelLabel(value, ar)}</SelectItem>)}</SelectContent></Select>{requiredParentLevel && (parentChoices.length > 0 ? <Select value={unitForm.parentId} onValueChange={(value) => setUnitForm({ ...unitForm, parentId: value })}><SelectTrigger><SelectValue placeholder={tr(`اختر ${levelLabel(requiredParentLevel, true)}`, `Choose a ${levelLabel(requiredParentLevel, false).toLowerCase()}`)} /></SelectTrigger><SelectContent>{parentChoices.map((unit) => <SelectItem key={unit.id} value={unit.id}>{ar ? unit.titleAr : unit.titleEn || unit.titleAr}</SelectItem>)}</SelectContent></Select> : <p className="rounded-lg border border-dashed border-border p-3 text-sm text-muted">{tr(`أضف ${levelLabel(requiredParentLevel, true)} أولاً`, `Add a ${levelLabel(requiredParentLevel, false).toLowerCase()} first`)}</p>)}<Input label={tr('العنوان بالعربية *', 'Arabic title *')} value={unitForm.titleAr} onChange={(e) => setUnitForm({ ...unitForm, titleAr: e.target.value })} required /><Input label={tr('العنوان بالإنجليزية', 'English title')} value={unitForm.titleEn} onChange={(e) => setUnitForm({ ...unitForm, titleEn: e.target.value })} /><Input label={tr('الرمز المرجعي', 'Reference code')} value={unitForm.referenceCode} onChange={(e) => setUnitForm({ ...unitForm, referenceCode: e.target.value })} /><Button type="submit" disabled={!unitForm.titleAr || (!!requiredParentLevel && !unitForm.parentId) || createUnit.isPending}>{tr('إضافة الوحدة', 'Add unit')}</Button></form></CardContent></Card>
+          <Card><CardHeader><CardTitle>{tr('التسلسل الحالي', 'Current hierarchy')}</CardTitle></CardHeader><CardContent className="space-y-2">{flatUnits.map((unit) => <div key={unit.id} style={{ paddingInlineStart: `${unit.depth * 24}px` }} className="flex items-center gap-2 rounded-lg border border-border p-3"><ChevronLeft className="h-4 w-4 text-gold" /><div><p className="font-medium">{ar ? unit.titleAr : unit.titleEn || unit.titleAr}</p><p className="text-xs text-muted">{levelLabel(unit.level, ar)} · {unit.referenceCode || '—'} · {unit._count?.records || 0} {tr('مادة', 'items')}</p></div></div>)}</CardContent></Card>
         </TabsContent>
 
         <TabsContent value="roles" className="grid gap-6 pt-4 lg:grid-cols-[.8fr_1.2fr]">

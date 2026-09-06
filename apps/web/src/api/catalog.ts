@@ -1,3 +1,4 @@
+import type { ArchivalLevel } from '@/lib/archival-levels';
 import apiClient from './client';
 
 export interface InstitutionSummary {
@@ -12,7 +13,7 @@ export interface ArchivalUnit {
   id: string;
   institutionId: string;
   parentId?: string;
-  level: 'fonds' | 'collection' | 'series' | 'file';
+  level: ArchivalLevel;
   titleAr: string;
   titleEn?: string;
   referenceCode?: string;

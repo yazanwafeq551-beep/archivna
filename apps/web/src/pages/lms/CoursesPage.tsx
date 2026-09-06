@@ -19,7 +19,6 @@ import {
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { getStoredReducedMotion } from "@/lib/appearance";
-import { CapacityPrograms } from "@/components/lms/CapacityPrograms";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   document: <FileText className="h-5 w-5" />,
@@ -164,8 +163,6 @@ export function CoursesPage() {
           </div>
         </div>
       </section>
-
-      <CapacityPrograms />
 
       {/* Categories */}
       <section className="border-b border-gold-light/30 bg-surface/50">

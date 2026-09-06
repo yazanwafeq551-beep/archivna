@@ -88,6 +88,9 @@ export interface CreateArchiveRequest {
   materialType: string;
   accessLevel: "public" | "sensitive" | "sovereign";
   date?: string;
+  /** Machine-readable bounds, alongside the free-text display date. */
+  date_from?: string;
+  date_to?: string;
   institution?: string;
   creator?: string;
   collection?: string;

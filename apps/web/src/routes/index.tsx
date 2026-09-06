@@ -102,7 +102,8 @@ export const router = createBrowserRouter([
     path: "/lms",
     element: <LmsLayout />,
     children: [
-      { index: true, lazy: page(() => import("@/pages/lms/CoursesPage"), "CoursesPage") },
+      { index: true, lazy: page(() => import("@/pages/lms/CapacityPage"), "CapacityPage") },
+      { path: "materials", lazy: page(() => import("@/pages/lms/CoursesPage"), "CoursesPage") },
       { path: "courses/:slug", lazy: page(() => import("@/pages/lms/CourseDetailPage"), "CourseDetailPage") },
       { path: "courses/:courseSlug/lessons/:lessonId", lazy: page(() => import("@/pages/lms/LessonPage"), "LessonPage") },
       {

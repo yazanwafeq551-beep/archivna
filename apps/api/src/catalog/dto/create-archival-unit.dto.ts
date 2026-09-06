@@ -1,4 +1,5 @@
 import { IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { ARCHIVAL_LEVELS } from '../archival-levels';
 
 export class CreateArchivalUnitDto {
   @IsString()
@@ -8,7 +9,7 @@ export class CreateArchivalUnitDto {
   @IsString()
   parent_id?: string;
 
-  @IsEnum(['fonds', 'collection', 'series', 'file'])
+  @IsEnum(ARCHIVAL_LEVELS)
   level: string;
 
   @IsString()

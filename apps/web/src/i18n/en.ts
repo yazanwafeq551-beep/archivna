@@ -352,14 +352,15 @@ export default {
         "titleAr": "Title in Arabic *",
         "titleEn": "Title in English",
         "reference": "Reference Number",
-        "description": "Description",
+        "description": "Description - keywords",
         "date": "Date",
         "datePlaceholder": "e.g. 1948 or 1936-1938",
         "institution": "Institution",
         "creator": "Creator",
-        "collection": "Collection",
         "archivalUnit": "Parent archival unit",
-        "selectArchivalUnit": "Select a fonds, series, or file..."
+        "selectArchivalUnit": "Select a fonds, series, or file...",
+        "dateFrom": "From date",
+        "dateTo": "To date"
       },
       "classify": {
         "subjects": "Subjects",
@@ -725,9 +726,10 @@ export default {
     "programs": {
       "title": "Capacity-building programmes",
       "subtitle": "Three tracks for developing your archival skills",
-      "materials": { "title": "Training materials", "description": "Self-paced material on archival science and digital preservation, available any time.", "cta": "Browse courses" },
+      "materials": { "title": "Training materials", "description": "Self-paced material on archival science and digital preservation, available any time.", "cta": "Browse the training material" },
       "live": { "title": "Live training", "description": "Live sessions with trainers, on a published schedule.", "cta": "Contact us to register" },
-      "interactive": { "title": "Interactive training", "description": "Hands-on workshops and applied exercises on real archival material.", "cta": "Contact us to register" }
+      "interactive": { "title": "Interactive training", "description": "Hands-on workshops and applied exercises on real archival material.", "cta": "Contact us to register" },
+      "comingSoon": "Coming soon"
     },
     "title": "Archival Capacity Building",
     "subtitle": "Develop your knowledge in archival science, records management, digital preservation, and Palestinian documentary heritage through structured professional learning paths.",

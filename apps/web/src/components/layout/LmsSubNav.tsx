@@ -14,7 +14,8 @@ export function LmsSubNav() {
   const location = useLocation();
 
   const links = [
-    { to: "/lms", label: t("lms.nav.courses"), icon: BookOpen, exact: true },
+    { to: "/lms", label: t("lms.nav.capacityBuilding"), icon: GraduationCap, exact: true },
+    { to: "/lms/materials", label: t("lms.programs.materials.title"), icon: BookOpen, exact: false },
     ...(isAuthenticated
       ? [
           { to: "/lms/me", label: t("lms.nav.myLearning"), icon: GraduationCap, exact: true },

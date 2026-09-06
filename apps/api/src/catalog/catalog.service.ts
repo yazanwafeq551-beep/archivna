@@ -4,8 +4,7 @@ import { AuthorizationService } from '../common/authorization/authorization.serv
 import { CreateArchivalUnitDto } from './dto/create-archival-unit.dto';
 import { UpdateArchivalUnitDto } from './dto/update-archival-unit.dto';
 import { CreateAgentDto, CreateControlledTermDto, LinkAgentDto, LinkTermDto } from './dto/authority.dto';
-
-const LEVEL_ORDER: Record<string, number> = { fonds: 0, collection: 0, series: 1, file: 2 };
+import { ROOT_LEVEL, levelDepth, parentLevelOf } from './archival-levels';
 
 @Injectable()
 export class CatalogService {
@@ -156,14 +155,18 @@ export class CatalogService {
   }
 
   private async validateParent(institutionId: string, parentId: string | undefined | null, level: string, currentId?: string) {
+    const expectedParent = parentLevelOf(level);
     if (!parentId) {
-      if (!['fonds', 'collection'].includes(level)) throw new BadRequestException('المستوى الجذري يجب أن يكون رصيداً أو مجموعة');
+      if (expectedParent) throw new BadRequestException('اختر الوحدة الأب لهذا المستوى');
       return;
     }
+    if (!expectedParent) throw new BadRequestException(`${ROOT_LEVEL} لا يكون تابعاً لوحدة أخرى`);
     if (parentId === currentId) throw new BadRequestException('لا يمكن جعل الوحدة أباً لنفسها');
     const parent = await this.prisma.archivalUnit.findUnique({ where: { id: parentId } });
     if (!parent || parent.institution_id !== institutionId) throw new BadRequestException('الوحدة الأب غير صالحة لهذه المؤسسة');
-    if ((LEVEL_ORDER[level] ?? -1) <= (LEVEL_ORDER[parent.level] ?? -1)) {
+    // Exactly one step, not merely deeper: a file belongs to a sub-series, not
+    // straight to a fonds.
+    if (levelDepth(level) !== levelDepth(parent.level) + 1) {
       throw new BadRequestException('ترتيب المستوى الأرشيفي غير صحيح');
     }
   }

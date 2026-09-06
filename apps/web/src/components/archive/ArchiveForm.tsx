@@ -27,11 +27,12 @@ const archiveSchema = z.object({
   referenceNumber: z.string().optional(),
   description: z.string().optional(),
   date: z.string().optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
   institution: z.string().optional(),
   institutionId: z.string().optional(),
   archivalUnitId: z.string().optional(),
   creator: z.string().optional(),
-  collection: z.string().optional(),
   subjects: z.string().optional(),
   place: z.string().optional(),
   language: z.string().optional(),
@@ -67,11 +68,12 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
       referenceNumber: initialData?.referenceNumber || "",
       description: initialData?.description || "",
       date: initialData?.date || "",
+      dateFrom: initialData?.dateFrom || "",
+      dateTo: initialData?.dateTo || "",
       institution: initialData?.institution || "",
       institutionId: initialData?.institutionId || user?.institutionId || "",
       archivalUnitId: initialData?.archivalUnitId || "",
       creator: initialData?.creator || "",
-      collection: initialData?.collection || "",
       subjects: initialData?.subjects || "",
       place: initialData?.place || "",
       language: initialData?.language || "",
@@ -119,11 +121,12 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
         referenceNumber: data.referenceNumber,
         description: data.description,
         date: data.date,
+        date_from: data.dateFrom || undefined,
+        date_to: data.dateTo || undefined,
         institution: data.institution,
         institutionId: data.institutionId,
         archivalUnitId: data.archivalUnitId,
         creator: data.creator,
-        collection: data.collection,
         place: data.place,
         language: data.language,
         rights: data.rights,
@@ -240,6 +243,20 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
                 placeholder={t("dashboard.newArchive.info.datePlaceholder")}
                 {...form.register("date")}
               />
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  type="date"
+                  dir="ltr"
+                  label={t("dashboard.newArchive.info.dateFrom")}
+                  {...form.register("dateFrom")}
+                />
+                <Input
+                  type="date"
+                  dir="ltr"
+                  label={t("dashboard.newArchive.info.dateTo")}
+                  {...form.register("dateTo")}
+                />
+              </div>
               <div>
                 <Label className="mb-1.5 block">{t("dashboard.newArchive.info.institution")}</Label>
                 <Select value={institutionId} onValueChange={(value) => {
@@ -253,16 +270,10 @@ export function ArchiveForm({ initialData, archiveId, onSuccess }: ArchiveFormPr
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label={t("dashboard.newArchive.info.creator")}
-                {...form.register("creator")}
-              />
-              <Input
-                label={t("dashboard.newArchive.info.collection")}
-                {...form.register("collection")}
-              />
-            </div>
+            <Input
+              label={t("dashboard.newArchive.info.creator")}
+              {...form.register("creator")}
+            />
             <div>
               <Label className="mb-1.5 block">{t("dashboard.newArchive.info.archivalUnit")}</Label>
               <Select value={form.watch("archivalUnitId")} onValueChange={(value) => form.setValue("archivalUnitId", value)} disabled={!institutionId}>
