@@ -13,17 +13,28 @@ import { isNative } from "./platform";
 const REFRESH_TOKEN_KEY = "archivna.refreshToken";
 
 /**
- * Async from the start. The store behind it is `localStorage` today and
- * becomes encrypted device storage before release; that swap changes this
- * file only if the callers already await.
+ * Loaded on demand so the browser bundle never pulls in a native runtime it
+ * can never reach. Vite splits it into its own chunk that a browser never
+ * requests, because `isNative()` returns before this is called.
+ */
+async function preferences() {
+  const { Preferences } = await import("@capacitor/preferences");
+  return Preferences;
+}
+
+/**
+ * Async from the start. The store behind it is device preferences today and
+ * becomes encrypted storage before release; that swap changes this file only
+ * if the callers already await.
  */
 export async function getRefreshToken(): Promise<string | null> {
   if (!isNative()) return null;
 
   try {
-    return window.localStorage.getItem(REFRESH_TOKEN_KEY);
+    const { value } = await (await preferences()).get({ key: REFRESH_TOKEN_KEY });
+    return value ?? null;
   } catch {
-    // A web view with storage disabled still has to run, just without a
+    // A web view with storage unavailable still has to run, just without a
     // session that survives a restart.
     return null;
   }
@@ -33,10 +44,11 @@ export async function setRefreshToken(token: string | null): Promise<void> {
   if (!isNative()) return;
 
   try {
+    const store = await preferences();
     if (token) {
-      window.localStorage.setItem(REFRESH_TOKEN_KEY, token);
+      await store.set({ key: REFRESH_TOKEN_KEY, value: token });
     } else {
-      window.localStorage.removeItem(REFRESH_TOKEN_KEY);
+      await store.remove({ key: REFRESH_TOKEN_KEY });
     }
   } catch {
     // Nothing to recover: the session simply will not outlive the process.

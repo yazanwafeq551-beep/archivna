@@ -58,12 +58,18 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   app.enableCors({
-    // FRONTEND_URL may list several origins (production, previews).
+    // FRONTEND_URL may list several origins (production, previews, and the
+    // packaged app, which sends https://localhost on Android and
+    // capacitor://localhost on iOS).
     origin: (process.env.FRONTEND_URL || 'http://localhost:5173')
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Client'],
+    // A preflight before every request costs a round trip on a phone that
+    // may be on mobile data; a day is the longest Chrome will honour.
+    maxAge: 86400,
   });
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));

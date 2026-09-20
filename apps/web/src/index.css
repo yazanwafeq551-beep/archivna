@@ -276,3 +276,27 @@ html.reduce-motion, html.reduce-motion * , html.reduce-motion *::before, html.re
     break-inside: avoid;
   }
 }
+
+/*
+ * Inside a packaged app the web view owns the whole screen, so the sticky
+ * header sits under the status bar and the footer under the home indicator.
+ * initNative sets data-native, which is why none of this applies on the web:
+ * env() alone would be zero in a browser, but keying off the attribute means
+ * the deployed site does not even have to rely on that.
+ */
+[data-native] header {
+  padding-top: env(safe-area-inset-top);
+}
+
+[data-native] footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Anything fixed to an edge - dialogs, toasts, the mobile menu - needs the
+   same treatment, and the inline insets matter on a landscape notch. */
+[data-native] .safe-area {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-inline-start: env(safe-area-inset-left);
+  padding-inline-end: env(safe-area-inset-right);
+}
