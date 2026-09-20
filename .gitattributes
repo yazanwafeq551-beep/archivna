@@ -1,0 +1,24 @@
+# Default: let Git normalise text in the repository and check it out however
+# the local platform wants it.
+* text=auto
+
+# The Gradle wrapper is run as a shell script by the Linux and macOS build
+# servers. Checked out with CRLF it fails with "bad interpreter", which is a
+# confusing way to learn about line endings.
+*.sh text eol=lf
+gradlew text eol=lf
+
+# Windows-only, and cmd.exe wants CRLF.
+*.bat text eol=crlf
+gradlew.bat text eol=crlf
+
+# Never touched as text. The wrapper jar in particular is what bootstraps the
+# whole Android build; a single mangled byte and nothing builds anywhere.
+*.jar binary
+*.keystore binary
+*.jks binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+*.ttf binary
