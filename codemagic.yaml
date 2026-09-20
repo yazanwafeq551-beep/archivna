@@ -27,8 +27,14 @@ workflows:
         script: npm run build:native --workspace apps/web
       - name: Copy it into the native project
         script: cd apps/web && npx cap sync android
+      - name: Point Gradle at the build machine SDK
+        # Capacitor generates no local.properties, and it is gitignored
+        # anyway because it holds a path from whoever built last.
+        script: echo "sdk.dir=$ANDROID_SDK_ROOT" > apps/web/android/local.properties
       - name: Assemble the APK
-        script: cd apps/web/android && ./gradlew assembleDebug
+        # No daemon: the machine is destroyed after the build, so a resident
+        # Gradle process only holds memory the compile could use.
+        script: cd apps/web/android && ./gradlew assembleDebug --no-daemon
     artifacts:
       - apps/web/android/app/build/outputs/**/*.apk
     publishing:
