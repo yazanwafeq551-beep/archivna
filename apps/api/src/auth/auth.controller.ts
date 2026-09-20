@@ -20,6 +20,7 @@ import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SessionTokenDto } from './dto/session-token.dto';
 import { JwtAuthGuard, Public } from './auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -32,6 +33,16 @@ const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
  * different domains has to mark the cookie cross-site, and browsers only
  * accept that over HTTPS.
  */
+/**
+ * A packaged app runs in a web view, where a third-party SameSite=None cookie
+ * is dropped - so it would never hold a session. Those clients say so, and
+ * carry the refresh token themselves instead. Browsers keep the cookie: it is
+ * unreadable by JavaScript, which device storage is not.
+ */
+function isTokenBearingClient(req: Request): boolean {
+  return req.headers['x-client'] === 'native';
+}
+
 function refreshCookiePolicy() {
   const crossSite = process.env.CROSS_SITE_COOKIES === 'true';
   return {
@@ -62,6 +73,29 @@ export class AuthController {
     });
   }
 
+  /**
+   * One token, one place. Setting the cookie *and* returning the token would
+   * leave two live copies of a value that is rotated on every use, turning
+   * every refresh into a race resolved by the replacement grace window.
+   */
+  private issueSession(
+    req: Request,
+    res: Response,
+    result: { user: unknown; accessToken: string; refreshToken: string },
+    remember = true,
+  ) {
+    if (isTokenBearingClient(req)) {
+      return {
+        user: result.user,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      };
+    }
+
+    this.setRefreshCookie(res, result.refreshToken, remember);
+    return { user: result.user, accessToken: result.accessToken };
+  }
+
   private clearRefreshCookie(res: Response) {
     res.clearCookie(REFRESH_COOKIE, {
       httpOnly: true,
@@ -75,16 +109,12 @@ export class AuthController {
   @ApiOperation({ summary: 'تسجيل مستخدم جديد' })
   async register(
     @Body() dto: RegisterDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.register(dto);
 
-    this.setRefreshCookie(res, result.refreshToken);
-
-    return {
-      user: result.user,
-      accessToken: result.accessToken,
-    };
+    return this.issueSession(req, res, result);
   }
 
   @Public()
@@ -93,16 +123,12 @@ export class AuthController {
   @ApiOperation({ summary: 'تسجيل الدخول' })
   async login(
     @Body() dto: LoginDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.login(dto);
 
-    this.setRefreshCookie(res, result.refreshToken, dto.remember_me !== false);
-
-    return {
-      user: result.user,
-      accessToken: result.accessToken,
-    };
+    return this.issueSession(req, res, result, dto.remember_me !== false);
   }
 
   @Public()
@@ -110,10 +136,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'تحديث رمز الوصول' })
   async refresh(
+    @Body() dto: SessionTokenDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE];
+    const refreshToken = dto?.refresh_token || req.cookies?.[REFRESH_COOKIE];
     if (!refreshToken) {
       throw new UnauthorizedException('رمز التحديث غير موجود');
     }
@@ -129,8 +156,7 @@ export class AuthController {
 
     try {
       const result = await this.authService.rotateRefreshToken(refreshToken);
-      this.setRefreshCookie(res, result.refreshToken);
-      return { accessToken: result.accessToken, user: result.user };
+      return this.issueSession(req, res, result);
     } catch (error) {
       this.clearRefreshCookie(res);
       throw error;
@@ -142,10 +168,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'تسجيل الخروج' })
   async logout(
+    @Body() dto: SessionTokenDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE];
+    // Without this a client that holds its own token could not revoke it, and
+    // signing out would leave a live refresh token on the device for a week.
+    const refreshToken = dto?.refresh_token || req.cookies?.[REFRESH_COOKIE];
 
     const result = await this.authService.logout(refreshToken);
 
