@@ -1,4 +1,5 @@
 import apiClient from "./client";
+import { clearRefreshToken, getRefreshToken, setRefreshToken } from "@/lib/nativeSession";
 
 export interface User {
   id: string;
@@ -57,6 +58,11 @@ export interface RegisterRequest {
 export interface AuthResponse {
   accessToken: string;
   user: User;
+  /**
+   * Only for clients that keep their own token - a browser gets an httpOnly
+   * cookie instead and never sees this field.
+   */
+  refreshToken?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -73,20 +79,33 @@ export interface ForgotPasswordResponse {
 export const authApi = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
     const response = await apiClient.post("/auth/login", data);
+    await setRefreshToken(response.data?.refreshToken ?? null);
     return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const response = await apiClient.post("/auth/register", data);
+    await setRefreshToken(response.data?.refreshToken ?? null);
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post("/auth/logout");
+    // The server only revokes a chain when it is handed the token, and a
+    // native client has no cookie to send. Without this, signing out would
+    // leave a live refresh token on the device for a week.
+    const refreshToken = await getRefreshToken();
+    try {
+      await apiClient.post("/auth/logout", refreshToken ? { refreshToken } : {});
+    } finally {
+      // Sign out locally even if the request never landed; the alternative
+      // is an app that refuses to log out while offline.
+      await clearRefreshToken();
+    }
   },
 
   refresh: async (): Promise<AuthResponse> => {
     const response = await apiClient.post("/auth/refresh");
+    await setRefreshToken(response.data?.refreshToken ?? null);
     return response.data;
   },
 

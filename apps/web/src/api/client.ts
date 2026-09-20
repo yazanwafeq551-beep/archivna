@@ -1,4 +1,6 @@
 import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import { isNative } from "@/lib/platform";
+import { clearRefreshToken, getRefreshToken, setRefreshToken } from "@/lib/nativeSession";
 
 /**
  * Empty in development and wherever the API is proxied under the same domain;
@@ -23,6 +25,8 @@ export interface SessionUser {
 export interface Session {
   accessToken: string;
   user: SessionUser;
+  /** Present only for clients that carry their own token; never in a browser. */
+  refreshToken?: string;
 }
 
 let accessToken: string | null = null;
@@ -61,18 +65,54 @@ function isSessionEndpoint(url?: string) {
   return SESSION_ENDPOINTS.some((endpoint) => url.includes(endpoint));
 }
 
+export const NATIVE_CLIENT_HEADER = "X-Client";
+
+/**
+ * A missing session has to look like one. `isTransientFailure` reads a
+ * status-less error as "the network stumbled" and keeps the app waiting, so
+ * a plain Error here would strand a signed-out app half-authenticated for
+ * good instead of sending it to the login screen.
+ */
+function noSessionError(): AxiosError {
+  const error = new AxiosError(
+    "No stored refresh token.",
+    AxiosError.ERR_BAD_REQUEST
+  );
+  error.response = { status: 401 } as AxiosResponse;
+  return error;
+}
+
 export function refreshSession(): Promise<Session> {
   if (!refreshRequest) {
-    refreshRequest = axios
-      .post(`${API_ORIGIN}/api/v1/auth/refresh`, {}, { withCredentials: true })
-      .then((response) => {
-        const session = response.data as Session;
-        setAccessToken(session.accessToken);
-        return session;
-      })
-      .finally(() => {
-        refreshRequest = null;
-      });
+    // Assigned before the first await, so concurrent callers still share
+    // the one in-flight request rather than racing the rotation.
+    refreshRequest = (async () => {
+      const native = isNative();
+      const storedToken = native ? await getRefreshToken() : null;
+
+      if (native && !storedToken) throw noSessionError();
+
+      const response = await axios.post(
+        `${API_ORIGIN}/api/v1/auth/refresh`,
+        storedToken ? { refreshToken: storedToken } : {},
+        {
+          withCredentials: true,
+          // This call bypasses apiClient, so it has to say so itself.
+          headers: native ? { [NATIVE_CLIENT_HEADER]: "native" } : undefined,
+        }
+      );
+
+      const session = response.data as Session;
+      setAccessToken(session.accessToken);
+
+      // The server rotates on every use: keeping the old token would leave
+      // the device holding a credential that is already spent.
+      if (session.refreshToken) await setRefreshToken(session.refreshToken);
+
+      return session;
+    })().finally(() => {
+      refreshRequest = null;
+    });
   }
 
   return refreshRequest;
@@ -87,6 +127,9 @@ function isTransientFailure(error: unknown) {
 apiClient.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  if (isNative()) {
+    config.headers[NATIVE_CLIENT_HEADER] = "native";
   }
   return config;
 });
@@ -140,6 +183,10 @@ apiClient.interceptors.response.use(
       // A rate limit, a server hiccup or an offline moment is not a logout.
       if (!isTransientFailure(refreshError)) {
         setAccessToken(null);
+        // The stored token is the reason a native app stays signed in. Once
+        // the server has rejected it, keeping it only guarantees that every
+        // later refresh fails the same way.
+        void clearRefreshToken();
         onSessionExpired?.();
       }
       return Promise.reject(error);
