@@ -4,6 +4,8 @@ import { AuthProvider } from "@/store/authStore";
 import { router } from "@/routes";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
+import { useNativeBackButton } from "@/lib/useNativeBackButton";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,10 +18,13 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
+  useNativeBackButton();
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
+          <OfflineBanner />
           <RouterProvider router={router} />
           <Toaster position="top-center" richColors />
         </TooltipProvider>

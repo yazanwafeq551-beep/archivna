@@ -1,4 +1,5 @@
 import apiClient from "./client";
+import { saveAndShare } from "@/lib/nativeBridge";
 
 const apiOrigin = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
@@ -72,6 +73,11 @@ export const filesApi = {
     const response = await apiClient.get(`/archives/file/${fileId}/download`, {
       responseType: "blob",
     });
+
+    // Inside a web view an anchor with a download attribute does nothing at
+    // all - the tap looks broken. There the file goes to the share sheet.
+    if (await saveAndShare(response.data, filename)) return;
+
     const objectUrl = URL.createObjectURL(response.data);
     const anchor = document.createElement("a");
     anchor.href = objectUrl;

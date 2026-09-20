@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatFileSize, isImageFile, isPdfFile, isAudioFile, isVideoFile } from "@/lib/utils";
 import { filesApi } from "@/api/files";
 import type { ArchiveFile } from "@/api/archives";
+import { isNative } from "@/lib/platform";
 
 interface FilePreviewProps {
   file: ArchiveFile;
@@ -94,6 +95,25 @@ export function FilePreview({ file, canAccess = true, allowDownload = true, wate
   }
 
   if (isPdfFile(filename)) {
+    // A web view renders an <iframe> of a PDF as a blank rectangle - no
+    // viewer, no error, nothing to tap. The device has a document reader
+    // already, so the app hands the file to it rather than pretending.
+    if (isNative()) {
+      return (
+        <Card className="flex flex-col items-center gap-3 p-8 text-center">
+          <div className="rounded-full bg-primary/10 p-5">
+            <FileText className="h-10 w-10 text-primary" />
+          </div>
+          <p className="truncate text-sm font-medium text-foreground">{filename}</p>
+          <p className="text-xs text-muted">{t("archive.detail.openDocumentHint")}</p>
+          <Button onClick={handleDownload}>
+            <FileText className="me-1 h-4 w-4" />
+            {t("archive.detail.openDocument")}
+          </Button>
+        </Card>
+      );
+    }
+
     return (
       <div className="relative rounded-lg border border-border overflow-hidden bg-surface">
         {watermark}

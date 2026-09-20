@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { ExternalAnchor } from "@/components/shared/ExternalAnchor";
 import { FileText, Download, ExternalLink, Link as LinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type LessonAttachment } from "@/api/lms";
@@ -37,11 +38,9 @@ export function LessonContent({ content, attachments, className }: LessonContent
           </h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {resourceAttachments.map((attachment) => (
-              <a
+              <ExternalAnchor
                 key={attachment.id}
                 href={attachment.url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex items-center gap-3 rounded-lg border border-gold-light/30 bg-surface p-3 text-sm transition-all hover:border-gold/30 hover:shadow-sm"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold-light/30 text-gold">
@@ -55,7 +54,7 @@ export function LessonContent({ content, attachments, className }: LessonContent
                     <p className="text-xs text-muted">{formatFileSize(attachment.fileSize)}</p>
                   )}
                 </div>
-              </a>
+              </ExternalAnchor>
             ))}
           </div>
         </section>
@@ -70,17 +69,15 @@ export function LessonContent({ content, attachments, className }: LessonContent
           <ul className="space-y-2">
             {referenceAttachments.map((ref) => (
               <li key={ref.id}>
-                <a
+                <ExternalAnchor
                   href={ref.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-gold hover:underline"
                 >
                   <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
                   <span>
                     {isRtl ? ref.titleAr : (ref.titleEn || ref.titleAr)}
                   </span>
-                </a>
+                </ExternalAnchor>
               </li>
             ))}
           </ul>
@@ -96,17 +93,15 @@ export function LessonContent({ content, attachments, className }: LessonContent
           <ul className="space-y-2">
             {externalLinks.map((link) => (
               <li key={link.id}>
-                <a
+                <ExternalAnchor
                   href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-gold hover:underline"
                 >
                   <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
                   <span>
                     {isRtl ? link.titleAr : (link.titleEn || link.titleAr)}
                   </span>
-                </a>
+                </ExternalAnchor>
               </li>
             ))}
           </ul>

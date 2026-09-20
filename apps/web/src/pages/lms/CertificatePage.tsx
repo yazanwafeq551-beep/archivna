@@ -1,8 +1,10 @@
 import { useParams, Link } from "react-router-dom";
+import { isNative } from "@/lib/platform";
+import { shareLink } from "@/lib/nativeBridge";
 import { useTranslation } from "react-i18next";
 import { PUBLIC_WEB_ORIGIN } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
-import { Award, BadgeCheck, Printer } from "lucide-react";
+import { Award, BadgeCheck, Printer, Share2 } from "lucide-react";
 import { lmsApi } from "@/api/lms";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/shared/LoadingSpinner";
@@ -48,10 +50,26 @@ export function CertificatePage() {
           {t("lms.certificate.verified")}
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => window.print()}>
-            <Printer className="me-1 h-4 w-4" />
-            {t("lms.certificate.print")}
-          </Button>
+          {/*
+            window.print() is a no-op in a web view: the button would look
+            live and do nothing. The device can share the verification link
+            instead, which is what the printed copy carries anyway.
+          */}
+          {isNative() ? (
+            <Button
+              onClick={() =>
+                void shareLink(verificationUrl, courseTitle, certificate.serial)
+              }
+            >
+              <Share2 className="me-1 h-4 w-4" />
+              {t("lms.certificate.share")}
+            </Button>
+          ) : (
+            <Button onClick={() => window.print()}>
+              <Printer className="me-1 h-4 w-4" />
+              {t("lms.certificate.print")}
+            </Button>
+          )}
           <Button variant="outline" asChild>
             <Link to="/lms/me/certificates">
               {t("lms.certificate.backToLearning")}
