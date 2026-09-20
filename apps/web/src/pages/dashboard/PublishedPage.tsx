@@ -22,7 +22,7 @@ export function PublishedPage() {
   const { user } = useAuth();
   const canUnpublish = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin"].includes(assignment.role));
 
-  const { data, isLoading, error } = usePublished({
+  const { data, isLoading, error, refetch } = usePublished({
     page,
     limit: 10,
     q: search || undefined,
@@ -65,7 +65,7 @@ export function PublishedPage() {
           ))}
         </div>
       ) : error ? (
-        <ErrorState onRetry={() => window.location.reload()} />
+        <ErrorState onRetry={() => refetch()} />
       ) : data && data.data.length > 0 ? (
         <>
           <ArchiveTable

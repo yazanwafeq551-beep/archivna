@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { PUBLIC_WEB_ORIGIN } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import { Award, BadgeCheck, Printer } from "lucide-react";
 import { lmsApi } from "@/api/lms";
@@ -37,7 +38,7 @@ export function CertificatePage() {
   }
 
   const courseTitle = primaryText(certificate.courseTitleAr, certificate.courseTitleEn);
-  const verificationUrl = `${window.location.origin}/certificates/${certificate.serial}`;
+  const verificationUrl = `${PUBLIC_WEB_ORIGIN}/certificates/${certificate.serial}`;
 
   return (
     <div className="container-app py-10">

@@ -24,7 +24,7 @@ export function MyArchivesPage() {
   const canDeposit = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin", "depositor", "cataloger"].includes(assignment.role));
   const canUnpublish = user?.roleAssignments?.some((assignment) => ["system_admin", "institution_admin"].includes(assignment.role));
 
-  const { data, isLoading, error } = useMyArchives({
+  const { data, isLoading, error, refetch } = useMyArchives({
     page,
     limit: 10,
     q: search || undefined,
@@ -76,7 +76,7 @@ export function MyArchivesPage() {
           ))}
         </div>
       ) : error ? (
-        <ErrorState onRetry={() => window.location.reload()} />
+        <ErrorState onRetry={() => refetch()} />
       ) : data && data.data.length > 0 ? (
         <>
           <ArchiveTable

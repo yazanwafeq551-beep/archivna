@@ -139,3 +139,12 @@ export const COURSE_BADGE_TYPES = [
 ] as const;
 
 export const LEARNING_HOURS_PER_CREDIT = 15;
+
+/**
+ * Where the site lives for anyone who is not the current reader: printed on
+ * certificates, copied by share buttons. window.location.origin is right in a
+ * browser and wrong everywhere else a build of this app can run.
+ */
+export const PUBLIC_WEB_ORIGIN =
+  import.meta.env.VITE_PUBLIC_WEB_URL?.replace(/\/$/, "") ||
+  (typeof window !== "undefined" ? window.location.origin : "");

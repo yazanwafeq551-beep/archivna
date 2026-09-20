@@ -13,7 +13,7 @@ export function NewsListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["news", page],
     queryFn: () => newsApi.getAll(page, 9),
   });
@@ -35,7 +35,7 @@ export function NewsListPage() {
           ))}
         </div>
       ) : error ? (
-        <ErrorState onRetry={() => window.location.reload()} />
+        <ErrorState onRetry={() => refetch()} />
       ) : data && data.data.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

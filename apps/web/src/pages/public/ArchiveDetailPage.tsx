@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { PUBLIC_WEB_ORIGIN } from "@/lib/constants";
 import { Heart, Link2, Download, Edit, Calendar, Building, User, Tag, MapPin, Globe, Lock, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +32,7 @@ export function ArchiveDetailPage() {
   const queryClient = useQueryClient();
   const [accessReason, setAccessReason] = useState("");
 
-  const { data: archive, isLoading, error } = useArchive(id!);
+  const { data: archive, isLoading, error, refetch } = useArchive(id!);
   const { data: relatedArchives } = useRelatedArchives(id!, 4);
 
   const { data: favData } = useQuery({
@@ -58,7 +59,7 @@ export function ArchiveDetailPage() {
   });
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(`${PUBLIC_WEB_ORIGIN}${window.location.pathname}`);
     toast.success(t("common.copied"));
   };
 
@@ -67,7 +68,7 @@ export function ArchiveDetailPage() {
   };
 
   if (isLoading) return <PageLoader />;
-  if (error) return <ErrorState onRetry={() => window.location.reload()} />;
+  if (error) return <ErrorState onRetry={() => refetch()} />;
   if (!archive) return <ErrorState title={t("archive.notFound")} />;
 
   const canAccessFile = archive.accessGranted ?? (archive.accessLevel === "public" || user?.id === archive.ownerId);

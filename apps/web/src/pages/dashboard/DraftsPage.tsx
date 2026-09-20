@@ -19,7 +19,7 @@ export function DraftsPage() {
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Archive | null>(null);
 
-  const { data, isLoading, error } = useDrafts({
+  const { data, isLoading, error, refetch } = useDrafts({
     page,
     limit: 10,
     q: search || undefined,
@@ -62,7 +62,7 @@ export function DraftsPage() {
           ))}
         </div>
       ) : error ? (
-        <ErrorState onRetry={() => window.location.reload()} />
+        <ErrorState onRetry={() => refetch()} />
       ) : data && data.data.length > 0 ? (
         <>
           <ArchiveTable

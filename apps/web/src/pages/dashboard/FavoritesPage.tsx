@@ -13,7 +13,7 @@ export function FavoritesPage() {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["favorites", page],
     queryFn: () => favoritesApi.getAll(page, 12),
   });
@@ -31,7 +31,7 @@ export function FavoritesPage() {
           ))}
         </div>
       ) : error ? (
-        <ErrorState onRetry={() => window.location.reload()} />
+        <ErrorState onRetry={() => refetch()} />
       ) : data && data.data.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

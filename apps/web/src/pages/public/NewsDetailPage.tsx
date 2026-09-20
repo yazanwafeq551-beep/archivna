@@ -11,14 +11,14 @@ export function NewsDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
 
-  const { data: article, isLoading, error } = useQuery({
+  const { data: article, isLoading, error, refetch } = useQuery({
     queryKey: ["news", slug],
     queryFn: () => newsApi.getBySlug(slug!),
     enabled: !!slug,
   });
 
   if (isLoading) return <PageLoader />;
-  if (error) return <ErrorState onRetry={() => window.location.reload()} />;
+  if (error) return <ErrorState onRetry={() => refetch()} />;
   if (!article) return <ErrorState title={t("archive.notFound")} />;
 
   return (

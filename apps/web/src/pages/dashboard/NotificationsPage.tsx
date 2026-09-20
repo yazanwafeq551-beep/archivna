@@ -14,7 +14,7 @@ export function NotificationsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => notificationsApi.getAll(1, 50),
   });
@@ -37,7 +37,7 @@ export function NotificationsPage() {
   });
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorState onRetry={() => window.location.reload()} />;
+  if (error) return <ErrorState onRetry={() => refetch()} />;
 
   const notifications = data?.data || [];
   const unreadCount = data?.meta?.unreadCount || 0;

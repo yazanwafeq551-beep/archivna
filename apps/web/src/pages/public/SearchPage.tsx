@@ -55,7 +55,7 @@ export function SearchPage() {
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
 
-  const { data, isLoading, error } = useSearch(filters);
+  const { data, isLoading, error, refetch } = useSearch(filters);
 
   // The institution filter carries an id; the chip has to show its name.
   const { data: institutions } = useQuery({
@@ -240,7 +240,7 @@ export function SearchPage() {
               ))}
             </div>
           ) : error ? (
-            <ErrorState onRetry={() => window.location.reload()} />
+            <ErrorState onRetry={() => refetch()} />
           ) : data && data.data.length > 0 ? (
             <>
               <div className={

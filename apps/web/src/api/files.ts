@@ -56,7 +56,9 @@ export const filesApi = {
   },
 
   getDownloadUrl: (fileId: string): string => {
-    return `/api/v1/archives/file/${fileId}/download`;
+    // Absolute: a root-relative path would resolve against the site, where
+    // the SPA rewrite answers it with index.html rather than the file.
+    return `${apiOrigin}/api/v1/archives/file/${fileId}/download`;
   },
 
   getContentBlob: async (fileId: string): Promise<string> => {
