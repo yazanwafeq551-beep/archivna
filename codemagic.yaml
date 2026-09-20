@@ -1,0 +1,85 @@
+# Builds the packaged app. Android needs nothing but this file and a free
+# Codemagic account. iOS also needs an Apple Developer account, because ios/
+# can only be generated on macOS and CocoaPods does not run on Windows.
+#
+# Both workflows build the web bundle in "native" mode, which reads
+# apps/web/.env.native and fails the build when the API URL is missing: a
+# native build with an empty VITE_API_URL looks fine and is broken at runtime.
+
+workflows:
+  android-debug:
+    name: Android APK (installable, unsigned)
+    max_build_duration: 30
+    instance_type: linux_x2
+    environment:
+      node: 22
+      java: 17
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build the web bundle for a device
+        script: npm run build:native --workspace apps/web
+      - name: Copy it into the native project
+        script: cd apps/web && npx cap sync android
+      - name: Assemble the APK
+        script: cd apps/web/android && ./gradlew assembleDebug
+    artifacts:
+      - apps/web/android/app/build/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - yazanwafeq551@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  # Enable once the Apple Developer account exists: without it there is no App
+  # ID, no signing certificate and no TestFlight.
+  #
+  # ios/ is not in the repository yet. The first run of this workflow creates
+  # it, and it has to be committed afterwards - it carries hand edits that are
+  # never regenerated, above all the camera and photo-library usage strings.
+  # A build without NSCameraUsageDescription crashes the instant the user taps
+  # "take a photo", which is the first thing a reviewer will find.
+  ios-testflight:
+    name: iOS TestFlight
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 22
+      xcode: latest
+      cocoapods: default
+      groups:
+        - appstore_credentials
+    triggering:
+      events:
+        - tag
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build the web bundle for a device
+        script: npm run build:native --workspace apps/web
+      - name: Create the iOS project if it is missing
+        script: |
+          cd apps/web
+          if [ ! -d ios ]; then npx cap add ios; fi
+          npx cap sync ios
+      - name: Fetch signing files
+        script: app-store-connect fetch-signing-files "ps.arsheefna.app" --type IOS_APP_STORE --create
+      - name: Build the archive
+        script: |
+          cd apps/web/ios/App
+          xcode-project use-profiles
+          xcode-project build-ipa --workspace App.xcworkspace --scheme App
+    artifacts:
+      - apps/web/ios/App/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
