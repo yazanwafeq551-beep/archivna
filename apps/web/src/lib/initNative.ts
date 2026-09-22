@@ -1,3 +1,4 @@
+import { API_ORIGIN } from "@/api/client";
 import { isNative, platformName } from "./platform";
 
 /**
@@ -29,6 +30,10 @@ export async function initNative(): Promise<void> {
     }
   }
 
+  // Not awaited: the wake-up is the slow part and nothing on screen depends
+  // on it.
+  wakeApi();
+
   await Promise.allSettled([styleStatusBar(), dismissSplash()]);
 }
 
@@ -50,4 +55,19 @@ async function dismissSplash(): Promise<void> {
   // launchAutoHide is off, so the splash stays up until this runs. Hiding on
   // a timer instead would show a blank shell whenever the first paint is slow.
   await SplashScreen.hide();
+}
+
+/**
+ * The API sleeps when idle on its current hosting plan, and the first request
+ * after that waits out a cold start - up to a minute with nothing coming back.
+ * On the web that cost is spread over a page load; in the app it lands
+ * squarely on whatever the user taps first, which is usually the login button.
+ *
+ * Starting the wake-up at launch means it happens while they are still typing.
+ * Failure is the expected case offline and is deliberately ignored.
+ */
+function wakeApi(): void {
+  if (!API_ORIGIN) return;
+
+  void fetch(API_ORIGIN + "/api/v1/health").catch(() => undefined);
 }

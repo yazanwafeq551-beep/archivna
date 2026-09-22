@@ -457,6 +457,7 @@ export default {
       "register": "Create account",
       "button": "Login",
       "success": "Logged in successfully",
+      "waking": "The server is waking up - the first try can take a minute...",
       "error": "Invalid email or password"
     },
     "register": {
@@ -637,6 +638,7 @@ export default {
     "unauthorizedDesc": "You don't have permission to access this page.",
     "genericMessage": "Sorry, an unexpected error occurred. Please try again later.",
     "network": "Could not reach the server. Check your connection and try again.",
+    "timeout": "The server took too long to answer. It may be waking up - wait a moment and try again.",
     "sessionExpired": "Your session has expired, please sign in again.",
     "notFoundMessage": "Sorry, the page you are looking for does not exist or has been moved to another address.",
     "unauthorizedMessage": "Sorry, you do not have permission to access this page. Please login with the correct account."

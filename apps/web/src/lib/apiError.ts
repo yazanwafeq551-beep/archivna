@@ -20,6 +20,12 @@ export function getApiErrorMessage(error: unknown, fallback?: string): string {
   }
 
   if (axiosError?.response === undefined && axiosError?.request) {
+    // A timeout and an unreachable server both arrive here with no response,
+    // but they need different advice: one is "wait", the other is "check
+    // your connection".
+    if (axiosError.code === AxiosError.ECONNABORTED) {
+      return i18n.t("error.timeout");
+    }
     return i18n.t("error.network");
   }
 

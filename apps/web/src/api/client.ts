@@ -6,7 +6,16 @@ import { clearRefreshToken, getRefreshToken, setRefreshToken } from "@/lib/nativ
  * Empty in development and wherever the API is proxied under the same domain;
  * set to the API's origin when the two are deployed separately.
  */
-const API_ORIGIN = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+export const API_ORIGIN = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
+/**
+ * Long, because the API sleeps when idle on its current hosting plan and a
+ * cold start can hold the connection open for a minute before the first
+ * byte arrives. The point is not to be strict - it is that axios without a
+ * timeout waits forever, so a stalled request on a phone spins a button
+ * with no error, no message and no way back.
+ */
+const REQUEST_TIMEOUT_MS = 90_000;
 
 const apiClient = axios.create({
   baseURL: `${API_ORIGIN}/api/v1`,
@@ -14,6 +23,7 @@ const apiClient = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true,
+  timeout: REQUEST_TIMEOUT_MS,
 });
 
 export interface SessionUser {
@@ -97,6 +107,9 @@ export function refreshSession(): Promise<Session> {
         storedToken ? { refreshToken: storedToken } : {},
         {
           withCredentials: true,
+          // This call bypasses apiClient, so it needs the timeout too -
+          // and it runs at startup, where a hang shows no UI at all.
+          timeout: REQUEST_TIMEOUT_MS,
           // This call bypasses apiClient, so it has to say so itself.
           headers: native ? { [NATIVE_CLIENT_HEADER]: "native" } : undefined,
         }
@@ -127,6 +140,13 @@ function isTransientFailure(error: unknown) {
 apiClient.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  // An upload is measured in megabytes and minutes, so the timeout that
+  // protects ordinary calls would abort it halfway. It has its own signal
+  // that it is alive: onUploadProgress.
+  if (String(config.headers["Content-Type"] ?? "").includes("multipart/form-data")) {
+    config.timeout = 0;
   }
   if (isNative()) {
     config.headers[NATIVE_CLIENT_HEADER] = "native";

@@ -30,6 +30,21 @@ export function LoginPage() {
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [slow, setSlow] = useState(false);
+
+  /*
+   * The API sleeps when idle on its hosting plan, so the first request
+   * after a quiet spell waits out a cold start. A spinner alone reads as a
+   * frozen app, and the user taps away before it ever answers.
+   */
+  useEffect(() => {
+    if (!isLoading) {
+      setSlow(false);
+      return;
+    }
+    const timer = setTimeout(() => setSlow(true), 6000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   // Where the user was headed before ProtectedRoute sent them here.
   const redirectTo =
@@ -116,6 +131,11 @@ export function LoginPage() {
             <Button type="submit" className="w-full" isLoading={isLoading}>
               {t("auth.login.button")}
             </Button>
+            {slow && (
+              <p className="text-center text-xs text-muted" role="status">
+                {t("auth.login.waking")}
+              </p>
+            )}
           </form>
           <div className="mt-6 text-center text-sm text-muted">
             {t("auth.login.noAccount")}{" "}
