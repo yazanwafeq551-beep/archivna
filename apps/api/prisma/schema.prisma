@@ -1,13 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   // The deployment image is Alpine, so the engines must be the musl build.
   // "native" keeps local development working on whatever the developer runs.
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   // Pooled connections cannot run migrations: PgBouncer does not keep the
   // session state Prisma needs for DDL. Queries go through the pool, schema
   // changes go straight to the database.
@@ -15,24 +15,24 @@ datasource db {
 }
 
 model Institution {
-  id                 String   @id @default(uuid())
-  name_ar            String
-  name_en            String?
-  slug               String   @unique
-  institution_type   String?
+  id                  String   @id @default(uuid())
+  name_ar             String
+  name_en             String?
+  slug                String   @unique
+  institution_type    String?
   registration_number String?
-  description_ar     String?
-  description_en     String?
-  logo_path          String?
-  contact_person     String?
-  email              String?
-  phone              String?
-  website            String?
-  address            String?
-  city               String?
-  created_by         String?
-  created_at         DateTime @default(now())
-  updated_at         DateTime @default(now()) @updatedAt
+  description_ar      String?
+  description_en      String?
+  logo_path           String?
+  contact_person      String?
+  email               String?
+  phone               String?
+  website             String?
+  address             String?
+  city                String?
+  created_by          String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @default(now()) @updatedAt
 
   users            User[]
   archival_units   ArchivalUnit[]
@@ -42,37 +42,37 @@ model Institution {
 }
 
 model User {
-  id                 String         @id @default(uuid())
-  full_name          String
-  email              String         @unique
-  password_hash      String
-  phone              String?
-  institution_name   String?
-  avatar_path        String?
-  avatar_url         String?
-  bio                String?
-  preferred_language String         @default("ar")
-  theme              String         @default("system")
-  text_size          String         @default("normal")
-  reduced_motion     Boolean        @default(false)
-  account_status     String         @default("active")
-  account_type       String         @default("individual")
-  institution_id     String?
-  password_reset_token        String?
-  password_reset_expires_at   DateTime?
-  created_at         DateTime       @default(now())
-  updated_at         DateTime       @default(now()) @updatedAt
-  last_login_at      DateTime?
+  id                        String    @id @default(uuid())
+  full_name                 String
+  email                     String    @unique
+  password_hash             String
+  phone                     String?
+  institution_name          String?
+  avatar_path               String?
+  avatar_url                String?
+  bio                       String?
+  preferred_language        String    @default("ar")
+  theme                     String    @default("system")
+  text_size                 String    @default("normal")
+  reduced_motion            Boolean   @default(false)
+  account_status            String    @default("active")
+  account_type              String    @default("individual")
+  institution_id            String?
+  password_reset_token      String?
+  password_reset_expires_at DateTime?
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @default(now()) @updatedAt
+  last_login_at             DateTime?
 
-  refresh_tokens  RefreshToken[]
-  archive_records ArchiveRecord[]
-  favorites       Favorite[]
-  notifications   Notification[]
-  app_settings    AppSetting?
-  audit_logs      AuditLog[]
-  archive_files   ArchiveFile[]
-  role_assignments         RoleAssignment[]      @relation("AssignedRoles")
-  role_assignments_created RoleAssignment[]      @relation("RoleAssigner")
+  refresh_tokens           RefreshToken[]
+  archive_records          ArchiveRecord[]
+  favorites                Favorite[]
+  notifications            Notification[]
+  app_settings             AppSetting?
+  audit_logs               AuditLog[]
+  archive_files            ArchiveFile[]
+  role_assignments         RoleAssignment[]       @relation("AssignedRoles")
+  role_assignments_created RoleAssignment[]       @relation("RoleAssigner")
   access_requests          AccessRequest[]        @relation("AccessRequester")
   access_decisions         AccessRequest[]        @relation("AccessDecisionMaker")
   workflow_events          ArchiveWorkflowEvent[]
@@ -83,8 +83,8 @@ model User {
   course_reviews     CourseReview[]
   saved_courses      SavedCourse[]
   certificates       Certificate[]
-  support_requests   SupportRequest[] @relation("SupportRequester")
-  support_responses  SupportRequest[] @relation("SupportResponder")
+  support_requests   SupportRequest[]   @relation("SupportRequester")
+  support_responses  SupportRequest[]   @relation("SupportResponder")
 
   institution Institution? @relation(fields: [institution_id], references: [id], onDelete: SetNull)
 }
@@ -108,7 +108,7 @@ model RefreshToken {
 }
 
 model ArchiveRecord {
-  id                   String         @id @default(uuid())
+  id                   String    @id @default(uuid())
   owner_id             String
   institution_id       String?
   archival_unit_id     String?
@@ -130,32 +130,37 @@ model ArchiveRecord {
   date_from            DateTime?
   date_to              DateTime?
   rights_statement     String?
-  access_level         String         @default("public")
-  status               String         @default("draft")
-  ocr_status           String         @default("not_started")
+  access_level         String    @default("public")
+  status               String    @default("draft")
+  ocr_status           String    @default("not_started")
   ocr_text_ar          String?
   ocr_text_en          String?
-  metadata             Json?
-  technical_metadata   Json?
-  submitted_at         DateTime?
-  reviewed_at          DateTime?
-  reviewed_by          String?
-  approved_at          DateTime?
-  approved_by          String?
-  published_at         DateTime?
-  created_at           DateTime       @default(now())
-  updated_at           DateTime       @default(now()) @updatedAt
 
-  owner     User              @relation(fields: [owner_id], references: [id], onDelete: Cascade)
-  institution Institution?    @relation(fields: [institution_id], references: [id], onDelete: SetNull)
-  archival_unit ArchivalUnit? @relation(fields: [archival_unit_id], references: [id], onDelete: SetNull)
-  files     ArchiveFile[]
-  subjects  ArchiveSubject[]
-  favorites Favorite[]
-  access_policy AccessPolicy?
-  access_requests AccessRequest[]
-  workflow_events ArchiveWorkflowEvent[]
-  agents ArchiveAgent[]
+  /// Every searchable field, normalised for Arabic and kept current by a
+  /// database trigger. Never written by the application - see the
+  /// 20260924100000_arabic_search_text migration.
+  search_text        String?
+  metadata           Json?
+  technical_metadata Json?
+  submitted_at       DateTime?
+  reviewed_at        DateTime?
+  reviewed_by        String?
+  approved_at        DateTime?
+  approved_by        String?
+  published_at       DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @default(now()) @updatedAt
+
+  owner            User                   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  institution      Institution?           @relation(fields: [institution_id], references: [id], onDelete: SetNull)
+  archival_unit    ArchivalUnit?          @relation(fields: [archival_unit_id], references: [id], onDelete: SetNull)
+  files            ArchiveFile[]
+  subjects         ArchiveSubject[]
+  favorites        Favorite[]
+  access_policy    AccessPolicy?
+  access_requests  AccessRequest[]
+  workflow_events  ArchiveWorkflowEvent[]
+  agents           ArchiveAgent[]
   controlled_terms ArchiveRecordTerm[]
 
   @@index([institution_id, status])
@@ -179,7 +184,7 @@ model ArchivalUnit {
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now()) @updatedAt
 
-  institution Institution    @relation(fields: [institution_id], references: [id], onDelete: Cascade)
+  institution Institution     @relation(fields: [institution_id], references: [id], onDelete: Cascade)
   parent      ArchivalUnit?   @relation("ArchivalUnitTree", fields: [parent_id], references: [id], onDelete: Cascade)
   children    ArchivalUnit[]  @relation("ArchivalUnitTree")
   records     ArchiveRecord[]
@@ -198,9 +203,9 @@ model RoleAssignment {
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now()) @updatedAt
 
-  user         User         @relation("AssignedRoles", fields: [user_id], references: [id], onDelete: Cascade)
-  assigned_by  User?        @relation("RoleAssigner", fields: [assigned_by_id], references: [id], onDelete: SetNull)
-  institution Institution?  @relation(fields: [institution_id], references: [id], onDelete: Cascade)
+  user        User         @relation("AssignedRoles", fields: [user_id], references: [id], onDelete: Cascade)
+  assigned_by User?        @relation("RoleAssigner", fields: [assigned_by_id], references: [id], onDelete: SetNull)
+  institution Institution? @relation(fields: [institution_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, role, institution_id])
   @@index([institution_id, role])
@@ -285,17 +290,17 @@ model ArchiveAgent {
 }
 
 model ControlledTerm {
-  id          String   @id @default(uuid())
-  scheme      String
-  label_ar    String
-  label_en    String?
-  code        String?
-  broader_id  String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now()) @updatedAt
+  id         String   @id @default(uuid())
+  scheme     String
+  label_ar   String
+  label_en   String?
+  code       String?
+  broader_id String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
-  broader  ControlledTerm?  @relation("ControlledTermTree", fields: [broader_id], references: [id], onDelete: SetNull)
-  narrower ControlledTerm[]  @relation("ControlledTermTree")
+  broader  ControlledTerm?     @relation("ControlledTermTree", fields: [broader_id], references: [id], onDelete: SetNull)
+  narrower ControlledTerm[]    @relation("ControlledTermTree")
   records  ArchiveRecordTerm[]
 
   @@index([scheme, label_ar])
@@ -305,7 +310,7 @@ model ArchiveRecordTerm {
   archive_record_id String
   term_id           String
 
-  archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
+  archive_record ArchiveRecord  @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
   term           ControlledTerm @relation(fields: [term_id], references: [id], onDelete: Cascade)
 
   @@id([archive_record_id, term_id])
@@ -349,7 +354,7 @@ model Favorite {
   archive_record_id String
   created_at        DateTime @default(now())
 
-  user           User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   archive_record ArchiveRecord @relation(fields: [archive_record_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, archive_record_id])
@@ -442,6 +447,7 @@ model CourseCategory {
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
 
   courses Course[]
+
   @@map("course_categories")
 }
 
@@ -451,6 +457,7 @@ model CourseTag {
   slug String @unique
 
   courses CourseTagOnCourse[]
+
   @@map("course_tags")
 }
 
@@ -466,52 +473,53 @@ model CourseTagOnCourse {
 }
 
 model Course {
-  id                  String   @id @default(uuid())
-  titleAr             String   @map("title_ar")
-  titleEn             String?  @map("title_en")
-  slug                String   @unique
-  shortDescAr         String?  @map("short_desc_ar")
-  shortDescEn         String?  @map("short_desc_en")
-  fullDescAr          String?  @map("full_desc_ar")
-  fullDescEn          String?  @map("full_desc_en")
-  thumbnailUrl        String?  @map("thumbnail_url")
-  bannerUrl           String?  @map("banner_url")
-  instructorName      String   @map("instructor_name")
-  instructorBio       String?  @map("instructor_bio")
-  instructorAvatar    String?  @map("instructor_avatar")
-  categoryId          String?  @map("category_id")
-  difficulty          String   @default("beginner")
-  duration            Int?
-  estimatedStudyTime  Int?     @map("estimated_study_time")
-  language            String   @default("ar")
-  prerequisites       String?  @map("prerequisites")
-  learningObjectives  Json?    @map("learning_objectives")
-  archiveTopic        String?  @map("archive_topic")
-  region              String?
-  historicalPeriod    String?  @map("historical_period")
-  targetAudience      String?  @map("target_audience")
-  seoTitle            String?  @map("seo_title")
-  seoDescription      String?  @map("seo_description")
-  seoKeywords         String?  @map("seo_keywords")
-  version             String?  @default("1.0")
-  status              String   @default("draft")
-  visibility          String   @default("public")
-  isFeatured          Boolean  @default(false) @map("is_featured")
-  isPopular           Boolean  @default(false) @map("is_popular")
-  isFree              Boolean  @default(true) @map("is_free")
-  publishedAt         DateTime? @map("published_at")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  titleAr            String    @map("title_ar")
+  titleEn            String?   @map("title_en")
+  slug               String    @unique
+  shortDescAr        String?   @map("short_desc_ar")
+  shortDescEn        String?   @map("short_desc_en")
+  fullDescAr         String?   @map("full_desc_ar")
+  fullDescEn         String?   @map("full_desc_en")
+  thumbnailUrl       String?   @map("thumbnail_url")
+  bannerUrl          String?   @map("banner_url")
+  instructorName     String    @map("instructor_name")
+  instructorBio      String?   @map("instructor_bio")
+  instructorAvatar   String?   @map("instructor_avatar")
+  categoryId         String?   @map("category_id")
+  difficulty         String    @default("beginner")
+  duration           Int?
+  estimatedStudyTime Int?      @map("estimated_study_time")
+  language           String    @default("ar")
+  prerequisites      String?   @map("prerequisites")
+  learningObjectives Json?     @map("learning_objectives")
+  archiveTopic       String?   @map("archive_topic")
+  region             String?
+  historicalPeriod   String?   @map("historical_period")
+  targetAudience     String?   @map("target_audience")
+  seoTitle           String?   @map("seo_title")
+  seoDescription     String?   @map("seo_description")
+  seoKeywords        String?   @map("seo_keywords")
+  version            String?   @default("1.0")
+  status             String    @default("draft")
+  visibility         String    @default("public")
+  isFeatured         Boolean   @default(false) @map("is_featured")
+  isPopular          Boolean   @default(false) @map("is_popular")
+  isFree             Boolean   @default(true) @map("is_free")
+  publishedAt        DateTime? @map("published_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  category    CourseCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category       CourseCategory?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   certificates   Certificate[]
   lessons        Lesson[]
   lessonProgress LessonProgress[]
   enrollments    CourseEnrollment[]
-  tags        CourseTagOnCourse[]
-  reviews     CourseReview[]
-  savedBy     SavedCourse[]
-  achievements Achievement[]
+  tags           CourseTagOnCourse[]
+  reviews        CourseReview[]
+  savedBy        SavedCourse[]
+  achievements   Achievement[]
+
   @@map("courses")
 }
 
@@ -537,9 +545,10 @@ model Lesson {
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @default(now()) @updatedAt @map("updated_at")
 
-  course      Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
   attachments LessonAttachment[]
   progress    LessonProgress[]
+
   @@unique([courseId, lessonNumber])
   @@unique([courseId, slug])
   @@map("lessons")
@@ -558,21 +567,22 @@ model LessonAttachment {
   createdAt DateTime @default(now()) @map("created_at")
 
   lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
   @@map("lesson_attachments")
 }
 
 model CourseEnrollment {
-  id                   String    @id @default(uuid())
-  userId               String    @map("user_id")
-  courseId             String    @map("course_id")
-  enrolledAt           DateTime  @default(now()) @map("enrolled_at")
-  completedAt          DateTime? @map("completed_at")
-  lastActivityAt       DateTime? @map("last_activity_at")
-  currentLessonNumber  Int       @default(1) @map("current_lesson_number")
-  courseProgress       Float     @default(0) @map("course_progress")
-  lessonsCompleted     Int       @default(0) @map("lessons_completed")
-  totalWatchTime       Int       @default(0) @map("total_watch_time")
-  isCompleted          Boolean   @default(false) @map("is_completed")
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  courseId            String    @map("course_id")
+  enrolledAt          DateTime  @default(now()) @map("enrolled_at")
+  completedAt         DateTime? @map("completed_at")
+  lastActivityAt      DateTime? @map("last_activity_at")
+  currentLessonNumber Int       @default(1) @map("current_lesson_number")
+  courseProgress      Float     @default(0) @map("course_progress")
+  lessonsCompleted    Int       @default(0) @map("lessons_completed")
+  totalWatchTime      Int       @default(0) @map("total_watch_time")
+  isCompleted         Boolean   @default(false) @map("is_completed")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -595,30 +605,31 @@ model LessonProgress {
   startedAt       DateTime  @default(now()) @map("started_at")
   updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lesson Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
   @@map("lesson_progress")
 }
 
 model Achievement {
-  id              String   @id @default(uuid())
-  titleAr         String   @map("title_ar")
-  titleEn         String?  @map("title_en")
-  descriptionAr   String?  @map("description_ar")
-  descriptionEn   String?  @map("description_en")
-  iconUrl         String?  @map("icon_url")
-  badgeColor      String?  @map("badge_color")
-  criteriaType    String   @map("criteria_type")
-  criteriaValue   Int?     @map("criteria_value")
-  courseId        String?  @map("course_id")
-  sortOrder       Int      @default(0) @map("sort_order")
-  createdAt       DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid())
+  titleAr       String   @map("title_ar")
+  titleEn       String?  @map("title_en")
+  descriptionAr String?  @map("description_ar")
+  descriptionEn String?  @map("description_en")
+  iconUrl       String?  @map("icon_url")
+  badgeColor    String?  @map("badge_color")
+  criteriaType  String   @map("criteria_type")
+  criteriaValue Int?     @map("criteria_value")
+  courseId      String?  @map("course_id")
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
 
-  course  Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  users   UserAchievement[]
+  course Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  users  UserAchievement[]
+
   @@map("achievements")
 }
 
@@ -637,7 +648,7 @@ model UserAchievement {
 model CourseReview {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
-  courseId   String   @map("course_id")
+  courseId  String   @map("course_id")
   rating    Int
   comment   String?
   createdAt DateTime @default(now()) @map("created_at")
@@ -652,7 +663,7 @@ model CourseReview {
 
 model SavedCourse {
   userId   String   @map("user_id")
-  courseId  String   @map("course_id")
+  courseId String   @map("course_id")
   savedAt  DateTime @default(now()) @map("saved_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -666,17 +677,17 @@ model SavedCourse {
 /// learner and course details are copied in so a printed certificate keeps
 /// saying what it said on the day it was issued.
 model Certificate {
-  id            String   @id @default(uuid())
-  serial        String   @unique
-  userId        String   @map("user_id")
-  courseId      String   @map("course_id")
-  recipientName String   @map("recipient_name")
-  courseTitleAr String   @map("course_title_ar")
-  courseTitleEn String?  @map("course_title_en")
-  instructorName String? @map("instructor_name")
-  lessonsCount  Int      @default(0) @map("lessons_count")
-  learningHours Float    @default(0) @map("learning_hours")
-  issuedAt      DateTime @default(now()) @map("issued_at")
+  id             String   @id @default(uuid())
+  serial         String   @unique
+  userId         String   @map("user_id")
+  courseId       String   @map("course_id")
+  recipientName  String   @map("recipient_name")
+  courseTitleAr  String   @map("course_title_ar")
+  courseTitleEn  String?  @map("course_title_en")
+  instructorName String?  @map("instructor_name")
+  lessonsCount   Int      @default(0) @map("lessons_count")
+  learningHours  Float    @default(0) @map("learning_hours")
+  issuedAt       DateTime @default(now()) @map("issued_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)

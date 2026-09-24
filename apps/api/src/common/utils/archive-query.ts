@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { normalizeSearchQuery } from './arabic-normalization';
+import { buildSearchTerms } from './arabic-normalization';
 
 export interface ArchiveQueryParams {
   q?: string;
@@ -35,72 +35,23 @@ export function buildArchiveWhere(
   }
 
   if (params.q) {
-    const normalizedQuery = normalizeSearchQuery(params.q);
-    andClauses.push({
-      OR: [
-        { title_ar: { contains: normalizedQuery, mode: 'insensitive' } },
-        { title_en: { contains: normalizedQuery, mode: 'insensitive' } },
-        {
-          alternative_title_ar: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        {
-          alternative_title_en: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        {
-          reference_number: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        {
-          description_ar: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        {
-          description_en: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        {
-          creator_name: { contains: normalizedQuery, mode: 'insensitive' },
-        },
-        {
-          institution_name: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        { institution: { name_ar: { contains: normalizedQuery, mode: 'insensitive' } } },
-        { institution: { name_en: { contains: normalizedQuery, mode: 'insensitive' } } },
-        { archival_unit: { title_ar: { contains: normalizedQuery, mode: 'insensitive' } } },
-        { archival_unit: { title_en: { contains: normalizedQuery, mode: 'insensitive' } } },
-        {
-          collection_name: {
-            contains: normalizedQuery,
-            mode: 'insensitive',
-          },
-        },
-        {
-          subject_text: { contains: normalizedQuery, mode: 'insensitive' },
-        },
-        { place: { contains: normalizedQuery, mode: 'insensitive' } },
-        {
-          ocr_text_ar: { contains: normalizedQuery, mode: 'insensitive' },
-        },
-        {
-          ocr_text_en: { contains: normalizedQuery, mode: 'insensitive' },
-        },
-      ],
-    });
+    /*
+     * One normalised column instead of a nineteen-way OR over raw ones.
+     * The old form compared a normalised query against text that was never
+     * normalised, so "دبكة" became "دبكه" and matched nothing at all: the
+     * folding that was supposed to widen the search was the thing closing
+     * it. search_text holds the same folding, applied by the database.
+     *
+     * Terms are ANDed so every word has to appear somewhere in the record,
+     * and each term carries its spellings - "الدبكة" also searches "دبكة".
+     */
+    for (const variants of buildSearchTerms(params.q)) {
+      andClauses.push({
+        OR: variants.map((variant) => ({
+          search_text: { contains: variant },
+        })),
+      });
+    }
   }
 
   if (params.material_type) {
