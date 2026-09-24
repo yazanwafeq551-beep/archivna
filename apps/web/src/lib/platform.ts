@@ -29,6 +29,26 @@ export function isNative(): boolean {
   return cached;
 }
 
+/**
+ * A Capacitor plugin call crosses a bridge into native code, and if nothing
+ * answers on the other side the promise does not reject - it simply never
+ * settles. try/catch is no defence against that: there is nothing to catch,
+ * and neither Promise.all nor allSettled will ever resolve.
+ *
+ * Every bridge call in this app goes through here. A plugin is allowed to
+ * fail. It is not allowed to hang, because the code waiting on it is usually
+ * the thing standing between the user and a working screen.
+ */
+export function withBridgeTimeout<T>(
+  work: Promise<T>,
+  ms = 3000
+): Promise<T | undefined> {
+  return Promise.race([
+    work.catch(() => undefined),
+    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), ms)),
+  ]);
+}
+
 /** "ios", "android", or "web" - for the handful of platform-specific quirks. */
 export function platformName(): string {
   return capacitor()?.getPlatform?.() ?? "web";

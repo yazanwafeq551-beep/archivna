@@ -1,5 +1,5 @@
 import { API_ORIGIN } from "@/api/client";
-import { isNative, platformName } from "./platform";
+import { isNative, platformName, withBridgeTimeout } from "./platform";
 
 /**
  * Everything the app has to tell the device about itself at startup. Returns
@@ -34,7 +34,13 @@ export async function initNative(): Promise<void> {
   // on it.
   wakeApi();
 
-  await Promise.allSettled([styleStatusBar(), dismissSplash()]);
+  // allSettled is not enough here: it waits forever on a promise that never
+  // settles, and launchAutoHide is off, so a silent bridge would leave the
+  // splash screen up permanently with the app running behind it.
+  await Promise.all([
+    withBridgeTimeout(styleStatusBar()),
+    withBridgeTimeout(dismissSplash()),
+  ]);
 }
 
 async function styleStatusBar(): Promise<void> {

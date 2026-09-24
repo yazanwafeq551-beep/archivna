@@ -1,4 +1,4 @@
-import { isNative } from "./platform";
+import { isNative, withBridgeTimeout } from "./platform";
 
 /**
  * The handful of things a web page does that a web view cannot: opening
@@ -19,7 +19,9 @@ export async function openExternal(url: string): Promise<void> {
   }
 
   const { Browser } = await import("@capacitor/browser");
-  await Browser.open({ url });
+  // Opening a tab is instant, so a wait here means the bridge is not
+  // answering - and the caller is a tap that would otherwise never finish.
+  await withBridgeTimeout(Browser.open({ url }));
 }
 
 /**
@@ -35,6 +37,8 @@ export async function shareLink(
   if (!isNative()) return false;
 
   const { Share } = await import("@capacitor/share");
+  // Not time-boxed on purpose: this resolves when the user dismisses the
+  // share sheet, so waiting is the correct behaviour rather than a fault.
   await Share.share({ title, text, url });
   return true;
 }
